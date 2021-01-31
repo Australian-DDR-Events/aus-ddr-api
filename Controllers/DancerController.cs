@@ -5,6 +5,7 @@ using AusDdrApi.Models;
 using AusDdrApi.Models.Requests;
 using AusDdrApi.Models.Responses;
 using AusDdrApi.Persistence;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -22,12 +23,14 @@ namespace AusDdrApi.Controllers
             _logger = logger;
             _context = context;
         }
+
         [HttpGet]
+        [Authorize]
         public IEnumerable<DancerResponse> Get()
         {
             return _context.Dancers.Select(DancerResponse.FromDancer).ToArray();
         }
-        
+
         [HttpPost]
         public Dancer Post(DancerRequest dancerRequest)
         {

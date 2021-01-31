@@ -1,6 +1,5 @@
 using System;
-using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using System.Collections.Generic;
 
 namespace AusDdrApi.Models
 {
@@ -13,5 +12,6 @@ namespace AusDdrApi.Models
         public string PrimaryMachineLocation { get; set; }
         public string State { get; set; }
         public string ProfilePictureUrl { get; set; }
+        public List<Score> Scores { get; set; }
     }
 }

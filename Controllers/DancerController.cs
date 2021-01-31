@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using AusDdrApi.Models;
+using AusDdrApi.Models.Requests;
+using AusDdrApi.Models.Responses;
 using AusDdrApi.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -21,16 +23,15 @@ namespace AusDdrApi.Controllers
             _context = context;
         }
         [HttpGet]
-        public IEnumerable<Dancer> Get()
+        public IEnumerable<DancerResponse> Get()
         {
-            return _context.Dancers.AsQueryable().ToArray();
+            return _context.Dancers.Select(DancerResponse.FromDancer).ToArray();
         }
         
         [HttpPost]
-        public Dancer Post(Dancer dancer)
+        public Dancer Post(DancerRequest dancerRequest)
         {
-            dancer.Id = Guid.Empty;
-            var newDancer = _context.Dancers.Add(dancer);
+            var newDancer = _context.Dancers.Add(dancerRequest.ToDancer());
             _context.SaveChanges();
             return newDancer.Entity;
         }

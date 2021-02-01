@@ -30,6 +30,7 @@ namespace AusDdrApi
                 options.UseNpgsql(Configuration.GetConnectionString("DatabaseContext")));
             services.AddControllers();
             services.AddJwtAuthentication(Configuration);
+            services.AddRouting(options => options.LowercaseUrls = true);
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "AusDdrApi", Version = "v1" });

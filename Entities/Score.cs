@@ -17,6 +17,8 @@ namespace AusDdrApi.Entities
         /// </summary>
         public DateTime SubmissionTime { get; set; }
         
+        public string ScoreUrl { get; set; }
+        
         public Guid DancerId { get; set; }
         public Dancer Dancer { get; set; }
         

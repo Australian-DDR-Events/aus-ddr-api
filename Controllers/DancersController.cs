@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using AusDdrApi.Authentication;
 using AusDdrApi.Entities;
@@ -8,12 +9,13 @@ using AusDdrApi.Models.Requests;
 using AusDdrApi.Models.Responses;
 using AusDdrApi.Persistence;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
 namespace AusDdrApi.Controllers
 {
-    [ApiController]
+    [ApiController] 
     [Route("[controller]")]
     public class DancersController : ControllerBase
     {
@@ -30,6 +32,21 @@ namespace AusDdrApi.Controllers
         public IEnumerable<DancerResponse> Get()
         {
             return _context.Dancers.Select(DancerResponse.FromDancer).ToArray();
+        }
+
+        [HttpGet]
+        [Route("~/dancers/{authId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public ActionResult<DancerResponse> GetDancer(string authId)
+        {
+            var dancer = _context.Dancers.AsQueryable().SingleOrDefault(dancer => dancer.AuthenticationId == authId);
+            if (dancer == null)
+            {
+                return NotFound();
+            }
+
+            return DancerResponse.FromDancer(dancer);
         }
 
         [HttpPost]

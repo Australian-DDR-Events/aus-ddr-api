@@ -19,7 +19,7 @@ namespace AusDdrApi.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63)
                 .HasAnnotation("ProductVersion", "5.0.2");
 
-            modelBuilder.Entity("AusDdrApi.Models.Dancer", b =>
+            modelBuilder.Entity("AusDdrApi.Entities.Dancer", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -51,7 +51,7 @@ namespace AusDdrApi.Migrations
                     b.ToTable("Dancers");
                 });
 
-            modelBuilder.Entity("AusDdrApi.Models.Score", b =>
+            modelBuilder.Entity("AusDdrApi.Entities.Score", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -80,7 +80,7 @@ namespace AusDdrApi.Migrations
                     b.ToTable("Scores");
                 });
 
-            modelBuilder.Entity("AusDdrApi.Models.Song", b =>
+            modelBuilder.Entity("AusDdrApi.Entities.Song", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -106,15 +106,15 @@ namespace AusDdrApi.Migrations
                     b.ToTable("Songs");
                 });
 
-            modelBuilder.Entity("AusDdrApi.Models.Score", b =>
+            modelBuilder.Entity("AusDdrApi.Entities.Score", b =>
                 {
-                    b.HasOne("AusDdrApi.Models.Dancer", "Dancer")
+                    b.HasOne("AusDdrApi.Entities.Dancer", "Dancer")
                         .WithMany("Scores")
                         .HasForeignKey("DancerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("AusDdrApi.Models.Song", "Song")
+                    b.HasOne("AusDdrApi.Entities.Song", "Song")
                         .WithMany()
                         .HasForeignKey("SongId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -125,7 +125,7 @@ namespace AusDdrApi.Migrations
                     b.Navigation("Song");
                 });
 
-            modelBuilder.Entity("AusDdrApi.Models.Dancer", b =>
+            modelBuilder.Entity("AusDdrApi.Entities.Dancer", b =>
                 {
                     b.Navigation("Scores");
                 });

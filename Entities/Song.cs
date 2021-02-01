@@ -1,6 +1,6 @@
 using System;
 
-namespace AusDdrApi.Models
+namespace AusDdrApi.Entities
 {
     public class Song
     {

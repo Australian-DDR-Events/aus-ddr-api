@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using AusDdrApi.Models;
+using AusDdrApi.Entities;
 using AusDdrApi.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -10,12 +10,12 @@ namespace AusDdrApi.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class SongController
+    public class SongsController : ControllerBase
     {
-        private readonly ILogger<SongController> _logger;
+        private readonly ILogger<SongsController> _logger;
         private DatabaseContext _context;
 
-        public SongController(ILogger<SongController> logger, DatabaseContext context)
+        public SongsController(ILogger<SongsController> logger, DatabaseContext context)
         {
             _logger = logger;
             _context = context;

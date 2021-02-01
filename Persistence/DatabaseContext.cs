@@ -1,5 +1,5 @@
 using System;
-using AusDdrApi.Models;
+using AusDdrApi.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace AusDdrApi.Persistence
@@ -16,12 +16,7 @@ namespace AusDdrApi.Persistence
             modelBuilder.Entity<Dancer>()
                 .HasIndex(p => p.AuthenticationId)
                 .IsUnique();
-            
-            // modelBuilder.Entity<Score>()
-            //     .HasOne(score => score.Dancer);
-            // modelBuilder.Entity<Score>()
-            //     .HasOne(score => score.Dancer)
-            //     .WithMany(dancer => dancer.Scores);
+
             modelBuilder.Entity<Score>()
                 .Property(s => s.SubmissionTime)
                 .HasDefaultValue(DateTime.UtcNow);

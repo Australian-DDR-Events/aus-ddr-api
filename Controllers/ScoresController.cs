@@ -2,9 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AusDdrApi.Models;
+using AusDdrApi.Entities;
 using AusDdrApi.Models.Requests;
 using AusDdrApi.Persistence;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -13,12 +14,12 @@ namespace AusDdrApi.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class ScoreController
+    public class ScoresController : ControllerBase
     {
-        private readonly ILogger<ScoreController> _logger;
+        private readonly ILogger<ScoresController> _logger;
         private DatabaseContext _context;
 
-        public ScoreController(ILogger<ScoreController> logger, DatabaseContext context)
+        public ScoresController(ILogger<ScoresController> logger, DatabaseContext context)
         {
             _logger = logger;
             _context = context;
@@ -34,6 +35,7 @@ namespace AusDdrApi.Controllers
         }
         
         [HttpPost]
+        [Authorize]
         public async Task<Score> SubmitScore(ScoreSubmissionRequest request)
         {
             var score = await _context.Scores.AddAsync(new Score

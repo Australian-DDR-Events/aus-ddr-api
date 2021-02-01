@@ -21,7 +21,7 @@ namespace AusDdrApi.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63)
                 .HasAnnotation("ProductVersion", "5.0.2");
 
-            modelBuilder.Entity("AusDdrApi.Models.Dancer", b =>
+            modelBuilder.Entity("AusDdrApi.Entities.Dancer", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()

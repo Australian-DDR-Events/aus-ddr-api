@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using AusDdrApi.Models;
+using AusDdrApi.Entities;
 using AusDdrApi.Models.Requests;
 using AusDdrApi.Models.Responses;
 using AusDdrApi.Persistence;
@@ -13,12 +13,12 @@ namespace AusDdrApi.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class DancerController : ControllerBase
+    public class DancersController : ControllerBase
     {
-        private readonly ILogger<DancerController> _logger;
+        private readonly ILogger<DancersController> _logger;
         private DatabaseContext _context;
 
-        public DancerController(ILogger<DancerController> logger, DatabaseContext context)
+        public DancersController(ILogger<DancersController> logger, DatabaseContext context)
         {
             _logger = logger;
             _context = context;

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace AusDdrApi.Models
+namespace AusDdrApi.Entities
 {
     public class Dancer
     {

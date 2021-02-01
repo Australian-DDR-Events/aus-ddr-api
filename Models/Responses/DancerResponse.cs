@@ -1,4 +1,5 @@
 using System;
+using AusDdrApi.Entities;
 
 namespace AusDdrApi.Models.Responses
 {

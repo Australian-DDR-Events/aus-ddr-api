@@ -32,7 +32,7 @@ namespace AusDdrApi.Models.Requests
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            if (new[] {"vic", "act"}.Contains(State))
+            if (!new[] {"vic", "act", "nsw", "sa", "nt", "tas", "qld", "wa"}.Contains(State))
                 yield return new ValidationResult("Invalid state");
             
             if (!int.TryParse(DdrCode, out _))

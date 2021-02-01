@@ -22,7 +22,7 @@ namespace AusDdrApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddEntityFrameworkNpgsql().AddDbContext<DatabaseContext>(options =>
-                options.UseNpgsql(Configuration.GetConnectionString("DatabaseContext")));
+                options.UseNpgsql(Configuration["DatabaseConnectionString"]));
             services.AddControllers();
             services.AddRouting(options => options.LowercaseUrls = true);
             services.AddSwaggerGen(c =>
@@ -37,11 +37,12 @@ namespace AusDdrApi
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "AusDdrApi v1"));
             }
+            
+            app.UseSwagger();
+            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "AusDdrApi v1"));
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
 
             app.UseRouting();
 

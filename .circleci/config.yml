@@ -5,7 +5,7 @@ jobs:
   install:
     working_directory: ~/aus-ddr-api
     docker:
-      - image: microsoft/dotnet:sdk
+      - image: microsoft/dotnet/sdk:5.0
     resource_class: medium
     environment:
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1

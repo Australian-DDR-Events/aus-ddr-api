@@ -26,7 +26,7 @@ namespace AusDdrApi
             services.AddEntityFrameworkNpgsql().AddDbContext<DatabaseContext>(options =>
                 options.UseNpgsql(Configuration.GetConnectionString("DatabaseContext")));
             services.AddControllers();
-            services.AddJwtAuthentication();
+            services.AddJwtAuthentication(Configuration);
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "AusDdrApi", Version = "v1" });

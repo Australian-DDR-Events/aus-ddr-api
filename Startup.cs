@@ -1,4 +1,7 @@
+using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using AusDdrApi.Authentication;
 using AusDdrApi.Persistence;
 using Microsoft.AspNetCore.Builder;
@@ -80,6 +83,8 @@ namespace AusDdrApi
             app.UseAuthentication();
             
             app.UseAuthorization();
+
+            app.Use(UserContext.UseUserContext);
 
             app.UseEndpoints(endpoints =>
             {

@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using AusDdrApi.Authentication;
 using AusDdrApi.Entities;
 using AusDdrApi.Models.Requests;
 using AusDdrApi.Models.Responses;
@@ -25,15 +27,16 @@ namespace AusDdrApi.Controllers
         }
 
         [HttpGet]
-        [Authorize]
         public IEnumerable<DancerResponse> Get()
         {
             return _context.Dancers.Select(DancerResponse.FromDancer).ToArray();
         }
 
         [HttpPost]
+        [Authorize]
         public Dancer Post(DancerRequest dancerRequest)
         {
+            dancerRequest.AuthenticationId = HttpContext.GetUserId();
             var newDancer = _context.Dancers.Add(dancerRequest.ToDancer());
             _context.SaveChanges();
             return newDancer.Entity;

@@ -12,7 +12,7 @@ jobs:
       DOTNET_CLI_TELEMETRY_OPTOUT: 1
     steps:
       - checkout
-      - run: dotnet user-secrets set "Database:ConnectionString" "$DATABASE_CONNECTION_STRING"
+      - run: dotnet user-secrets set "DatabaseConnectionString" "$DATABASE_CONNECTION_STRING"
       - run: dotnet restore
       - run: dotnet build
         

@@ -26,7 +26,7 @@ namespace AusDdrApi.Controllers
         }
 
         [HttpGet]
-        [Route("~/dancer/{dancerId}/score")]
+        [Route("~/dancers/{dancerId}/scores")]
         public IEnumerable<Score> GetScoresByDancerId(Guid dancerId)
         {
             return _context.Scores

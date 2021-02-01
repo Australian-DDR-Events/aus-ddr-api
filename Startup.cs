@@ -22,7 +22,7 @@ namespace AusDdrApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddEntityFrameworkNpgsql().AddDbContext<DatabaseContext>(options =>
-                options.UseNpgsql(Configuration.GetConnectionString("DatabaseContext")));
+                options.UseNpgsql(Configuration.GetConnectionString(Configuration["Database:ConnectionString"])));
             services.AddControllers();
             services.AddRouting(options => options.LowercaseUrls = true);
             services.AddSwaggerGen(c =>

@@ -66,7 +66,7 @@ namespace AusDdrApi.Controllers
             return newDancer.Entity;
         }
 
-        [HttpPut("{dancerId")]
+        [HttpPut("{dancerId}")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]

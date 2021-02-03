@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
 
 namespace AusDdrApi
@@ -74,7 +75,8 @@ namespace AusDdrApi
                 options.AddPolicy(name: "CorsPolicy",
                     builder =>
                     {
-                        builder.WithOrigins("http://localhost:1234");
+                        builder.WithOrigins("http://localhost:1234")
+                            .WithHeaders(HeaderNames.Authorization);
                     });
             });
         }

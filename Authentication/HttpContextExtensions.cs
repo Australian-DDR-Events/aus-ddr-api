@@ -8,10 +8,7 @@ namespace AusDdrApi.Authentication
         public static string GetUserId(this HttpContext context)
         {
             var userId = context.Items[UserContext.UserIdClaimType]?.ToString();
-            if (userId == null)
-            {
-                throw new UnauthorizedAccessException();
-            }
+            if (userId == null) throw new UnauthorizedAccessException();
 
             return userId;
         }

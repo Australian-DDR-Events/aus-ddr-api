@@ -12,6 +12,8 @@ namespace AusDdrApi.Entities
         public string PrimaryMachineLocation { get; set; }
         public string State { get; set; }
         public string ProfilePictureUrl { get; set; }
-        public List<Score> Scores { get; set; }
+        public ICollection<Score> Scores { get; set; }
+        public ICollection<GradedDancerDish> GradedDishes { get; set; }
+        public ICollection<GradedDancerIngredient> GradedIngredients { get; set; }
     }
 }

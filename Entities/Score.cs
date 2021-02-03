@@ -16,9 +16,12 @@ namespace AusDdrApi.Entities
         /// This value is generated once on create and cannot be updated.
         /// </summary>
         public DateTime SubmissionTime { get; set; }
-        
-        public string ScoreUrl { get; set; }
-        
+
+        /// <summary>
+        /// Evidence of the score
+        /// </summary>
+        public string ImageUrl { get; set; }
+
         public Guid DancerId { get; set; }
         public Dancer Dancer { get; set; }
         

@@ -8,8 +8,6 @@ namespace AusDdrApi.Models.Requests
     public class DancerRequest : IValidatableObject
     {
         [Required]
-        public string AuthenticationId { get; set; }
-        [Required]
         public string DdrName { get; set; }
         [Required]
         public string DdrCode { get; set; }
@@ -22,7 +20,6 @@ namespace AusDdrApi.Models.Requests
         
         public Dancer ToDancer() => new Dancer
         {
-            AuthenticationId = AuthenticationId,
             DdrName = DdrName,
             DdrCode = DdrCode,
             PrimaryMachineLocation = PrimaryMachineLocation,

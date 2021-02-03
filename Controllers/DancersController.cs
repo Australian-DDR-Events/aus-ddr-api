@@ -34,8 +34,7 @@ namespace AusDdrApi.Controllers
             return _context.Dancers.Select(DancerResponse.FromDancer).ToArray();
         }
 
-        [HttpGet]
-        [Route("~/dancers/{authId}")]
+        [HttpGet("{authId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public ActionResult<DancerResponse> GetDancer(string authId)
@@ -51,12 +50,44 @@ namespace AusDdrApi.Controllers
 
         [HttpPost]
         [Authorize]
-        public Dancer Post(DancerRequest dancerRequest)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        public async Task<ActionResult<Dancer>> Post(DancerRequest dancerRequest)
         {
-            dancerRequest.AuthenticationId = HttpContext.GetUserId();
-            var newDancer = _context.Dancers.Add(dancerRequest.ToDancer());
-            _context.SaveChanges();
+            var existingDancer = _context.Dancers.AsQueryable().SingleOrDefault(dancer => dancer.AuthenticationId == HttpContext.GetUserId());
+            if (existingDancer != null)
+            {
+                return Conflict();
+            }
+            var dancer = dancerRequest.ToDancer();
+            dancer.AuthenticationId = HttpContext.GetUserId();
+            var newDancer = await _context.Dancers.AddAsync(dancer);
+            await _context.SaveChangesAsync();
             return newDancer.Entity;
+        }
+
+        [HttpPut("{dancerId")]
+        [Authorize]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<Dancer>> Put(Guid dancerId, DancerRequest dancerRequest)
+        {
+            var existingDancer = await _context.Dancers.FindAsync(dancerId);
+            if (existingDancer == null)
+            {
+                return NotFound();
+            }
+            if (existingDancer.AuthenticationId != HttpContext.GetUserId())
+            {
+                return Unauthorized();
+            }
+            var dancer = dancerRequest.ToDancer();
+            dancer.Id = dancerId;
+            dancer.AuthenticationId = HttpContext.GetUserId();
+            var newDancer = _context.Dancers.Update(dancer);
+            await _context.SaveChangesAsync();
+            return Ok(newDancer.Entity);
         }
     }
 }

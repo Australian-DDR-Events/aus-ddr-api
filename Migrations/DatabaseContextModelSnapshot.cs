@@ -60,16 +60,13 @@ namespace AusDdrApi.Migrations
                     b.Property<Guid>("DancerId")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("ScoreUrl")
-                        .HasColumnType("text");
-
                     b.Property<Guid>("SongId")
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("SubmissionTime")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp without time zone")
-                        .HasDefaultValue(new DateTime(2021, 2, 1, 22, 30, 16, 592, DateTimeKind.Utc).AddTicks(760));
+                        .HasDefaultValue(new DateTime(2021, 1, 31, 12, 5, 47, 459, DateTimeKind.Utc).AddTicks(8480));
 
                     b.Property<int>("Value")
                         .HasColumnType("integer");

@@ -42,7 +42,8 @@ namespace AusDdrApi.Controllers
             {
                 Value = request.Score,
                 SongId = request.SongId,
-                DancerId = request.DancerId
+                DancerId = request.DancerId,
+                ScoreUrl = request.ScoreUrl
             });
             await _context.SaveChangesAsync();
             return score.Entity;

@@ -17,6 +17,8 @@ namespace AusDdrApi.Models.Responses
         /// </summary>
         public DateTime SubmissionTime { get; set; }
         
+        public string ScoreUrl { get; set; }
+        
         public Guid DancerId { get; set; }
 
         public string SongName { get; set; }

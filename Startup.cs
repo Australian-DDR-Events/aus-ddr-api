@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using AusDdrApi.Authentication;
+using AusDdrApi.Middleware;
 using AusDdrApi.Persistence;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -46,7 +47,7 @@ namespace AusDdrApi
                     Scheme = "Bearer"
                 });
 
-                c.AddSecurityRequirement(new OpenApiSecurityRequirement()
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
                 {
                     {
                         new OpenApiSecurityScheme
@@ -64,6 +65,17 @@ namespace AusDdrApi
                         new List<string>()
                     }
                 });
+                
+                
+            });
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy(name: "CorsPolicy",
+                    builder =>
+                    {
+                        builder.WithOrigins("http://localhost:1234");
+                    });
             });
         }
 
@@ -74,6 +86,8 @@ namespace AusDdrApi
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseOptions();
             
             app.UseSwagger();
             app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "AusDdrApi v1"));
@@ -81,6 +95,8 @@ namespace AusDdrApi
             //app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseCors("CorsPolicy");
 
             app.UseAuthentication();
             

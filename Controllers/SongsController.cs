@@ -46,5 +46,15 @@ namespace AusDdrApi.Controllers
             await _context.SaveChangesAsync();
             return newSong.Entity;
         }
+
+        [HttpDelete]
+        [Route("~/songs/{songId}")]
+        public async Task<ActionResult> Delete(Guid songId)
+        {
+            var song = await _context.Songs.FindAsync(songId);
+            _context.Songs.Remove(song);
+            await _context.SaveChangesAsync();
+            return Ok();
+        }
     }
 }

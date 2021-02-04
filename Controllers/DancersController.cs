@@ -1,9 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
+using Amazon.S3;
+using Amazon.S3.Transfer;
 using AusDdrApi.Authentication;
+using AusDdrApi.Context;
 using AusDdrApi.Entities;
 using AusDdrApi.Models.Requests;
 using AusDdrApi.Models.Responses;
@@ -20,12 +23,14 @@ namespace AusDdrApi.Controllers
     public class DancersController : ControllerBase
     {
         private readonly ILogger<DancersController> _logger;
-        private DatabaseContext _context;
+        private readonly DatabaseContext _context;
+        private readonly IAmazonS3 _s3Client;
 
-        public DancersController(ILogger<DancersController> logger, DatabaseContext context)
+        public DancersController(ILogger<DancersController> logger, DatabaseContext context, IAmazonS3 s3Client)
         {
             _logger = logger;
             _context = context;
+            _s3Client = s3Client;
         }
 
         [HttpGet]
@@ -64,6 +69,45 @@ namespace AusDdrApi.Controllers
             var newDancer = await _context.Dancers.AddAsync(dancer);
             await _context.SaveChangesAsync();
             return newDancer.Entity;
+        }
+
+        [HttpPost("ProfilePicture")]
+        [Authorize]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult> PostProfilePicture(IFormFile file)
+        {
+            var authenticationId = HttpContext.GetUserId();
+            var existingDancer = _context.Dancers.AsQueryable().SingleOrDefault(dancer => dancer.AuthenticationId == authenticationId);
+            if (existingDancer == null)
+            {
+                return NotFound();
+            }
+
+            try
+            {
+                await using var newMemoryStream = new MemoryStream();
+                await file.CopyToAsync(newMemoryStream);
+
+                var uploadRequest = new TransferUtilityUploadRequest
+                {
+                    InputStream = newMemoryStream,
+                    Key = $"/Profile/Picture/${authenticationId}",
+                    BucketName = HttpContext.GetAWSConfiguration().AssetsBucketName,
+                    CannedACL = S3CannedACL.PublicRead,
+                };
+
+                var fileTransferUtility = new TransferUtility(_s3Client);
+                await fileTransferUtility.UploadAsync(uploadRequest);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return BadRequest();
+            }
+
+            return Ok();
         }
 
         [HttpPut("{dancerId}")]

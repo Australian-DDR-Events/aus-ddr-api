@@ -2,7 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using Amazon.Runtime;
+using Amazon.S3;
 using AusDdrApi.Authentication;
+using AusDdrApi.Context;
 using AusDdrApi.Middleware;
 using AusDdrApi.Persistence;
 using Microsoft.AspNetCore.Builder;
@@ -66,8 +69,6 @@ namespace AusDdrApi
                         new List<string>()
                     }
                 });
-                
-                
             });
 
             services.AddCors(options =>
@@ -79,6 +80,11 @@ namespace AusDdrApi
                             .WithHeaders(HeaderNames.Authorization);
                     });
             });
+
+            var awsOptions = Configuration.GetAWSOptions();
+            awsOptions.Credentials = new BasicAWSCredentials(Configuration["AwsAccessKey"], Configuration["AwsSecretKey"]);
+            services.AddDefaultAWSOptions(awsOptions);
+            services.AddAWSService<IAmazonS3>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -105,6 +111,8 @@ namespace AusDdrApi
             app.UseAuthorization();
 
             app.Use(UserContext.UseUserContext);
+
+            app.UseAWSContext(Configuration);
 
             app.UseEndpoints(endpoints =>
             {

@@ -71,12 +71,13 @@ namespace AusDdrApi.Controllers
             return newDancer.Entity;
         }
 
-        [HttpPost("ProfilePicture")]
+        [HttpPost]
+        [Route("~/dancers/profilepicture")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult> PostProfilePicture(IFormFile file)
+        public async Task<ActionResult> PostProfilePicture(IFormFile ProfilePicture)
         {
             var authenticationId = HttpContext.GetUserId();
             var existingDancer = _context.Dancers.AsQueryable().SingleOrDefault(dancer => dancer.AuthenticationId == authenticationId);
@@ -88,12 +89,14 @@ namespace AusDdrApi.Controllers
             try
             {
                 await using var newMemoryStream = new MemoryStream();
-                await file.CopyToAsync(newMemoryStream);
+                await ProfilePicture.CopyToAsync(newMemoryStream);
+
+                var extension = ProfilePicture.FileName.Substring(ProfilePicture.FileName.LastIndexOf('.'));
 
                 var uploadRequest = new TransferUtilityUploadRequest
                 {
                     InputStream = newMemoryStream,
-                    Key = $"/Profile/Picture/${authenticationId}",
+                    Key = $"Profile/Picture/{authenticationId}{extension}",
                     BucketName = HttpContext.GetAWSConfiguration().AssetsBucketName,
                     CannedACL = S3CannedACL.PublicRead,
                 };

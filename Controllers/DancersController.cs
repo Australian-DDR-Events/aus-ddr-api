@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Amazon.S3;
 using Amazon.S3.Transfer;
@@ -15,6 +16,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats.Png;
+using SixLabors.ImageSharp.Processing;
 
 namespace AusDdrApi.Controllers
 {
@@ -86,10 +90,13 @@ namespace AusDdrApi.Controllers
                 return NotFound();
             }
 
+            using var image = await Image.LoadAsync(ProfilePicture.OpenReadStream());
+            image.Mutate(x => x.Resize(256, 256));
+
             try
             {
                 await using var newMemoryStream = new MemoryStream();
-                await ProfilePicture.CopyToAsync(newMemoryStream);
+                image.SaveAsync(newMemoryStream, new PngEncoder(), CancellationToken.None);
 
                 var extension = ProfilePicture.FileName.Substring(ProfilePicture.FileName.LastIndexOf('.'));
 
@@ -104,9 +111,9 @@ namespace AusDdrApi.Controllers
                 var fileTransferUtility = new TransferUtility(_s3Client);
                 await fileTransferUtility.UploadAsync(uploadRequest);
                 existingDancer.ProfilePictureUrl =
-                    $"https://{HttpContext.GetAWSConfiguration().AssetsBucketName}.s3-ap-southeast-2.amazonaws.com/Profile/Picture/{authenticationId}{extension}";
+                    $"https://{HttpContext.GetAWSConfiguration().AssetsBucketName}.s3-{HttpContext.GetAWSConfiguration().AssetsBucketLocation}.amazonaws.com/Profile/Picture/{authenticationId}{extension}";
                 
-                await _context.Dancers.AddAsync(existingDancer);
+                _context.Dancers.Update(existingDancer);
                 await _context.SaveChangesAsync();
             }
             catch (Exception e)

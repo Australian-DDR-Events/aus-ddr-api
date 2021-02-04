@@ -13,6 +13,7 @@ namespace AusDdrApi.Context
     public class AWSConfiguration
     {
         public string AssetsBucketName { get; set; }
+        public string AssetsBucketLocation { get; set; }
     }
     public static class AWSContext
     {

@@ -4,14 +4,12 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Amazon.S3;
-using Amazon.S3.Transfer;
 using AusDdrApi.Authentication;
-using AusDdrApi.Context;
 using AusDdrApi.Entities;
 using AusDdrApi.Models.Requests;
 using AusDdrApi.Models.Responses;
 using AusDdrApi.Persistence;
+using AusDdrApi.Services.FileStorage;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -28,13 +26,13 @@ namespace AusDdrApi.Controllers
     {
         private readonly ILogger<DancersController> _logger;
         private readonly DatabaseContext _context;
-        private readonly IAmazonS3 _s3Client;
+        private readonly IFileStorage _fileStorage;
 
-        public DancersController(ILogger<DancersController> logger, DatabaseContext context, IAmazonS3 s3Client)
+        public DancersController(ILogger<DancersController> logger, DatabaseContext context, IFileStorage fileStorage)
         {
             _logger = logger;
             _context = context;
-            _s3Client = s3Client;
+            _fileStorage = fileStorage;
         }
 
         [HttpGet]
@@ -81,7 +79,7 @@ namespace AusDdrApi.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult> PostProfilePicture(IFormFile ProfilePicture)
+        public async Task<ActionResult> PostProfilePicture(IFormFile profilePicture)
         {
             var authenticationId = HttpContext.GetUserId();
             var existingDancer = _context.Dancers.AsQueryable().SingleOrDefault(dancer => dancer.AuthenticationId == authenticationId);
@@ -90,29 +88,18 @@ namespace AusDdrApi.Controllers
                 return NotFound();
             }
 
-            using var image = await Image.LoadAsync(ProfilePicture.OpenReadStream());
-            image.Mutate(x => x.Resize(256, 256));
-
             try
             {
+                using var image = await Image.LoadAsync(profilePicture.OpenReadStream());
+                image.Mutate(x => x.Resize(256, 256));
+                
                 await using var newMemoryStream = new MemoryStream();
                 image.SaveAsync(newMemoryStream, new PngEncoder(), CancellationToken.None);
 
-                var extension = ProfilePicture.FileName.Substring(ProfilePicture.FileName.LastIndexOf('.'));
+                var destinationKey = $"Profile/Picture/{authenticationId}.png";
+                var imageUrl = await _fileStorage.UploadFileFromStream(new MemoryStream(), destinationKey);
 
-                var uploadRequest = new TransferUtilityUploadRequest
-                {
-                    InputStream = newMemoryStream,
-                    Key = $"Profile/Picture/{authenticationId}{extension}",
-                    BucketName = HttpContext.GetAWSConfiguration().AssetsBucketName,
-                    CannedACL = S3CannedACL.PublicRead,
-                };
-
-                var fileTransferUtility = new TransferUtility(_s3Client);
-                await fileTransferUtility.UploadAsync(uploadRequest);
-                existingDancer.ProfilePictureUrl =
-                    $"https://{HttpContext.GetAWSConfiguration().AssetsBucketName}.s3-{HttpContext.GetAWSConfiguration().AssetsBucketLocation}.amazonaws.com/Profile/Picture/{authenticationId}{extension}";
-                
+                existingDancer.ProfilePictureUrl = imageUrl;
                 _context.Dancers.Update(existingDancer);
                 await _context.SaveChangesAsync();
             }

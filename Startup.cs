@@ -1,13 +1,12 @@
-using System;
 using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
+using Amazon;
 using Amazon.Runtime;
 using Amazon.S3;
 using AusDdrApi.Authentication;
 using AusDdrApi.Context;
 using AusDdrApi.Middleware;
 using AusDdrApi.Persistence;
+using AusDdrApi.Services.FileStorage;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -31,7 +30,7 @@ namespace AusDdrApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddEntityFrameworkNpgsql().AddDbContext<DatabaseContext>(options =>
+            services.AddDbContext<DatabaseContext>(options =>
                 options.UseNpgsql(Configuration["DatabaseConnectionString"]));
             services.AddControllers();
             services.AddJwtAuthentication(Configuration);
@@ -81,10 +80,12 @@ namespace AusDdrApi
                     });
             });
 
-            var awsOptions = Configuration.GetAWSOptions();
-            awsOptions.Credentials = new BasicAWSCredentials(Configuration["AwsAccessKey"], Configuration["AwsSecretKey"]);
-            services.AddDefaultAWSOptions(awsOptions);
-            services.AddAWSService<IAmazonS3>();
+            var credentials = new BasicAWSCredentials(Configuration["AwsAccessKey"], Configuration["AwsSecretKey"]);
+            var region = RegionEndpoint.GetBySystemName(Configuration["AWS:Region"]);
+            var client = new AmazonS3Client(credentials, region);
+            var awsConfiguration = Configuration.GetSection("AWSConfiguration").Get<AwsConfiguration>();
+            
+            services.AddSingleton<IFileStorage>(new S3FileStorage(client, awsConfiguration));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -111,8 +112,6 @@ namespace AusDdrApi
             app.UseAuthorization();
 
             app.Use(UserContext.UseUserContext);
-
-            app.UseAWSContext(Configuration);
 
             app.UseEndpoints(endpoints =>
             {

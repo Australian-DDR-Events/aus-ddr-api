@@ -99,6 +99,7 @@ namespace AusDdrApi
             app.UseOptions();
             
             app.UseSwagger();
+
             app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "AusDdrApi v1"));
 
             //app.UseHttpsRedirection();

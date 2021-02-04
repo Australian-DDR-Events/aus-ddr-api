@@ -18,8 +18,9 @@ jobs:
           command: |
             docker build -t ${HEROKU_APP_NAME} .
       - heroku/push-docker-image:
-          recursive: true
-      - heroku/release-docker-image
+          process-types: web
+      - heroku/release-docker-image:
+          process-types: web
 workflows:
   build_and_deploy:
     jobs:

@@ -5,8 +5,7 @@ orbs:
 jobs:
   build:
     working_directory: /app
-    docker:
-      - image: docker:20.10.3-git
+    executor: heroku/default
     environment:
       - HEROKU_APP_NAME: aus-ddr-api
     steps:

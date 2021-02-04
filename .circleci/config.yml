@@ -5,10 +5,10 @@ orbs:
 jobs:
   build:
     working_directory: ~/aus-ddr-api
-      docker:
-        - image: docker:20.10.3-git
-      environment:
-        - HEROKU_APP_NAME: aus-ddr-api
+    docker:
+      - image: docker:20.10.3-git
+    environment:
+      - HEROKU_APP_NAME: aus-ddr-api
     steps:
       - checkout
       - setup_remote_docker

@@ -5,32 +5,10 @@ orbs:
 jobs:
   build:
     working_directory: /app
-    docker:
-      - image: cimg/base:2020.01
-    environment:
-      - HEROKU_APP_NAME: aus-ddr-api
+    executor: heroku/install
     steps:
-      - run:
-          name: Install dependencies
-          command: |
-            sudo apt-get update && sudo apt-get install -y \
-              git \
-              apt-transport-https \
-              ca-certificates \
-              curl \
-              gnupg-agent \
-              software-properties-common
-            curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-            sudo apt-key fingerprint 0EBFCD88
-            sudo add-apt-repository \
-               "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
-               $(lsb_release -cs) \
-               stable"
-            sudo apt-get update
-            sudo apt-get install docker-ce docker-ce-cli containerd.io
-            curl https://cli-assets.heroku.com/install-ubuntu.sh | sh
       - checkout
-      - setup_remote_docker
+      - heroku/install
       - run:
           name: Build application Docker image
           command: |

@@ -81,9 +81,9 @@ namespace AusDdrApi
             });
 
             var credentials = new BasicAWSCredentials(Configuration["AwsAccessKey"], Configuration["AwsSecretKey"]);
-            var region = RegionEndpoint.GetBySystemName(Configuration["AWS:Region"]);
+            var region = RegionEndpoint.GetBySystemName(Configuration["AwsConfiguration:Region"]);
             var client = new AmazonS3Client(credentials, region);
-            var awsConfiguration = Configuration.GetSection("AWSConfiguration").Get<AwsConfiguration>();
+            var awsConfiguration = Configuration.GetSection("AwsConfiguration").Get<AwsConfiguration>();
             
             services.AddSingleton<IFileStorage>(new S3FileStorage(client, awsConfiguration));
         }

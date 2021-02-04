@@ -103,6 +103,11 @@ namespace AusDdrApi.Controllers
 
                 var fileTransferUtility = new TransferUtility(_s3Client);
                 await fileTransferUtility.UploadAsync(uploadRequest);
+                existingDancer.ProfilePictureUrl =
+                    $"https://{HttpContext.GetAWSConfiguration().AssetsBucketName}.s3-ap-southeast-2.amazonaws.com/Profile/Picture/{authenticationId}{extension}";
+                
+                await _context.Dancers.AddAsync(existingDancer);
+                await _context.SaveChangesAsync();
             }
             catch (Exception e)
             {

@@ -94,7 +94,7 @@ namespace AusDdrApi.Controllers
                 image.Mutate(x => x.Resize(256, 256));
                 
                 await using var newMemoryStream = new MemoryStream();
-                image.SaveAsync(newMemoryStream, new PngEncoder(), CancellationToken.None);
+                await image.SaveAsync(newMemoryStream, new PngEncoder(), CancellationToken.None);
 
                 var destinationKey = $"Profile/Picture/{authenticationId}.png";
                 var imageUrl = await _fileStorage.UploadFileFromStream(new MemoryStream(), destinationKey);

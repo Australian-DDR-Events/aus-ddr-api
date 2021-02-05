@@ -5,8 +5,8 @@ orbs:
 jobs:
   build:
     working_directory: ~/aus-ddr-api
-    docker:
-      - image: cimg/base:2020.01
+    machine:
+      image: ubuntu-2004:202101-01
     environment:
       - HEROKU_APP_NAME: aus-ddr-api
     steps:

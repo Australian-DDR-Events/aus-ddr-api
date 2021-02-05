@@ -5,12 +5,14 @@ orbs:
 jobs:
   build:
     working_directory: ~/aus-ddr-api
-    machine:
-      image: ubuntu-2004:202101-01
+    docker:
+      - image: cimg/base:2020.01
+    resource_class: medium
     environment:
       - HEROKU_APP_NAME: aus-ddr-api
     steps:
       - checkout
+      - setup_remote_docker
       - heroku/install
       - run:
           name: Build application Docker image

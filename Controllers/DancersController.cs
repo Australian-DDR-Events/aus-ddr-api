@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AusDdrApi.Authentication;
-using AusDdrApi.Entities;
 using AusDdrApi.Models.Requests;
 using AusDdrApi.Models.Responses;
 using AusDdrApi.Persistence;
@@ -128,10 +127,14 @@ namespace AusDdrApi.Controllers
             {
                 return Unauthorized();
             }
-            var dancer = dancerRequest.ToEntity();
-            dancer.Id = dancerId;
-            dancer.AuthenticationId = HttpContext.GetUserId();
-            var newDancer = _context.Dancers.Update(dancer);
+
+            existingDancer.State = dancerRequest.State;
+            existingDancer.DdrCode = dancerRequest.DdrCode;
+            existingDancer.DdrName = dancerRequest.DdrName;
+            existingDancer.PrimaryMachineLocation = dancerRequest.PrimaryMachineLocation;
+            existingDancer.ProfilePictureUrl = dancerRequest.ProfilePictureUrl;
+            
+            var newDancer = _context.Dancers.Update(existingDancer);
             await _context.SaveChangesAsync();
             return Ok(DancerResponse.FromEntity(newDancer.Entity));
         }

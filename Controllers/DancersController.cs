@@ -92,11 +92,11 @@ namespace AusDdrApi.Controllers
                 using var image = await Image.LoadAsync(profilePicture.OpenReadStream());
                 image.Mutate(x => x.Resize(256, 256));
                 
-                await using var newMemoryStream = new MemoryStream();
-                await image.SaveAsync(newMemoryStream, new PngEncoder(), CancellationToken.None);
+                await using var memoryStream = new MemoryStream();
+                await image.SaveAsync(memoryStream, new PngEncoder(), CancellationToken.None);
 
                 var destinationKey = $"Profile/Picture/{authenticationId}.png";
-                var imageUrl = await _fileStorage.UploadFileFromStream(new MemoryStream(), destinationKey);
+                var imageUrl = await _fileStorage.UploadFileFromStream(memoryStream, destinationKey);
 
                 existingDancer.ProfilePictureUrl = imageUrl;
                 _context.Dancers.Update(existingDancer);

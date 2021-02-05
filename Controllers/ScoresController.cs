@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AusDdrApi.Entities;
 using AusDdrApi.Models.Requests;
+using AusDdrApi.Models.Responses;
 using AusDdrApi.Persistence;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -27,16 +28,16 @@ namespace AusDdrApi.Controllers
 
         [HttpGet]
         [Route("~/dancers/{dancerId}/scores")]
-        public IEnumerable<Score> GetScoresByDancerId(Guid dancerId)
+        public IEnumerable<ScoreResponse> GetScoresByDancerId(Guid dancerId)
         {
             return _context.Scores
                 .Include(s => s.Song)
-                .AsQueryable().Where(score => score.DancerId == dancerId);
+                .AsQueryable().Where(score => score.DancerId == dancerId).AsEnumerable().Select(ScoreResponse.FromEntity);
         }
         
         [HttpPost]
         [Authorize]
-        public async Task<Score> SubmitScore(ScoreSubmissionRequest request)
+        public async Task<ScoreResponse> SubmitScore(ScoreSubmissionRequest request)
         {
             var score = await _context.Scores.AddAsync(new Score
             {
@@ -46,7 +47,7 @@ namespace AusDdrApi.Controllers
                 ImageUrl = request.ImageUrl
             });
             await _context.SaveChangesAsync();
-            return score.Entity;
+            return ScoreResponse.FromEntity(score.Entity);
         }
     }
 }

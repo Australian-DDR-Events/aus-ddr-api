@@ -18,7 +18,7 @@ namespace AusDdrApi.Models.Requests
         [Required]
         public string ProfilePictureUrl { get; set; }
         
-        public Dancer ToDancer() => new Dancer
+        public Dancer ToEntity() => new Dancer
         {
             DdrName = DdrName,
             DdrCode = DdrCode,

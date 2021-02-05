@@ -13,7 +13,7 @@ namespace AusDdrApi.Models.Responses
         public string State { get; set; }
         public string ProfilePictureUrl { get; set; }
 
-        public static DancerResponse FromDancer(Dancer dancer) => new DancerResponse
+        public static DancerResponse FromEntity(Dancer dancer) => new DancerResponse
         {
             Id = dancer.Id,
             AuthenticationId = dancer.AuthenticationId,

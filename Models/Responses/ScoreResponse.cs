@@ -1,4 +1,5 @@
 using System;
+using AusDdrApi.Entities;
 
 namespace AusDdrApi.Models.Responses
 {
@@ -11,16 +12,22 @@ namespace AusDdrApi.Models.Responses
         /// </summary>
         public int Value { get; set; }
 
-        /// <summary>
-        /// Stores the date time the score is submitted.<br/>
-        /// This value is generated once on create and cannot be updated.
-        /// </summary>
         public DateTime SubmissionTime { get; set; }
         
-        public string ScoreUrl { get; set; }
+        public string ImageUrl { get; set; }
         
         public Guid DancerId { get; set; }
 
         public string SongName { get; set; }
+        
+        public static ScoreResponse FromEntity(Score score) => new ScoreResponse
+        {
+            Id = score.Id,
+            Value = score.Value,
+            SubmissionTime = score.SubmissionTime,
+            ImageUrl = score.ImageUrl,
+            DancerId = score.DancerId,
+            SongName = score.Song.Name
+        };
     }
 }

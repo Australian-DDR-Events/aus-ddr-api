@@ -38,7 +38,7 @@ namespace AusDdrApi.Controllers
         [HttpGet]
         public IEnumerable<DancerResponse> Get()
         {
-            return _context.Dancers.Select(DancerResponse.FromDancer).ToArray();
+            return _context.Dancers.Select(DancerResponse.FromEntity).ToArray();
         }
 
         [HttpGet("{authId}")]
@@ -52,25 +52,25 @@ namespace AusDdrApi.Controllers
                 return NotFound();
             }
 
-            return DancerResponse.FromDancer(dancer);
+            return DancerResponse.FromEntity(dancer);
         }
 
         [HttpPost]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
-        public async Task<ActionResult<Dancer>> Post(DancerRequest dancerRequest)
+        public async Task<ActionResult<DancerResponse>> Post(DancerRequest dancerRequest)
         {
             var existingDancer = _context.Dancers.AsQueryable().SingleOrDefault(dancer => dancer.AuthenticationId == HttpContext.GetUserId());
             if (existingDancer != null)
             {
                 return Conflict();
             }
-            var dancer = dancerRequest.ToDancer();
+            var dancer = dancerRequest.ToEntity();
             dancer.AuthenticationId = HttpContext.GetUserId();
             var newDancer = await _context.Dancers.AddAsync(dancer);
             await _context.SaveChangesAsync();
-            return newDancer.Entity;
+            return DancerResponse.FromEntity(newDancer.Entity);
         }
 
         [HttpPost]
@@ -117,7 +117,7 @@ namespace AusDdrApi.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<Dancer>> Put(Guid dancerId, DancerRequest dancerRequest)
+        public async Task<ActionResult<DancerResponse>> Put(Guid dancerId, DancerRequest dancerRequest)
         {
             var existingDancer = await _context.Dancers.FindAsync(dancerId);
             if (existingDancer == null)
@@ -128,12 +128,12 @@ namespace AusDdrApi.Controllers
             {
                 return Unauthorized();
             }
-            var dancer = dancerRequest.ToDancer();
+            var dancer = dancerRequest.ToEntity();
             dancer.Id = dancerId;
             dancer.AuthenticationId = HttpContext.GetUserId();
             var newDancer = _context.Dancers.Update(dancer);
             await _context.SaveChangesAsync();
-            return Ok(newDancer.Entity);
+            return Ok(DancerResponse.FromEntity(newDancer.Entity));
         }
     }
 }

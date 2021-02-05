@@ -13,7 +13,7 @@ namespace AusDdrApi.Models.Requests
         public string Difficulty { get; set; }
         public int Level { get; set; }
         
-        public Song ToSong() => new Song
+        public Song ToEntity() => new Song
         {
             Name = Name,
             Artist = Artist,

@@ -31,7 +31,7 @@ namespace AusDdrApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<DatabaseContext>(options =>
-                options.UseNpgsql(Configuration["DatabaseConnectionString"]));
+                options.UseNpgsql(Configuration.GetConnectionString("DatabaseContext")));
             services.AddControllers();
             services.AddJwtAuthentication(Configuration);
             services.AddRouting(options => options.LowercaseUrls = true);

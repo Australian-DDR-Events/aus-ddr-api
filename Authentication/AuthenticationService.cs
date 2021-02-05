@@ -13,8 +13,8 @@ namespace AusDdrApi.Authentication
                 .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
-                    options.Authority = configuration["FirebaseUrl"];
-                    options.Audience = configuration["FirebaseAudience"];
+                    options.Authority = configuration["Firebase:Url"];
+                    options.Audience = configuration["Firebase:Audience"];
                 });
         }
     }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using AusDdrApi.Entities;
 using AusDdrApi.Models.Requests;
+using AusDdrApi.Models.Responses;
 using AusDdrApi.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -29,22 +30,22 @@ namespace AusDdrApi.Controllers
         }
         
         [HttpPost]
-        public async Task<Song> Post(SongRequest song)
+        public async Task<SongResponse> Post(SongRequest song)
         {
             var newSong = await _context.Songs.AddAsync(song.ToSong());
             await _context.SaveChangesAsync();
-            return newSong.Entity;
+            return SongResponse.FromEntity(newSong.Entity);
         }
 
         [HttpPut]
         [Route("~/songs/{songId}")]
-        public async Task<Song> Put(Guid songId, SongRequest songRequest)
+        public async Task<SongResponse> Put(Guid songId, SongRequest songRequest)
         {
             var song = songRequest.ToSong();
             song.Id = songId;
-            var newSong = _context.Songs.Update(song);
+            var updatedSong = _context.Songs.Update(song);
             await _context.SaveChangesAsync();
-            return newSong.Entity;
+            return SongResponse.FromEntity(updatedSong.Entity);
         }
 
         [HttpDelete]

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using AusDdrApi.Authentication;
 using AusDdrApi.Entities;
 using AusDdrApi.Models.Requests;
 using AusDdrApi.Models.Responses;
@@ -47,11 +48,17 @@ namespace AusDdrApi.Controllers
         [Authorize]
         public async Task<ActionResult<ScoreResponse>> SubmitScore(ScoreSubmissionRequest request)
         {
+            var authenticationId = HttpContext.GetUserId();
+            var existingDancer = _context.Dancers.AsQueryable().SingleOrDefault(dancer => dancer.AuthenticationId == authenticationId);
+            if (existingDancer == null)
+            {
+                return NotFound();
+            }
             var score = await _context.Scores.AddAsync(new Score
             {
                 Value = request.Score,
                 SongId = request.SongId,
-                DancerId = request.DancerId,
+                DancerId = existingDancer.Id,
             });
 
             try

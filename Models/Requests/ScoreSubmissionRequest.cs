@@ -8,7 +8,6 @@ namespace AusDdrApi.Models.Requests
         public int Score { get; set; }
         
         public IFormFile ScoreImage { get; set; }
-        public Guid DancerId { get; set; }
         public Guid SongId { get; set; }
     }
 }

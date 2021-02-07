@@ -5,6 +5,6 @@ namespace AusDdrApi.Services.FileStorage
 {
     public interface IFileStorage
     {
-        public Task<string> UploadFileFromStream(MemoryStream stream, string destination);
+        public Task<string> UploadFileFromStream(Stream stream, string destination);
     }
 }

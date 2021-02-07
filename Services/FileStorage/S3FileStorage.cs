@@ -18,7 +18,7 @@ namespace AusDdrApi.Services.FileStorage
             _awsConfiguration = awsConfiguration;
         }
         
-        public async Task<string> UploadFileFromStream(MemoryStream stream, string destination)
+        public async Task<string> UploadFileFromStream(Stream stream, string destination)
         {
             var uploadRequest = new TransferUtilityUploadRequest
             {

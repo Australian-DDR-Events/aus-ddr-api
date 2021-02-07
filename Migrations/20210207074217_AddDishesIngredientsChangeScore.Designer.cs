@@ -10,8 +10,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AusDdrApi.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20210203115253_RemoveScoreUrlAndAddDishesIngredientsEvents")]
-    partial class RemoveScoreUrlAndAddDishesIngredientsEvents
+    [Migration("20210207074217_AddDishesIngredientsChangeScore")]
+    partial class AddDishesIngredientsChangeScore
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -209,16 +209,13 @@ namespace AusDdrApi.Migrations
                     b.Property<Guid>("DancerId")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("ImageUrl")
-                        .HasColumnType("text");
-
                     b.Property<Guid>("SongId")
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("SubmissionTime")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp without time zone")
-                        .HasDefaultValue(new DateTime(2021, 2, 3, 11, 52, 53, 413, DateTimeKind.Utc).AddTicks(4280));
+                        .HasDefaultValue(new DateTime(2021, 2, 7, 7, 42, 17, 216, DateTimeKind.Utc).AddTicks(8180));
 
                     b.Property<int>("Value")
                         .HasColumnType("integer");

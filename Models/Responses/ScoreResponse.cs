@@ -18,16 +18,16 @@ namespace AusDdrApi.Models.Responses
         
         public Guid DancerId { get; set; }
 
-        public string SongName { get; set; }
+        public SongResponse Song { get; set; }
         
         public static ScoreResponse FromEntity(Score score) => new ScoreResponse
         {
             Id = score.Id,
             Value = score.Value,
             SubmissionTime = score.SubmissionTime,
-            ImageUrl = score.ImageUrl,
             DancerId = score.DancerId,
-            SongName = score.Song.Name
+            Song = SongResponse.FromEntity(score.Song),
+            ImageUrl = $"/Songs/{score.SongId}/Scores/{score.Id}.png"
         };
     }
 }

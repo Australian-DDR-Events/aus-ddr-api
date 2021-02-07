@@ -29,8 +29,21 @@ namespace AusDdrApi.Controllers
         {
             return _context.Songs.Select(SongResponse.FromEntity);
         }
+
+        [HttpGet]
+        [Route("~/songs/{songId}")]
+        public ActionResult<SongResponse> GetSong(Guid songId)
+        {
+            var song = _context.Songs.AsQueryable().SingleOrDefault(song => song.Id == songId);
+            if (song == null)
+            {
+                return NotFound();
+            }
+
+            return SongResponse.FromEntity(song);
+        }
         
-        [HttpPost]
+        /*[HttpPost]
         public async Task<SongResponse> Post(SongRequest song)
         {
             var newSong = await _context.Songs.AddAsync(song.ToEntity());
@@ -57,6 +70,6 @@ namespace AusDdrApi.Controllers
             _context.Songs.Remove(song);
             await _context.SaveChangesAsync();
             return Ok();
-        }
+        }*/
     }
 }

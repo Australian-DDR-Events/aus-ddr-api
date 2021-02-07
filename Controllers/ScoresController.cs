@@ -46,6 +46,7 @@ namespace AusDdrApi.Controllers
         
         [HttpPost]
         [Authorize]
+        [Route("~/scores/submit")]
         public async Task<ActionResult<ScoreResponse>> SubmitScore(ScoreSubmissionRequest request)
         {
             var authenticationId = HttpContext.GetUserId();

@@ -1,11 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using AusDdrApi.Entities;
-using AusDdrApi.Models.Requests;
 using AusDdrApi.Models.Responses;
 using AusDdrApi.Persistence;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -25,13 +23,16 @@ namespace AusDdrApi.Controllers
         }
 
         [HttpGet]
-        public IEnumerable<SongResponse> Get()
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public ActionResult<IEnumerable<SongResponse>> Get()
         {
-            return _context.Songs.Select(SongResponse.FromEntity);
+            return Ok(_context.Songs.Select(SongResponse.FromEntity));
         }
 
         [HttpGet]
         [Route("~/songs/{songId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public ActionResult<SongResponse> GetSong(Guid songId)
         {
             var song = _context.Songs.AsQueryable().SingleOrDefault(song => song.Id == songId);
@@ -40,7 +41,7 @@ namespace AusDdrApi.Controllers
                 return NotFound();
             }
 
-            return SongResponse.FromEntity(song);
+            return Ok(SongResponse.FromEntity(song));
         }
         
         /*[HttpPost]

@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using AusDdrApi.Authentication;
 using AusDdrApi.Entities;
@@ -11,12 +9,10 @@ using AusDdrApi.Models.Responses;
 using AusDdrApi.Persistence;
 using AusDdrApi.Services.FileStorage;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Formats.Png;
-using SixLabors.ImageSharp.Processing;
 
 namespace AusDdrApi.Controllers
 {
@@ -35,6 +31,38 @@ namespace AusDdrApi.Controllers
             _fileStorage = fileStorage;
         }
 
+        [HttpGet]
+        [Route("~/scores/{scoreId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public ActionResult<ScoreResponse> GetScore(Guid scoreId)
+        {
+            var score = _context.Scores.AsQueryable().SingleOrDefault(score => score.Id == scoreId);
+            if (score == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(ScoreResponse.FromEntity(score));
+        }
+
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public ActionResult<IEnumerable<ScoreResponse>> Get(
+            [FromQuery(Name = "dancer_id")] Guid? dancerId,
+            [FromQuery(Name = "song_id")] Guid? songId
+        )
+        {
+            return Ok(_context.Scores
+                .AsQueryable()
+                .Where(score => 
+                    (dancerId ?? score.DancerId) == score.DancerId &&
+                    (songId ?? score.SongId) == score.SongId
+                    )
+                .AsEnumerable()
+                .Select(ScoreResponse.FromEntity));
+        }
+ 
         [HttpGet]
         [Route("~/dancers/{dancerId}/scores")]
         public IEnumerable<ScoreResponse> GetScoresByDancerId(Guid dancerId)

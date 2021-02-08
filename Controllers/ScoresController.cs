@@ -32,7 +32,7 @@ namespace AusDdrApi.Controllers
         }
 
         [HttpGet]
-        [Route("~/scores/{scoreId}")]
+        [Route("{scoreId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public ActionResult<ScoreResponse> GetScore(Guid scoreId)
@@ -53,14 +53,14 @@ namespace AusDdrApi.Controllers
             [FromQuery(Name = "song_id")] Guid? songId
         )
         {
-            return Ok(_context.Scores
+            var scores = _context.Scores
                 .AsQueryable()
-                .Where(score => 
-                    (dancerId ?? score.DancerId) == score.DancerId &&
-                    (songId ?? score.SongId) == score.SongId
-                    )
+                .Where(score => (dancerId ?? score.DancerId) == score.DancerId &&
+                                (songId ?? score.SongId) == score.SongId)
                 .AsEnumerable()
-                .Select(ScoreResponse.FromEntity));
+                .Select(ScoreResponse.FromEntity);
+
+            return Ok(scores);
         }
  
         [HttpGet]

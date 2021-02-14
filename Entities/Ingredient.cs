@@ -8,6 +8,7 @@ namespace AusDdrApi.Entities
         public Guid Id { get; set; }
         public string Name { get; set; }
         
-        public ICollection<Dish> Dishes { get; set; }
+        public Guid SongId { get; set; }
+        public Song Song { get; set; }
     }
 }

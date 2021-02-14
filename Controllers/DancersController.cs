@@ -98,7 +98,6 @@ namespace AusDdrApi.Controllers
                 var destinationKey = $"Profile/Picture/{authenticationId}.png";
                 var imageUrl = await _fileStorage.UploadFileFromStream(memoryStream, destinationKey);
 
-                existingDancer.ProfilePictureUrl = imageUrl;
                 _context.Dancers.Update(existingDancer);
                 await _context.SaveChangesAsync();
             }
@@ -132,7 +131,6 @@ namespace AusDdrApi.Controllers
             existingDancer.DdrCode = dancerRequest.DdrCode;
             existingDancer.DdrName = dancerRequest.DdrName;
             existingDancer.PrimaryMachineLocation = dancerRequest.PrimaryMachineLocation;
-            existingDancer.ProfilePictureUrl = dancerRequest.ProfilePictureUrl;
             
             var newDancer = _context.Dancers.Update(existingDancer);
             await _context.SaveChangesAsync();

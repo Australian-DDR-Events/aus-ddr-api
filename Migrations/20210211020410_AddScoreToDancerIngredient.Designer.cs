@@ -3,15 +3,17 @@ using System;
 using AusDdrApi.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace AusDdrApi.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20210211020410_AddScoreToDancerIngredient")]
+    partial class AddScoreToDancerIngredient
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -35,6 +37,9 @@ namespace AusDdrApi.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("PrimaryMachineLocation")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ProfilePictureUrl")
                         .HasColumnType("text");
 
                     b.Property<string>("State")
@@ -174,9 +179,6 @@ namespace AusDdrApi.Migrations
                     b.Property<Guid>("IngredientId")
                         .HasColumnType("uuid");
 
-                    b.Property<int>("RequiredScore")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
 
                     b.HasIndex("IngredientId");
@@ -223,7 +225,7 @@ namespace AusDdrApi.Migrations
                     b.Property<DateTime>("SubmissionTime")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp without time zone")
-                        .HasDefaultValue(new DateTime(2021, 2, 14, 1, 12, 35, 149, DateTimeKind.Utc).AddTicks(440));
+                        .HasDefaultValue(new DateTime(2021, 2, 11, 2, 4, 9, 978, DateTimeKind.Utc).AddTicks(1580));
 
                     b.Property<int>("Value")
                         .HasColumnType("integer");
@@ -266,7 +268,7 @@ namespace AusDdrApi.Migrations
             modelBuilder.Entity("AusDdrApi.Entities.GradedDancerDish", b =>
                 {
                     b.HasOne("AusDdrApi.Entities.Dancer", "Dancer")
-                        .WithMany()
+                        .WithMany("GradedDishes")
                         .HasForeignKey("DancerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -285,7 +287,7 @@ namespace AusDdrApi.Migrations
             modelBuilder.Entity("AusDdrApi.Entities.GradedDancerIngredient", b =>
                 {
                     b.HasOne("AusDdrApi.Entities.Dancer", "Dancer")
-                        .WithMany()
+                        .WithMany("GradedIngredients")
                         .HasForeignKey("DancerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -349,7 +351,7 @@ namespace AusDdrApi.Migrations
             modelBuilder.Entity("AusDdrApi.Entities.Score", b =>
                 {
                     b.HasOne("AusDdrApi.Entities.Dancer", "Dancer")
-                        .WithMany()
+                        .WithMany("Scores")
                         .HasForeignKey("DancerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -363,6 +365,15 @@ namespace AusDdrApi.Migrations
                     b.Navigation("Dancer");
 
                     b.Navigation("Song");
+                });
+
+            modelBuilder.Entity("AusDdrApi.Entities.Dancer", b =>
+                {
+                    b.Navigation("GradedDishes");
+
+                    b.Navigation("GradedIngredients");
+
+                    b.Navigation("Scores");
                 });
 
             modelBuilder.Entity("AusDdrApi.Entities.Dish", b =>

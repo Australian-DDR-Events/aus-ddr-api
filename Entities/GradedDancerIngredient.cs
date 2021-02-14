@@ -12,7 +12,7 @@ namespace AusDdrApi.Entities
         public Guid DancerId { get; set; }
         public Dancer Dancer { get; set; }
         
-        public Guid? GradedDancerDishId { get; set; }
-        public GradedDancerDish GradedDancerDish { get; set; }
+        public Guid ScoreId { get; set; }
+        public Song Score { get; set; }
     }
 }

@@ -24,7 +24,6 @@ namespace AusDdrApi.Models.Requests
             DdrCode = DdrCode,
             PrimaryMachineLocation = PrimaryMachineLocation,
             State = State,
-            ProfilePictureUrl = ProfilePictureUrl
         };
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)

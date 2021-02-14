@@ -6,6 +6,7 @@ namespace AusDdrApi.Entities
     {
         public Guid Id { get; set; }
         public Grade Grade { get; set; }
+        public int RequiredScore { get; set; }
         public string Description { get; set; }
         
         public Guid IngredientId { get; set; }

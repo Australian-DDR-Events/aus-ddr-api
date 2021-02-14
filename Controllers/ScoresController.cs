@@ -75,7 +75,7 @@ namespace AusDdrApi.Controllers
         [HttpPost]
         [Authorize]
         [Route("~/scores/submit")]
-        public async Task<ActionResult<ScoreResponse>> SubmitScore(ScoreSubmissionRequest request)
+        public async Task<ActionResult<ScoreResponse>> SubmitScore([FromForm] ScoreSubmissionRequest request)
         {
             var authenticationId = HttpContext.GetUserId();
             var existingDancer = _context.Dancers.AsQueryable().SingleOrDefault(dancer => dancer.AuthenticationId == authenticationId);

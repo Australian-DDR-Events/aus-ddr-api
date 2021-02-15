@@ -57,6 +57,8 @@ namespace AusDdrApi.Controllers
                 .AsQueryable()
                 .Where(score => (dancerId ?? score.DancerId) == score.DancerId &&
                                 (songId ?? score.SongId) == score.SongId)
+                .Include(s => s.Dancer)
+                .Include(s => s.Song)
                 .AsEnumerable()
                 .Select(ScoreResponse.FromEntity);
 

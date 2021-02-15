@@ -13,6 +13,6 @@ namespace AusDdrApi.Entities
         public Dancer Dancer { get; set; }
         
         public Guid ScoreId { get; set; }
-        public Song Score { get; set; }
+        public Score Score { get; set; }
     }
 }

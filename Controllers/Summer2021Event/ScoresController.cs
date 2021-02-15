@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AusDdrApi.Authentication;
@@ -9,11 +10,12 @@ using AusDdrApi.Persistence;
 using AusDdrApi.Services.FileStorage;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace AusDdrApi.Controllers.Summer2021Event
 {
-    [ApiController] 
+    [ApiController]
     [Route("summer2021/[controller]")]
     public class ScoresController : ControllerBase
     {
@@ -27,14 +29,46 @@ namespace AusDdrApi.Controllers.Summer2021Event
             _context = context;
             _fileStorage = fileStorage;
         }
-        
+
+        [HttpGet]
+        [Authorize]
+        [Route("~/summer2021/scores")]
+        public async Task<ActionResult<GradedDancerIngredientResponse>> Get(
+            [FromQuery(Name = "dancer_id")] Guid dancerId,
+            [FromQuery(Name = "ingredient_id")] Guid ingredientId)
+        {
+            var authenticationId = HttpContext.GetUserId();
+            var existingDancer = _context.Dancers.AsQueryable()
+                .SingleOrDefault(dancer => dancer.AuthenticationId == authenticationId);
+            if (existingDancer == null)
+            {
+                return NotFound();
+            }
+
+            var gradedDancerIngredient = _context
+                .GradedDancerIngredients
+                .AsQueryable()
+                .Where(ingredient =>
+                    ingredient.DancerId == dancerId && ingredient.GradedIngredient.IngredientId == ingredientId)
+                .OrderByDescending(ingredient => ingredient.Score.Value)
+                .FirstOrDefault();
+            if (gradedDancerIngredient == null)
+            {
+                return NotFound();
+            }
+
+            return GradedDancerIngredientResponse.FromEntity(gradedDancerIngredient);
+        }
+
         [HttpPost]
         [Authorize]
         [Route("~/summer2021/scores/ingredient")]
-        public async Task<ActionResult<GradedDancerIngredient>> SubmitScoreForIngredient(GradedDancerIngredientSubmissionRequest request)
+        public async Task<ActionResult<GradedDancerIngredientResponse>> SubmitScoreForIngredient(
+            GradedDancerIngredientSubmissionRequest request)
         {
             var authenticationId = HttpContext.GetUserId();
-            var existingDancer = _context.Dancers.AsQueryable().SingleOrDefault(dancer => dancer.AuthenticationId == authenticationId);
+            var existingDancer = _context.Dancers.AsQueryable()
+                .SingleOrDefault(dancer => dancer.AuthenticationId == authenticationId);
             if (existingDancer == null)
             {
                 return NotFound();
@@ -58,13 +92,13 @@ namespace AusDdrApi.Controllers.Summer2021Event
                 Value = request.Score,
             });
 
-            var dancerIngredient = _context.GradedDancerIngredients.Add(new GradedDancerIngredient()
+            var dancerIngredient = await _context.GradedDancerIngredients.AddAsync(new GradedDancerIngredient()
             {
                 GradedIngredientId = gradedIngredient.Id,
                 DancerId = existingDancer.Id,
                 ScoreId = score.Entity.Id,
             });
-            
+
             try
             {
                 await using var memoryStream = request.ScoreImage.OpenReadStream();
@@ -76,11 +110,10 @@ namespace AusDdrApi.Controllers.Summer2021Event
             {
                 return BadRequest();
             }
-            
+
             await _context.SaveChangesAsync();
 
-            return Ok();
-            //return GradedDancerIngredient.FromEntity(dancerIngredient.Entity);
+            return GradedDancerIngredientResponse.FromEntity(dancerIngredient.Entity);
         }
     }
 }

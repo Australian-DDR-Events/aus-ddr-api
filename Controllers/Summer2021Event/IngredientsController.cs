@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -33,6 +34,27 @@ namespace AusDdrApi.Controllers.Summer2021Event
                 .Include(s => s.Song)
                 .Select(IngredientResponse.FromEntity)
                 .ToArray();
+        }
+
+        [HttpGet]
+        [Route("{ingredientId}")]
+        public async Task<ActionResult<IngredientWithGradingResponse>> Get(Guid ingredientId)
+        {
+            var ingredient = _context
+                .Ingredients
+                .FirstOrDefault(ingredient => ingredient.Id == ingredientId);
+            if (ingredient == null)
+            {
+                return NotFound();
+            }
+
+            var gradedIngredients = _context
+                .GradedIngredients
+                .AsQueryable()
+                .Where(gi => gi.IngredientId == ingredient.Id)
+                .ToArray();
+
+            return IngredientWithGradingResponse.FromEntity(ingredient, gradedIngredients);
         }
     }
 }

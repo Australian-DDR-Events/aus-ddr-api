@@ -32,7 +32,11 @@ namespace AusDdrApi
         {
             services.AddDbContext<DatabaseContext>(options =>
                 options.UseNpgsql(Configuration.GetConnectionString("DatabaseContext")));
-            services.AddControllers();
+            services.AddControllers()
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.IgnoreNullValues = true;
+                });
             services.AddJwtAuthentication(Configuration);
             services.AddRouting(options => options.LowercaseUrls = true);
             services.AddSwaggerGen(c =>

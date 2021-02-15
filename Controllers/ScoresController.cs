@@ -48,11 +48,16 @@ namespace AusDdrApi.Controllers
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public ActionResult<IEnumerable<ScoreResponse>> Get(
             [FromQuery(Name = "dancer_id")] Guid? dancerId,
             [FromQuery(Name = "song_id")] Guid? songId
         )
         {
+            if (dancerId == null && songId == null)
+            {
+                return BadRequest();
+            }
             var scores = _context.Scores
                 .AsQueryable()
                 .Where(score => (dancerId ?? score.DancerId) == score.DancerId &&

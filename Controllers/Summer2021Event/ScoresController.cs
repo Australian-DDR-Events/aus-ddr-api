@@ -32,7 +32,6 @@ namespace AusDdrApi.Controllers.Summer2021Event
 
         [HttpGet]
         [Authorize]
-        [Route("~/summer2021/scores")]
         public async Task<ActionResult<GradedDancerIngredientResponse>> Get(
             [FromQuery(Name = "dancer_id")] Guid dancerId,
             [FromQuery(Name = "ingredient_id")] Guid ingredientId)
@@ -62,7 +61,6 @@ namespace AusDdrApi.Controllers.Summer2021Event
 
         [HttpPost]
         [Authorize]
-        [Route("~/summer2021/scores/ingredient")]
         public async Task<ActionResult<GradedDancerIngredientResponse>> SubmitScoreForIngredient(
             GradedDancerIngredientSubmissionRequest request)
         {
@@ -103,7 +101,7 @@ namespace AusDdrApi.Controllers.Summer2021Event
             {
                 await using var memoryStream = request.ScoreImage.OpenReadStream();
 
-                var destinationKey = $"Songs/{score.Entity.SongId}/Scores/{score.Entity.Id}.png";
+                var destinationKey = $"songs/{score.Entity.SongId}/scores/{score.Entity.Id}.png";
                 await _fileStorage.UploadFileFromStream(memoryStream, destinationKey);
             }
             catch (Exception e)

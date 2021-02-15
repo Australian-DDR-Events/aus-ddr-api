@@ -85,12 +85,14 @@ namespace AusDdrApi.Controllers
             {
                 return NotFound();
             }
-            var score = await _context.Scores.AddAsync(new Score
-            {
-                Value = request.Score,
-                SongId = request.SongId,
-                DancerId = existingDancer.Id,
-            });
+            var score = await _context
+                .Scores
+                .AddAsync(new Score
+                {
+                    Value = request.Score,
+                    SongId = request.SongId,
+                    DancerId = existingDancer.Id,
+                });
 
             try
             {
@@ -105,8 +107,14 @@ namespace AusDdrApi.Controllers
             }
             
             await _context.SaveChangesAsync();
+
+            var resultingScore = _context
+                .Scores
+                .Include(s => s.Dancer)
+                .Include(s => s.Song)
+                .First(s => s.Id == score.Entity.Id);
             
-            return ScoreResponse.FromEntity(score.Entity);
+            return ScoreResponse.FromEntity(resultingScore);
         }
     }
 }

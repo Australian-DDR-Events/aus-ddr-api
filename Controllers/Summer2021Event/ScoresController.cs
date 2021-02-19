@@ -35,7 +35,7 @@ namespace AusDdrApi.Controllers.Summer2021Event
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<GradedDancerIngredientResponse>> Get(
+        public ActionResult<GradedDancerIngredientResponse> Get(
             [FromQuery(Name = "dancer_id")] Guid dancerId,
             [FromQuery(Name = "ingredient_id")] Guid ingredientId)
         {
@@ -67,7 +67,7 @@ namespace AusDdrApi.Controllers.Summer2021Event
         [Route("{dancerId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<IEnumerable<GradedDancerIngredientResponse>>> GetAllDancerDishes(Guid dancerId)
+        public ActionResult<IEnumerable<GradedDancerIngredientResponse>> GetAllDancerDishes(Guid dancerId)
         {
             var authenticationId = HttpContext.GetUserId();
             var existingDancer = _context.Dancers.AsQueryable()
@@ -136,7 +136,7 @@ namespace AusDdrApi.Controllers.Summer2021Event
                 var destinationKey = $"songs/{score.Entity.SongId}/scores/{score.Entity.Id}.png";
                 await _fileStorage.UploadFileFromStream(memoryStream, destinationKey);
             }
-            catch (Exception e)
+            catch
             {
                 return BadRequest();
             }

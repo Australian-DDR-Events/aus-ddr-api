@@ -32,7 +32,7 @@ namespace AusDdrApi.Controllers.Summer2021Event
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<DishResponse>>> Get()
+        public ActionResult<IEnumerable<DishResponse>> Get()
         {
             return _context.Dishes.Select(DishResponse.FromEntity).ToArray();
         }
@@ -40,7 +40,7 @@ namespace AusDdrApi.Controllers.Summer2021Event
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [Route("{dishId}")]
-        public async Task<ActionResult<IEnumerable<DishResponse>>> GetDish(Guid dishId)
+        public ActionResult<IEnumerable<DishResponse>> GetDish(Guid dishId)
         {
             return _context.Dishes.Select(DishResponse.FromEntity).ToArray();
         }

@@ -8,7 +8,9 @@ namespace AusDdrApi.Models.Responses
         public Guid Id { get; set; }
         public string Name { get; set; }
         
+        #nullable enable
         public SongResponse? Song { get; set; }
+        #nullable disable
         
         public static IngredientResponse FromEntity(Ingredient ingredient) => new IngredientResponse()
         {

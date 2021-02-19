@@ -106,7 +106,7 @@ namespace AusDdrApi.Controllers
                 var destinationKey = $"Songs/{score.Entity.SongId}/Scores/{score.Entity.Id}.png";
                 await _fileStorage.UploadFileFromStream(memoryStream, destinationKey);
             }
-            catch (Exception e)
+            catch
             {
                 return BadRequest();
             }

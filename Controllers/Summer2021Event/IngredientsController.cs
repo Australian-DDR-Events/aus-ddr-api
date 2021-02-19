@@ -29,7 +29,7 @@ namespace AusDdrApi.Controllers.Summer2021Event
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<IngredientResponse>>> Get()
+        public ActionResult<IEnumerable<IngredientResponse>> Get()
         {
             return _context
                 .Ingredients
@@ -42,7 +42,7 @@ namespace AusDdrApi.Controllers.Summer2021Event
         [Route("{ingredientId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<IngredientWithGradingResponse>> Get(Guid ingredientId)
+        public ActionResult<IngredientWithGradingResponse> Get(Guid ingredientId)
         {
             var ingredient = _context
                 .Ingredients

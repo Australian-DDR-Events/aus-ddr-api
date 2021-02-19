@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using AusDdrApi.Authentication;
@@ -53,16 +54,26 @@ namespace AusDdrApi.Controllers.Summer2021Event
         public async Task<ActionResult> Post(DishRequest dishRequest)
         {
             HttpContext.EnforceAdmin();
-            await _context.Dishes.AddAsync(new Dish()
+            var dish = await _context.Dishes.AddAsync(new Dish()
             {
                 Name = dishRequest.Name
             });
+            await _context.DishIngredients.AddRangeAsync(
+                dishRequest.IngredientIds.Select(
+                    ingredientId => new DishIngredient()
+                    {
+                        DishId = dish.Entity.Id,
+                        IngredientId = ingredientId
+                    }
+                )
+            );
             await _context.DishSongs.AddRangeAsync(
                 dishRequest.SongIds.Select(
                     (songId, index) => new DishSong()
                     {
                         SongId = songId,
-                        CookingOrder = index
+                        CookingOrder = index,
+                        DishId = dish.Entity.Id
                     }
                 )
             );

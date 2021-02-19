@@ -10,7 +10,5 @@ namespace AusDdrApi.Entities
         
         public Guid SongId { get; set; }
         public Song Song { get; set; }
-        
-        public ICollection<Dish> Dishes { get; set; }
     }
 }

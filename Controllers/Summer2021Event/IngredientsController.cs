@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AusDdrApi.Models.Responses;
 using AusDdrApi.Persistence;
 using AusDdrApi.Services.FileStorage;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -27,6 +28,7 @@ namespace AusDdrApi.Controllers.Summer2021Event
         }
 
         [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<IngredientResponse>>> Get()
         {
             return _context
@@ -38,6 +40,8 @@ namespace AusDdrApi.Controllers.Summer2021Event
 
         [HttpGet]
         [Route("{ingredientId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<IngredientWithGradingResponse>> Get(Guid ingredientId)
         {
             var ingredient = _context

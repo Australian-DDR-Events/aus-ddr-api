@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace AusDdrApi.Entities
 {
@@ -11,5 +12,7 @@ namespace AusDdrApi.Entities
         
         public Guid DancerId { get; set; }
         public Dancer Dancer { get; set; }
+
+        public ICollection<Score> Scores { get; set; }
     }
 }

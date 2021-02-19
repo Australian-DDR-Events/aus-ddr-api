@@ -14,7 +14,10 @@ namespace AusDdrApi.Persistence
         public DbSet<Ingredient> Ingredients { get; set; }
         public DbSet<GradedIngredient> GradedIngredients { get; set; }
         public DbSet<Dish> Dishes { get; set; }
+        public DbSet<DishSong> DishSongs { get; set; }
         public DbSet<GradedDancerIngredient> GradedDancerIngredients { get; set; }
+        
+        public DbSet<GradedDish> GradedDishes { get; set; }
         public DbSet<GradedDancerDish> GradedDancerDishes { get; set; }
         
         protected override void OnModelCreating(ModelBuilder modelBuilder)

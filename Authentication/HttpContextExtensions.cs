@@ -12,5 +12,11 @@ namespace AusDdrApi.Authentication
 
             return userId;
         }
+
+        public static void EnforceAdmin(this HttpContext context)
+        {
+            var admin = context.Items[UserContext.AdminClaimType]?.ToString();
+            if (admin != "true") throw new UnauthorizedAccessException();
+        }
     }
 }

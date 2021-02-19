@@ -9,6 +9,7 @@ using AusDdrApi.Models.Responses;
 using AusDdrApi.Persistence;
 using AusDdrApi.Services.FileStorage;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -32,6 +33,8 @@ namespace AusDdrApi.Controllers.Summer2021Event
 
         [HttpGet]
         [Authorize]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<GradedDancerIngredientResponse>> Get(
             [FromQuery(Name = "dancer_id")] Guid dancerId,
             [FromQuery(Name = "ingredient_id")] Guid ingredientId)
@@ -59,8 +62,37 @@ namespace AusDdrApi.Controllers.Summer2021Event
             return GradedDancerIngredientResponse.FromEntity(gradedDancerIngredient);
         }
 
+        [HttpGet]
+        [Authorize]
+        [Route("{dancerId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<IEnumerable<GradedDancerIngredientResponse>>> GetAllDancerDishes(Guid dancerId)
+        {
+            var authenticationId = HttpContext.GetUserId();
+            var existingDancer = _context.Dancers.AsQueryable()
+                .SingleOrDefault(dancer => dancer.AuthenticationId == authenticationId);
+            if (existingDancer == null)
+            {
+                return NotFound();
+            }
+
+            return _context
+                .GradedDancerIngredients
+                .Include(s => s.Score)
+                .GroupBy(ingredient => ingredient.Score.SongId)
+                .Select(i => i
+                    .OrderByDescending(i => i.Score.Value)
+                    .First())
+                .AsEnumerable()
+                .Select(GradedDancerIngredientResponse.FromEntity).ToList();
+        }
+
         [HttpPost]
         [Authorize]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<GradedDancerIngredientResponse>> SubmitScoreForIngredient(
             GradedDancerIngredientSubmissionRequest request)
         {

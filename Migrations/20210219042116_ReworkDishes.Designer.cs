@@ -3,15 +3,17 @@ using System;
 using AusDdrApi.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace AusDdrApi.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20210219042116_ReworkDishes")]
+    partial class ReworkDishes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -211,6 +213,9 @@ namespace AusDdrApi.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<Guid?>("DishId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Name")
                         .HasColumnType("text");
 
@@ -218,6 +223,8 @@ namespace AusDdrApi.Migrations
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("DishId");
 
                     b.HasIndex("SongId");
 
@@ -242,7 +249,7 @@ namespace AusDdrApi.Migrations
                     b.Property<DateTime>("SubmissionTime")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp without time zone")
-                        .HasDefaultValue(new DateTime(2021, 2, 19, 4, 50, 47, 985, DateTimeKind.Utc).AddTicks(9620));
+                        .HasDefaultValue(new DateTime(2021, 2, 19, 4, 21, 15, 744, DateTimeKind.Utc).AddTicks(950));
 
                     b.Property<int>("Value")
                         .HasColumnType("integer");
@@ -282,21 +289,6 @@ namespace AusDdrApi.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Songs");
-                });
-
-            modelBuilder.Entity("DishIngredient", b =>
-                {
-                    b.Property<Guid>("DishesId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("IngredientsId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("DishesId", "IngredientsId");
-
-                    b.HasIndex("IngredientsId");
-
-                    b.ToTable("DishIngredient");
                 });
 
             modelBuilder.Entity("AusDdrApi.Entities.DishSong", b =>
@@ -384,6 +376,10 @@ namespace AusDdrApi.Migrations
 
             modelBuilder.Entity("AusDdrApi.Entities.Ingredient", b =>
                 {
+                    b.HasOne("AusDdrApi.Entities.Dish", null)
+                        .WithMany("Ingredients")
+                        .HasForeignKey("DishId");
+
                     b.HasOne("AusDdrApi.Entities.Song", "Song")
                         .WithMany()
                         .HasForeignKey("SongId")
@@ -416,24 +412,11 @@ namespace AusDdrApi.Migrations
                     b.Navigation("Song");
                 });
 
-            modelBuilder.Entity("DishIngredient", b =>
-                {
-                    b.HasOne("AusDdrApi.Entities.Dish", null)
-                        .WithMany()
-                        .HasForeignKey("DishesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("AusDdrApi.Entities.Ingredient", null)
-                        .WithMany()
-                        .HasForeignKey("IngredientsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("AusDdrApi.Entities.Dish", b =>
                 {
                     b.Navigation("DishSongs");
+
+                    b.Navigation("Ingredients");
                 });
 
             modelBuilder.Entity("AusDdrApi.Entities.GradedDancerDish", b =>

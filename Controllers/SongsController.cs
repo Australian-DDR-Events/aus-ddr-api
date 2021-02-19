@@ -1,8 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using AusDdrApi.Authentication;
+using AusDdrApi.Models.Requests;
 using AusDdrApi.Models.Responses;
 using AusDdrApi.Persistence;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -44,14 +48,16 @@ namespace AusDdrApi.Controllers
             return Ok(SongResponse.FromEntity(song));
         }
         
-        /*[HttpPost]
+        [HttpPost]
+        [Authorize]
         public async Task<SongResponse> Post(SongRequest song)
         {
+            HttpContext.EnforceAdmin();
             var newSong = await _context.Songs.AddAsync(song.ToEntity());
             await _context.SaveChangesAsync();
             return SongResponse.FromEntity(newSong.Entity);
         }
-
+/*
         [HttpPut]
         [Route("~/songs/{songId}")]
         public async Task<SongResponse> Put(Guid songId, SongRequest songRequest)

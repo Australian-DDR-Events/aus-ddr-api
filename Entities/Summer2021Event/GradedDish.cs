@@ -10,7 +10,5 @@ namespace AusDdrApi.Entities
         
         public Guid DishId { get; set; }
         public Dish Dish { get; set; }
-        
-        public string ImageUrl { get; set; }
     }
 }

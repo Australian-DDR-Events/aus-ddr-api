@@ -21,7 +21,7 @@ namespace AusDdrApi.Models.Responses
             DdrCode = dancer.DdrCode,
             PrimaryMachineLocation = dancer.PrimaryMachineLocation,
             State = dancer.State,
-            ProfilePictureUrl = $"/Profile/Picture/{dancer.AuthenticationId}.png"
+            ProfilePictureUrl = $"/profile/picture/{dancer.AuthenticationId}.png"
         };
     }
 }

@@ -4,6 +4,7 @@ using Amazon.Runtime;
 using Amazon.S3;
 using AusDdrApi.Authentication;
 using AusDdrApi.Context;
+using AusDdrApi.Extensions;
 using AusDdrApi.Middleware;
 using AusDdrApi.Persistence;
 using AusDdrApi.Services.FileStorage;
@@ -93,6 +94,8 @@ namespace AusDdrApi
             var awsConfiguration = Configuration.GetSection("AwsConfiguration").Get<AwsConfiguration>();
             
             services.AddSingleton<IFileStorage>(new S3FileStorage(client, awsConfiguration));
+
+            services.AddDbEntityServices();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

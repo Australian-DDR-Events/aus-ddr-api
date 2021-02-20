@@ -35,7 +35,7 @@ namespace AusDdrApi.Controllers.Summer2021Event
         [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult<IEnumerable<DishResponse>> Get()
         {
-            return _context.Dishes.Select(DishResponse.FromEntity).ToArray();
+            return _context.Dishes.Select(dish => DishResponse.FromEntity(dish, null)).ToArray();
         }
 
         [HttpGet]
@@ -43,17 +43,16 @@ namespace AusDdrApi.Controllers.Summer2021Event
         [Route("{dishId}")]
         public ActionResult<IEnumerable<DishResponse>> GetDish(Guid dishId)
         {
-            return _context.Dishes.Select(DishResponse.FromEntity).ToArray();
+            return _context.Dishes.Select(dish => DishResponse.FromEntity(dish, null)).ToArray();
         }
 
         [HttpPost]
-        [Authorize]
+        [Authorize(Policy = "Admin")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> Post(DishRequest dishRequest)
         {
-            HttpContext.EnforceAdmin();
             var dish = await _context.Dishes.AddAsync(new Dish()
             {
                 Name = dishRequest.Name
@@ -83,14 +82,13 @@ namespace AusDdrApi.Controllers.Summer2021Event
         }
 
         [HttpPost]
-        [Authorize]
+        [Authorize(Policy = "Admin")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [Route("{dishId}")]
         public async Task<ActionResult> Post([FromRoute] Guid dishId, GradedDishRequest gradedDishRequest)
         {
-            HttpContext.EnforceAdmin();
             await _context.GradedDishes.AddAsync(new GradedDish()
             {
                 DishId = dishId,

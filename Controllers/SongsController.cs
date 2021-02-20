@@ -49,10 +49,9 @@ namespace AusDdrApi.Controllers
         }
         
         [HttpPost]
-        [Authorize]
+        [Authorize(Policy = "Admin")]
         public async Task<SongResponse> Post(SongRequest song)
         {
-            HttpContext.EnforceAdmin();
             var newSong = await _context.Songs.AddAsync(song.ToEntity());
             await _context.SaveChangesAsync();
             return SongResponse.FromEntity(newSong.Entity);

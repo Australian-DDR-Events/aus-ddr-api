@@ -16,6 +16,10 @@ namespace AusDdrApi.Authentication
                     options.Authority = configuration["Firebase:Url"];
                     options.Audience = configuration["Firebase:Audience"];
                 });
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("Admin", policy => policy.RequireClaim(UserContext.AdminClaimType));
+            });
         }
     }
 }

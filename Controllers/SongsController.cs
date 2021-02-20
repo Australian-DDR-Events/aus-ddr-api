@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AusDdrApi.Authentication;
 using AusDdrApi.Models.Requests;
 using AusDdrApi.Models.Responses;
-using AusDdrApi.Persistence;
+using AusDdrApi.Services.Entities.CoreService;
+using AusDdrApi.Services.Entities.SongService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -18,28 +18,33 @@ namespace AusDdrApi.Controllers
     public class SongsController : ControllerBase
     {
         private readonly ILogger<SongsController> _logger;
-        private DatabaseContext _context;
+        private readonly ICoreService _coreService;
+        private readonly ISongService _songService;
 
-        public SongsController(ILogger<SongsController> logger, DatabaseContext context)
+        public SongsController(
+            ILogger<SongsController> logger, 
+            ICoreService coreService,
+            ISongService songService)
         {
             _logger = logger;
-            _context = context;
+            _coreService = coreService;
+            _songService = songService;
         }
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult<IEnumerable<SongResponse>> Get()
         {
-            return Ok(_context.Songs.Select(SongResponse.FromEntity));
+            return Ok(_songService.GetAll().Select(SongResponse.FromEntity));
         }
 
         [HttpGet]
-        [Route("~/songs/{songId}")]
+        [Route("{songId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public ActionResult<SongResponse> GetSong(Guid songId)
         {
-            var song = _context.Songs.AsQueryable().SingleOrDefault(song => song.Id == songId);
+            var song = _songService.Get(songId);
             if (song == null)
             {
                 return NotFound();
@@ -50,32 +55,40 @@ namespace AusDdrApi.Controllers
         
         [HttpPost]
         [Authorize(Policy = "Admin")]
-        public async Task<SongResponse> Post(SongRequest song)
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        public async Task<ActionResult<SongResponse>> Post(SongRequest song)
         {
-            var newSong = await _context.Songs.AddAsync(song.ToEntity());
-            await _context.SaveChangesAsync();
-            return SongResponse.FromEntity(newSong.Entity);
+            var newSong = await _songService.Add(song.ToEntity());
+            await _coreService.SaveChanges();
+            return Created($"/songs/{newSong.Id}", SongResponse.FromEntity(newSong));
         }
-/*
+
         [HttpPut]
-        [Route("~/songs/{songId}")]
-        public async Task<SongResponse> Put(Guid songId, SongRequest songRequest)
+        [Route("{songId}")]
+        [Authorize(Policy = "Admin")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<SongResponse>> Put(Guid songId, SongRequest songRequest)
         {
             var song = songRequest.ToEntity();
             song.Id = songId;
-            var updatedSong = _context.Songs.Update(song);
-            await _context.SaveChangesAsync();
-            return SongResponse.FromEntity(updatedSong.Entity);
+            var updatedSong = await _songService.Update(song);
+            await _coreService.SaveChanges();
+            return Ok(SongResponse.FromEntity(updatedSong));
         }
 
         [HttpDelete]
-        [Route("~/songs/{songId}")]
+        [Route("{songId}")]
+        [Authorize(Policy = "Admin")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> Delete(Guid songId)
         {
-            var song = await _context.Songs.FindAsync(songId);
-            _context.Songs.Remove(song);
-            await _context.SaveChangesAsync();
+            if (!_songService.Delete(songId))
+            {
+                return NotFound();
+            }
+            await _coreService.SaveChanges();
             return Ok();
-        }*/
+        }
     }
 }

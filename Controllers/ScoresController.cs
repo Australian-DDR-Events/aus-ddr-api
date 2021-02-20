@@ -4,9 +4,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using AusDdrApi.Authentication;
 using AusDdrApi.Entities;
+using AusDdrApi.Helpers;
 using AusDdrApi.Models.Requests;
 using AusDdrApi.Models.Responses;
 using AusDdrApi.Persistence;
+using AusDdrApi.Services.Entities.CoreService;
+using AusDdrApi.Services.Entities.DancerService;
+using AusDdrApi.Services.Entities.ScoreService;
+using AusDdrApi.Services.Entities.SongService;
 using AusDdrApi.Services.FileStorage;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -21,13 +26,25 @@ namespace AusDdrApi.Controllers
     public class ScoresController : ControllerBase
     {
         private readonly ILogger<ScoresController> _logger;
-        private DatabaseContext _context;
-        private IFileStorage _fileStorage;
+        private readonly ICoreService _coreService;
+        private readonly IScoreService _scoreService;
+        private readonly ISongService _songService;
+        private readonly IDancerService _dancerService;
+        private readonly IFileStorage _fileStorage;
 
-        public ScoresController(ILogger<ScoresController> logger, DatabaseContext context, IFileStorage fileStorage)
+        public ScoresController(
+            ILogger<ScoresController> logger,
+            ICoreService coreService,
+            IScoreService scoreService,
+            ISongService songService,
+            IDancerService dancerService,
+            IFileStorage fileStorage)
         {
             _logger = logger;
-            _context = context;
+            _coreService = coreService;
+            _scoreService = scoreService;
+            _songService = songService;
+            _dancerService = dancerService;
             _fileStorage = fileStorage;
         }
 
@@ -37,12 +54,11 @@ namespace AusDdrApi.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public ActionResult<ScoreResponse> GetScore(Guid scoreId)
         {
-            var score = _context.Scores.AsQueryable().SingleOrDefault(score => score.Id == scoreId);
+            var score = _scoreService.GetScore(scoreId);
             if (score == null)
             {
                 return NotFound();
             }
-
             return Ok(ScoreResponse.FromEntity(score));
         }
 
@@ -58,68 +74,43 @@ namespace AusDdrApi.Controllers
             {
                 return BadRequest();
             }
-            var scores = _context.Scores
-                .AsQueryable()
-                .Where(score => (dancerId ?? score.DancerId) == score.DancerId &&
-                                (songId ?? score.SongId) == score.SongId)
-                .Include(s => s.Dancer)
-                .Include(s => s.Song)
-                .AsEnumerable()
-                .Select(ScoreResponse.FromEntity);
-
-            return Ok(scores);
-        }
- 
-        [HttpGet]
-        [Route("~/dancers/{dancerId}/scores")]
-        public IEnumerable<ScoreResponse> GetScoresByDancerId(Guid dancerId)
-        {
-            return _context.Scores
-                .Include(s => s.Song)
-                .AsQueryable().Where(score => score.DancerId == dancerId).AsEnumerable().Select(ScoreResponse.FromEntity);
+            return Ok(_scoreService.GetScores(dancerId, songId).Select(ScoreResponse.FromEntity));
         }
         
         [HttpPost]
         [Authorize]
-        [Route("~/scores/submit")]
+        [Route("submit")]
         public async Task<ActionResult<ScoreResponse>> SubmitScore([FromForm] ScoreSubmissionRequest request)
         {
-            var authenticationId = HttpContext.GetUserId();
-            var existingDancer = _context.Dancers.AsQueryable().SingleOrDefault(dancer => dancer.AuthenticationId == authenticationId);
-            if (existingDancer == null)
+            var authId = HttpContext.GetUserId();
+            var dancer = _dancerService.GetByAuthId(authId);
+            if (dancer == null)
             {
                 return NotFound();
             }
-            var score = await _context
-                .Scores
-                .AddAsync(new Score
-                {
-                    Value = request.Score,
-                    SongId = request.SongId,
-                    DancerId = existingDancer.Id,
-                });
+
+            var score = await _scoreService.Add(new Score
+            {
+                Value = request.Score,
+                SongId = request.SongId,
+                DancerId = dancer.Id,
+            });
 
             try
             {
-                await using var memoryStream = request.ScoreImage.OpenReadStream();
+                var image = await Images.FormFileToPngMemoryStream(request.ScoreImage);
 
-                var destinationKey = $"Songs/{score.Entity.SongId}/Scores/{score.Entity.Id}.png";
-                await _fileStorage.UploadFileFromStream(memoryStream, destinationKey);
+                var destinationKey = $"Songs/{score.SongId}/Scores/{score.Id}.png";
+                await _fileStorage.UploadFileFromStream(image, destinationKey);
             }
             catch
             {
                 return BadRequest();
             }
             
-            await _context.SaveChangesAsync();
-
-            var resultingScore = _context
-                .Scores
-                .Include(s => s.Dancer)
-                .Include(s => s.Song)
-                .First(s => s.Id == score.Entity.Id);
+            await _coreService.SaveChanges();
             
-            return ScoreResponse.FromEntity(resultingScore);
+            return ScoreResponse.FromEntity(score);
         }
     }
 }

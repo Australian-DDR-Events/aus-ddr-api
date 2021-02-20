@@ -17,8 +17,8 @@ namespace AusDdrApi.Models.Responses
         public string ImageUrl { get; set; }
         
         public Guid DancerId { get; set; }
-
-        public SongResponse Song { get; set; }
+        
+        public Guid SongId { get; set; }
         
         public static ScoreResponse FromEntity(Score score) => new ScoreResponse
         {
@@ -26,8 +26,8 @@ namespace AusDdrApi.Models.Responses
             Value = score.Value,
             SubmissionTime = score.SubmissionTime,
             DancerId = score.DancerId,
-            Song = SongResponse.FromEntity(score.Song),
-            ImageUrl = $"/Songs/{score.SongId}/Scores/{score.Id}.png"
+            SongId = score.SongId,
+            ImageUrl = $"/songs/{score.SongId}/scores/{score.Id}.png"
         };
     }
 }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AusDdrApi.Entities;
 using AusDdrApi.Persistence;
 using Microsoft.EntityFrameworkCore;
 using GradedDishEntity = AusDdrApi.Entities.GradedDish;
@@ -32,6 +33,15 @@ namespace AusDdrApi.Services.GradedDish
                 .GradedDishes
                 .AsQueryable()
                 .SingleOrDefault(g => g.Id == gradedDishId);
+        }
+
+        public GradedDishEntity? GetForDishIdAndGrade(Guid dishId, Grade grade)
+        {
+            return _context
+                .GradedDishes
+                .AsQueryable()
+                .Where(g => g.DishId == dishId)
+                .SingleOrDefault(g => g.Grade == grade);
         }
 
         public async Task<GradedDishEntity> Add(GradedDishEntity gradedDish)

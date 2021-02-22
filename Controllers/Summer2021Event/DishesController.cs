@@ -11,6 +11,7 @@ using AusDdrApi.Services.CoreData;
 using AusDdrApi.Services.Dancer;
 using AusDdrApi.Services.Dish;
 using AusDdrApi.Services.FileStorage;
+using AusDdrApi.Services.GradedDancerDish;
 using AusDdrApi.Services.GradedDancerIngredient;
 using AusDdrApi.Services.GradedDish;
 using AusDdrApi.Services.GradedIngredient;
@@ -34,6 +35,7 @@ namespace AusDdrApi.Controllers.Summer2021Event
         private readonly IDish _dishService;
         private readonly IIngredient _ingredientService;
         private readonly IGradedDancerIngredient _gradedDancerIngredientService;
+        private readonly IGradedDancerDish _gradedDancerDishService;
         private readonly IGradedDish _gradedDishService;
         private readonly IScore _scoreSerivce;
         private IFileStorage _fileStorage;
@@ -45,6 +47,7 @@ namespace AusDdrApi.Controllers.Summer2021Event
             IDish dishService,
             IIngredient ingredientService,
             IGradedDancerIngredient gradedDancerIngredientService,
+            IGradedDancerDish gradedDancerDishService,
             IGradedDish gradedDishService,
             IScore scoreService,
             IFileStorage fileStorage)
@@ -55,6 +58,7 @@ namespace AusDdrApi.Controllers.Summer2021Event
             _dishService = dishService;
             _ingredientService = ingredientService;
             _gradedDancerIngredientService = gradedDancerIngredientService;
+            _gradedDancerDishService = gradedDancerDishService;
             _gradedDishService = gradedDishService;
             _scoreSerivce = scoreService;
             _fileStorage = fileStorage;
@@ -99,7 +103,7 @@ namespace AusDdrApi.Controllers.Summer2021Event
             [FromRoute] Guid dishId,
             [FromForm] GradedDancerDishRequest gradedDancerDishRequest)
         {
-            /*var authId = HttpContext.GetUserId();
+            var authId = HttpContext.GetUserId();
             var existingDancer = _dancerService.GetByAuthId(authId);
             if (existingDancer == null) return NotFound();
 
@@ -140,22 +144,37 @@ namespace AusDdrApi.Controllers.Summer2021Event
             }
 
             var ingredientStars = gradedIngredients
-                .Aggregate(0, (acc, g) => acc + (int) g.GradedIngredient!.Grade) / 2;
-            var exPercent = scores.Aggregate(0, (count, s) => count += s.Value) / dish.MaxScore;
+                .Aggregate(0, (acc, g) => acc + (int) g.GradedIngredient!.Grade);
+            var avgStars = (float) ingredientStars / gradedIngredients.Count();
+            var exPercent = (double)scores.Aggregate(0, (count, s) => count += s.Value) / dish.MaxScore;
             var ex = Math.Pow(0.00573 * Math.E, 5.73 * exPercent);
 
             var orderVariance = 0;
-            for (var scoreIndex = 0; scoreIndex < scores.Count; ++scoreIndex)
+            var maxVariance = scores.Count - 1;
+            for (var scoreIndex = 1; scoreIndex < scores.Count; ++scoreIndex)
             {
-                var songOrder = dishSongs.FirstOrDefault(i => i.SongId == scores[scoreIndex].SongId);
-                if (songOrder != null)
-                {
-                    orderVariance += Math.Abs(scoreIndex - songOrder.CookingOrder);
-                }
+                var firstSong = dishSongs.FirstOrDefault(i => i.SongId == scores[scoreIndex - 1].SongId);
+                var secondSong = dishSongs.FirstOrDefault(i => i.SongId == scores[scoreIndex].SongId);
+                if (firstSong.CookingOrder + 1 == secondSong.CookingOrder) orderVariance++;
             }
 
-            await _coreDataService.SaveChanges();*/
-            return Ok();
+            var varianceMultiplier = 1 + (orderVariance / maxVariance) * 0.5;
+
+            var top = (avgStars / 2) + ex * varianceMultiplier;
+            var baseGrade = Math.Ceiling((top / 1.1) * (gradedDancerDishRequest.PairBonus ? 1.1 : 1.0));
+            var grade = (Grade) (Math.Max(Math.Min(baseGrade, 5), 1));
+            var gradedDish = _gradedDishService
+                .GetForDishIdAndGrade(dishId, grade);
+            var gradedDancerDish = await _gradedDancerDishService
+                .Add(new GradedDancerDish
+                {
+                    DancerId = existingDancer.Id,
+                    GradedDishId = gradedDish.Id,
+                    Scores = scores
+                });
+
+            await _coreDataService.SaveChanges();
+            return Ok(gradedDancerDish);
         }
 
         [HttpPost]

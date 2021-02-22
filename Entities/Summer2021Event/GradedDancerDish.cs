@@ -8,11 +8,11 @@ namespace AusDdrApi.Entities
         public Guid Id { get; set; }
         
         public Guid GradedDishId { get; set; }
-        public GradedDish GradedDish { get; set; }
+        public GradedDish? GradedDish { get; set; }
         
         public Guid DancerId { get; set; }
-        public Dancer Dancer { get; set; }
+        public Dancer? Dancer { get; set; }
 
-        public ICollection<Score> Scores { get; set; }
+        public ICollection<Score> Scores { get; set; } = new List<Score>();
     }
 }

@@ -10,23 +10,22 @@ namespace AusDdrApi.Helpers
 {
     public static class Images
     {
-        public static async Task<MemoryStream> FormFileToPngMemoryStream(IFormFile file)
+        // TODO: factor-based scaling (restrict size to maximum x/y)
+        public static async Task<MemoryStream> ImageToPngMemoryStream(Image image)
         {
-            using var image = await Image.LoadAsync(file.OpenReadStream());
+            using var newImage = image.Clone(context => { });
 
-            await using var memoryStream = new MemoryStream();
-            await image.SaveAsync(memoryStream, new PngEncoder(), CancellationToken.None);
+            var memoryStream = new MemoryStream();
+            await newImage.SaveAsync(memoryStream, new PngEncoder(), CancellationToken.None);
 
             return memoryStream;
         }
-        public static async Task<MemoryStream> FormFileToPngMemoryStream(IFormFile file, int width, int height)
+        public static async Task<MemoryStream> ImageToPngMemoryStream(Image image, int width, int height)
         {
-            using var image = await Image.LoadAsync(file.OpenReadStream());
+            using var newImage = image.Clone(context => context.Resize(width, height));
             
-            image.Mutate(x => x.Resize(width, height));
-
-            await using var memoryStream = new MemoryStream();
-            await image.SaveAsync(memoryStream, new PngEncoder(), CancellationToken.None);
+            var memoryStream = new MemoryStream();
+            await newImage.SaveAsync(memoryStream, new PngEncoder(), CancellationToken.None);
 
             return memoryStream;
         }

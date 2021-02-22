@@ -7,10 +7,7 @@ namespace AusDdrApi.Models.Responses
     {
         public Guid Id { get; set; }
         public int CookingOrder { get; set; }
-        
-        #nullable enable
         public SongResponse? Song { get; set; }
-        #nullable disable
         
         public static DishSongResponse FromEntity(DishSong dishSong) => new DishSongResponse()
         {

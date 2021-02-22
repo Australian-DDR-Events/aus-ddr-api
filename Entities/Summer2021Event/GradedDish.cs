@@ -6,9 +6,9 @@ namespace AusDdrApi.Entities
     {
         public Guid Id { get; set; }
         public Grade Grade { get; set; }
-        public string Description { get; set; }
+        public string Description { get; set; } = string.Empty;
         
         public Guid DishId { get; set; }
-        public Dish Dish { get; set; }
+        public Dish? Dish { get; set; }
     }
 }

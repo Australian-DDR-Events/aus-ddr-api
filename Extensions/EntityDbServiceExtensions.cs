@@ -1,9 +1,12 @@
-using System;
-using AusDdrApi.Persistence;
-using AusDdrApi.Services.Entities.CoreService;
-using AusDdrApi.Services.Entities.DancerService;
-using AusDdrApi.Services.Entities.ScoreService;
-using AusDdrApi.Services.Entities.SongService;
+using AusDdrApi.Services.CoreData;
+using AusDdrApi.Services.Dancer;
+using AusDdrApi.Services.Dish;
+using AusDdrApi.Services.GradedDancerIngredient;
+using AusDdrApi.Services.GradedDish;
+using AusDdrApi.Services.GradedIngredient;
+using AusDdrApi.Services.Ingredient;
+using AusDdrApi.Services.Score;
+using AusDdrApi.Services.Song;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AusDdrApi.Extensions
@@ -13,10 +16,16 @@ namespace AusDdrApi.Extensions
         public static IServiceCollection AddDbEntityServices(
             this IServiceCollection services)
         {
-            services.AddTransient<ICoreService, DbCoreService>();
-            services.AddTransient<ISongService, DbSongService>();
-            services.AddTransient<IScoreService, DbScoreService>();
-            services.AddTransient<IDancerService, DbDancerService>();
+            services.AddTransient<ICoreData, DbCoreData>();
+            services.AddTransient<ISong, DbSong>();
+            services.AddTransient<IScore, DbScore>();
+            services.AddTransient<IDancer, DbDancer>();
+            services.AddTransient<IGradedDancerIngredient, DbGradedDancerIngredient>();
+            services.AddTransient<IGradedIngredient, DbGradedIngredient>();
+            services.AddTransient<IIngredient, DbIngredient>();
+            services.AddTransient<IGradedDish, DbGradedDish>();
+            services.AddTransient<IDish, DbDish>();
+            
             return services;
         }
     }

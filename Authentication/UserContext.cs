@@ -18,8 +18,8 @@ namespace AusDdrApi.Authentication
                 var token = authHeader.Split(" ")[1];
                 var tokenHandler = new JwtSecurityTokenHandler();
                 var jsonToken = tokenHandler.ReadToken(token) as JwtSecurityToken;
-                context.Items[UserIdClaimType] = jsonToken.Claims.FirstOrDefault(claim => claim.Type == UserIdClaimType)?.Value;
-                context.Items[AdminClaimType] = jsonToken.Claims.FirstOrDefault(claim => claim.Type == AdminClaimType)?.Value;
+                context.Items[UserIdClaimType] = jsonToken?.Claims.FirstOrDefault(claim => claim.Type == UserIdClaimType)?.Value;
+                context.Items[AdminClaimType] = jsonToken?.Claims.FirstOrDefault(claim => claim.Type == AdminClaimType)?.Value;
             }
             return next();
         }

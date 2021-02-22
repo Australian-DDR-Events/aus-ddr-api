@@ -5,9 +5,9 @@ namespace AusDdrApi.Models.Requests
 {
     public class DishRequest
     {
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
         
-        public ICollection<Guid> SongIds { get; set; }
-        public ICollection<Guid> IngredientIds { get; set; }
+        public ICollection<Guid> SongIds { get; set; } = new List<Guid>();
+        public ICollection<Guid> IngredientIds { get; set; } = new List<Guid>();
     }
 }

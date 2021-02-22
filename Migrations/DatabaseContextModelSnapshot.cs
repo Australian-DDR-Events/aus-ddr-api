@@ -26,18 +26,23 @@ namespace AusDdrApi.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("AuthenticationId")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("DdrCode")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("DdrName")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("PrimaryMachineLocation")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("State")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
@@ -54,7 +59,11 @@ namespace AusDdrApi.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<int>("MaxScore")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
@@ -117,6 +126,7 @@ namespace AusDdrApi.Migrations
                         .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateTime>("StartDate")
@@ -181,6 +191,7 @@ namespace AusDdrApi.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("Description")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<Guid>("DishId")
@@ -204,13 +215,11 @@ namespace AusDdrApi.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("Description")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Grade")
                         .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("ImageUrl")
                         .HasColumnType("text");
 
                     b.Property<Guid>("IngredientId")
@@ -233,6 +242,7 @@ namespace AusDdrApi.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<Guid>("SongId")
@@ -263,7 +273,7 @@ namespace AusDdrApi.Migrations
                     b.Property<DateTime>("SubmissionTime")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp without time zone")
-                        .HasDefaultValue(new DateTime(2021, 2, 19, 5, 58, 4, 556, DateTimeKind.Utc).AddTicks(2110));
+                        .HasDefaultValue(new DateTime(2021, 2, 22, 7, 45, 28, 385, DateTimeKind.Utc).AddTicks(8860));
 
                     b.Property<int>("Value")
                         .HasColumnType("integer");
@@ -286,18 +296,22 @@ namespace AusDdrApi.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("Artist")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Difficulty")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("ImageUrl")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<int>("Level")
                         .HasColumnType("integer");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");

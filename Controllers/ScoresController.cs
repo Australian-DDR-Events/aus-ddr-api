@@ -7,17 +7,16 @@ using AusDdrApi.Entities;
 using AusDdrApi.Helpers;
 using AusDdrApi.Models.Requests;
 using AusDdrApi.Models.Responses;
-using AusDdrApi.Persistence;
-using AusDdrApi.Services.Entities.CoreService;
-using AusDdrApi.Services.Entities.DancerService;
-using AusDdrApi.Services.Entities.ScoreService;
-using AusDdrApi.Services.Entities.SongService;
+using AusDdrApi.Services.CoreData;
+using AusDdrApi.Services.Dancer;
 using AusDdrApi.Services.FileStorage;
+using AusDdrApi.Services.Score;
+using AusDdrApi.Services.Song;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using SixLabors.ImageSharp;
 
 namespace AusDdrApi.Controllers
 {
@@ -26,18 +25,18 @@ namespace AusDdrApi.Controllers
     public class ScoresController : ControllerBase
     {
         private readonly ILogger<ScoresController> _logger;
-        private readonly ICoreService _coreService;
-        private readonly IScoreService _scoreService;
-        private readonly ISongService _songService;
-        private readonly IDancerService _dancerService;
+        private readonly ICoreData _coreService;
+        private readonly IScore _scoreService;
+        private readonly ISong _songService;
+        private readonly IDancer _dancerService;
         private readonly IFileStorage _fileStorage;
 
         public ScoresController(
             ILogger<ScoresController> logger,
-            ICoreService coreService,
-            IScoreService scoreService,
-            ISongService songService,
-            IDancerService dancerService,
+            ICoreData coreService,
+            IScore scoreService,
+            ISong songService,
+            IDancer dancerService,
             IFileStorage fileStorage)
         {
             _logger = logger;
@@ -54,7 +53,7 @@ namespace AusDdrApi.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public ActionResult<ScoreResponse> GetScore(Guid scoreId)
         {
-            var score = _scoreService.GetScore(scoreId);
+            var score = _scoreService.Get(scoreId);
             if (score == null)
             {
                 return NotFound();
@@ -98,9 +97,10 @@ namespace AusDdrApi.Controllers
 
             try
             {
-                var image = await Images.FormFileToPngMemoryStream(request.ScoreImage);
+                var scoreImage = await Image.LoadAsync(request.ScoreImage!.OpenReadStream());
+                var image = await Images.ImageToPngMemoryStream(scoreImage);
 
-                var destinationKey = $"Songs/{score.SongId}/Scores/{score.Id}.png";
+                var destinationKey = $"songs/{score.SongId}/scores/{score.Id}.png";
                 await _fileStorage.UploadFileFromStream(image, destinationKey);
             }
             catch
@@ -111,6 +111,18 @@ namespace AusDdrApi.Controllers
             await _coreService.SaveChanges();
             
             return ScoreResponse.FromEntity(score);
+        }
+
+        [HttpDelete]
+        [Authorize(Policy = "Admin")]
+        public async Task<ActionResult> Delete(Guid scoreId)
+        {
+            if (!_scoreService.Delete(scoreId))
+            {
+                return NotFound();
+            }
+            await _coreService.SaveChanges();
+            return Ok();
         }
     }
 }

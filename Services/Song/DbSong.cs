@@ -2,37 +2,37 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AusDdrApi.Entities;
+using SongEntity = AusDdrApi.Entities.Song;
 using AusDdrApi.Persistence;
 
-namespace AusDdrApi.Services.Entities.SongService
+namespace AusDdrApi.Services.Song
 {
-    public class DbSongService : ISongService
+    public class DbSong : ISong
     {
         private DatabaseContext _context;
 
-        public DbSongService(DatabaseContext context)
+        public DbSong(DatabaseContext context)
         {
             _context = context;
         }
 
-        public IEnumerable<Song> GetAll()
+        public IEnumerable<SongEntity> GetAll()
         {
             return _context.Songs.AsQueryable().ToArray();
         }
 
-        public Song? Get(Guid songId)
+        public SongEntity? Get(Guid songId)
         {
             return _context.Songs.AsQueryable().SingleOrDefault(s => s.Id == songId);
         }
 
-        public async Task<Song> Add(Song song)
+        public async Task<SongEntity> Add(SongEntity song)
         {
             var songEntity = await _context.Songs.AddAsync(song);
             return songEntity.Entity;
         }
 
-        public async Task<Song> Update(Song song)
+        public SongEntity Update(SongEntity song)
         {
             return _context.Songs.Update(song).Entity;
         }

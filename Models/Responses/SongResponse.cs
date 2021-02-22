@@ -6,10 +6,10 @@ namespace AusDdrApi.Models.Responses
     public class SongResponse
     {
         public Guid Id { get; set; }
-        public string Name { get; set; }
-        public string Artist { get; set; }
-        public string ImageUrl { get; set; }
-        public string Difficulty { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string Artist { get; set; } = string.Empty;
+        public string ImageUrl { get; set; } = string.Empty;
+        public string Difficulty { get; set; } = string.Empty;
         public int Level { get; set; }
         
         public static SongResponse FromEntity(Song song) => new SongResponse

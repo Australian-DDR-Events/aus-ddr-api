@@ -1,13 +1,13 @@
 using System.Threading.Tasks;
 using AusDdrApi.Persistence;
 
-namespace AusDdrApi.Services.Entities.CoreService
+namespace AusDdrApi.Services.CoreData
 {
-    public class DbCoreService : ICoreService
+    public class DbCoreData : ICoreData
     {
         private DatabaseContext _context;
         
-        public DbCoreService(DatabaseContext context)
+        public DbCoreData(DatabaseContext context)
         {
             _context = context;
         }

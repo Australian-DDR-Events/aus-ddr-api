@@ -4,8 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using AusDdrApi.Models.Requests;
 using AusDdrApi.Models.Responses;
-using AusDdrApi.Services.Entities.CoreService;
-using AusDdrApi.Services.Entities.SongService;
+using AusDdrApi.Services.CoreData;
+using AusDdrApi.Services.Song;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -18,13 +18,13 @@ namespace AusDdrApi.Controllers
     public class SongsController : ControllerBase
     {
         private readonly ILogger<SongsController> _logger;
-        private readonly ICoreService _coreService;
-        private readonly ISongService _songService;
+        private readonly ICoreData _coreService;
+        private readonly ISong _songService;
 
         public SongsController(
             ILogger<SongsController> logger, 
-            ICoreService coreService,
-            ISongService songService)
+            ICoreData coreService,
+            ISong songService)
         {
             _logger = logger;
             _coreService = coreService;
@@ -54,7 +54,6 @@ namespace AusDdrApi.Controllers
         }
         
         [HttpPost]
-        [Authorize(Policy = "Admin")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         public async Task<ActionResult<SongResponse>> Post(SongRequest song)
         {
@@ -71,7 +70,7 @@ namespace AusDdrApi.Controllers
         {
             var song = songRequest.ToEntity();
             song.Id = songId;
-            var updatedSong = await _songService.Update(song);
+            var updatedSong = _songService.Update(song);
             await _coreService.SaveChanges();
             return Ok(SongResponse.FromEntity(updatedSong));
         }

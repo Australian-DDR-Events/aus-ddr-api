@@ -1,7 +1,7 @@
 using System;
 using AusDdrApi.Entities;
 using Microsoft.EntityFrameworkCore;
-
+#nullable disable
 namespace AusDdrApi.Persistence
 {
     public class DatabaseContext: DbContext
@@ -47,3 +47,4 @@ namespace AusDdrApi.Persistence
         }
     }
 }
+#nullable restore

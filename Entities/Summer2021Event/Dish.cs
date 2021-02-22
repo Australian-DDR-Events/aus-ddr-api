@@ -6,8 +6,10 @@ namespace AusDdrApi.Entities
     public class Dish
     {
         public Guid Id { get; set; }
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
         
-        public ICollection<DishSong> DishSongs { get; set; }
+        public int MaxScore { get; set; }
+        
+        public ICollection<DishSong> DishSongs { get; set; } = new List<DishSong>();
     }
 }

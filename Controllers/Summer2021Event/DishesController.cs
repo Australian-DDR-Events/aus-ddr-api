@@ -1,20 +1,26 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using AusDdrApi.Authentication;
 using AusDdrApi.Entities;
+using AusDdrApi.Helpers;
 using AusDdrApi.Models.Requests;
 using AusDdrApi.Models.Responses;
-using AusDdrApi.Persistence;
+using AusDdrApi.Services.CoreData;
+using AusDdrApi.Services.Dancer;
+using AusDdrApi.Services.Dish;
 using AusDdrApi.Services.FileStorage;
+using AusDdrApi.Services.GradedDancerIngredient;
+using AusDdrApi.Services.GradedDish;
+using AusDdrApi.Services.GradedIngredient;
+using AusDdrApi.Services.Ingredient;
+using AusDdrApi.Services.Score;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Microsoft.VisualBasic;
+using SixLabors.ImageSharp;
 
 namespace AusDdrApi.Controllers.Summer2021Event
 {
@@ -23,13 +29,34 @@ namespace AusDdrApi.Controllers.Summer2021Event
     public class DishesController : ControllerBase
     {
         private readonly ILogger<IngredientsController> _logger;
-        private DatabaseContext _context;
+        private readonly ICoreData _coreDataService;
+        private readonly IDancer _dancerService;
+        private readonly IDish _dishService;
+        private readonly IIngredient _ingredientService;
+        private readonly IGradedDancerIngredient _gradedDancerIngredientService;
+        private readonly IGradedDish _gradedDishService;
+        private readonly IScore _scoreSerivce;
         private IFileStorage _fileStorage;
 
-        public DishesController(ILogger<IngredientsController> logger, DatabaseContext context, IFileStorage fileStorage)
+        public DishesController(
+            ILogger<IngredientsController> logger,
+            ICoreData coreDataService,
+            IDancer dancerService,
+            IDish dishService,
+            IIngredient ingredientService,
+            IGradedDancerIngredient gradedDancerIngredientService,
+            IGradedDish gradedDishService,
+            IScore scoreService,
+            IFileStorage fileStorage)
         {
             _logger = logger;
-            _context = context;
+            _coreDataService = coreDataService;
+            _dancerService = dancerService;
+            _dishService = dishService;
+            _ingredientService = ingredientService;
+            _gradedDancerIngredientService = gradedDancerIngredientService;
+            _gradedDishService = gradedDishService;
+            _scoreSerivce = scoreService;
             _fileStorage = fileStorage;
         }
 
@@ -37,85 +64,74 @@ namespace AusDdrApi.Controllers.Summer2021Event
         [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult<IEnumerable<DishResponse>> Get()
         {
-            return _context.Dishes.Select(dish => DishResponse.FromEntity(dish, null)).ToArray();
+            return Ok(_dishService.GetAll().Select(DishResponse.FromEntity).AsEnumerable());
         }
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [Route("{dishId}")]
-        public ActionResult<DishResponse> GetDish(Guid dishId)
+        public ActionResult<DishResponse> Get(Guid dishId)
         {
-            var dish = _context
-                .Dishes
-                .Include(d => d.DishSongs)
-                .FirstOrDefault(d => d.Id == dishId);
+            var dish = _dishService.Get(dishId);
             if (dish == null)
             {
                 return NotFound();
             }
+            return Ok(DishResponse.FromEntity(dish));
+        }
+        
+        [HttpGet]
+        [Route("{dishId}/grades")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public ActionResult<IEnumerable<GradedDishResponse>> GetGrades(Guid dishId)
+        {
+            var dish = _dishService.Get(dishId);
+            if (dish == null) return NotFound();
 
-            var gradedDishes = _context
-                .GradedDishes
-                .AsQueryable()
-                .Where(g => g.DishId == dish.Id)
-                .ToArray();
-            return DishResponse.FromEntity(dish, gradedDishes);
+            var dishGrades = _gradedDishService.GetAllForDish(dish.Id);
+            return Ok(dishGrades.Select(GradedDishResponse.FromEntity));
         }
 
         [HttpPost]
-        [Route("{dishId}/submission")]
+        [Route("{dishId}")]
         public async Task<ActionResult<GradedDancerDishResponse>> PostDishSubmission(
             [FromRoute] Guid dishId,
             [FromForm] GradedDancerDishRequest gradedDancerDishRequest)
         {
-            var authenticationId = HttpContext.GetUserId();
-            var existingDancer = _context.Dancers.AsQueryable().SingleOrDefault(dancer => dancer.AuthenticationId == authenticationId);
-            if (existingDancer == null)
-            {
-                return NotFound();
-            }
+            /*var authId = HttpContext.GetUserId();
+            var existingDancer = _dancerService.GetByAuthId(authId);
+            if (existingDancer == null) return NotFound();
 
-            var dish = _context.Dishes.Include(d => d.DishSongs).AsQueryable().SingleOrDefault(d => d.Id == dishId);
-            var ingredients = _context
-                .DishIngredients
-                .AsQueryable()
-                .Where(i => i.DishId == dish.Id)
-                .ToList();
+            var dish = _dishService.Get(dishId);
+            if (dish == null) return NotFound();
+
+            var ingredients = _dishService.GetIngredientsForDish(dish.Id);
+            var gradedIngredients = _gradedDancerIngredientService.GetIngredientsForDancer(
+                ingredients.Select(i => i.Id),
+                existingDancer.Id);
+            if (ingredients.Count() != gradedIngredients.Count()) return BadRequest();
             
-            var gradedIngredients = _context
-                .GradedDancerIngredients
-                .Include(s => s.Score)
-                .Include(i => i.GradedIngredient)
-                .Where(g => ingredients.Exists(i => i.DishId == dish.Id))
-                .GroupBy(ingredient => ingredient.Score.SongId)
-                .Select(i => i
-                    .OrderByDescending(i => i.Score.Value)
-                    .First())
-                .ToList();
-
-            if (ingredients.Count != gradedIngredients.Count)
-            {
-                return BadRequest();
-            }
+            var dishSongs = _dishService.GetSongsForDish(dish.Id);
+            if (gradedDancerDishRequest.Scores.Count() != dishSongs.Count()) return BadRequest();
 
             var scores = new List<Score>();
             foreach (var scoreRequest in gradedDancerDishRequest.Scores)
             {
-                var score = await _context
-                    .Scores
-                    .AddAsync(new Score()
-                    {
-                        Value = scoreRequest.Score,
-                        SongId = scoreRequest.SongId,
-                        DancerId = existingDancer.Id
-                    });
-                scores.Add(score.Entity);
+                var score = await _scoreSerivce.Add(new Score
+                {
+                    Value = scoreRequest.Score,
+                    SongId = scoreRequest.SongId,
+                    DancerId = existingDancer.Id
+                });
+                scores.Add(score);
                 try
                 {
-                    await using var memoryStream = scoreRequest.ScoreImage.OpenReadStream();
+                    var scoreImage = await Image.LoadAsync(scoreRequest.ScoreImage!.OpenReadStream());
+                    var image = await Images.ImageToPngMemoryStream(scoreImage);
 
-                    var destinationKey = $"Songs/{score.Entity.SongId}/Scores/{score.Entity.Id}.png";
-                    await _fileStorage.UploadFileFromStream(memoryStream, destinationKey);
+                    var destinationKey = $"songs/{score.SongId}/scores/{score.Id}.png";
+                    await _fileStorage.UploadFileFromStream(image, destinationKey);
                 }
                 catch
                 {
@@ -124,17 +140,21 @@ namespace AusDdrApi.Controllers.Summer2021Event
             }
 
             var ingredientStars = gradedIngredients
-                .Aggregate(0, (acc, g) => acc + (int) g.GradedIngredient.Grade) / 2;
-            var exPercent = 100.0;
+                .Aggregate(0, (acc, g) => acc + (int) g.GradedIngredient!.Grade) / 2;
+            var exPercent = scores.Aggregate(0, (count, s) => count += s.Value) / dish.MaxScore;
             var ex = Math.Pow(0.00573 * Math.E, 5.73 * exPercent);
-            var ordering = scores.Aggregate(0, (acc, s) =>
+
+            var orderVariance = 0;
+            for (var scoreIndex = 0; scoreIndex < scores.Count; ++scoreIndex)
             {
-                var dishOrder = dish.DishSongs.FirstOrDefault(ds => ds.SongId == s.Id);
-                if (dishOrder == null) return 0;
-                return 0;
-            });
-            
-            //await _context.SaveChangesAsync();
+                var songOrder = dishSongs.FirstOrDefault(i => i.SongId == scores[scoreIndex].SongId);
+                if (songOrder != null)
+                {
+                    orderVariance += Math.Abs(scoreIndex - songOrder.CookingOrder);
+                }
+            }
+
+            await _coreDataService.SaveChanges();*/
             return Ok();
         }
 
@@ -145,30 +165,30 @@ namespace AusDdrApi.Controllers.Summer2021Event
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> Post(DishRequest dishRequest)
         {
-            var dish = await _context.Dishes.AddAsync(new Dish()
+            var dish = await _dishService.Add(new Dish()
             {
                 Name = dishRequest.Name
             });
-            await _context.DishIngredients.AddRangeAsync(
+            await _dishService.AddDishIngredients(
                 dishRequest.IngredientIds.Select(
                     ingredientId => new DishIngredient()
                     {
-                        DishId = dish.Entity.Id,
+                        DishId = dish.Id,
                         IngredientId = ingredientId
                     }
                 )
             );
-            await _context.DishSongs.AddRangeAsync(
+            await _dishService.AddDishSongs(
                 dishRequest.SongIds.Select(
                     (songId, index) => new DishSong()
                     {
                         SongId = songId,
                         CookingOrder = index,
-                        DishId = dish.Entity.Id
+                        DishId = dish.Id
                     }
                 )
             );
-            await _context.SaveChangesAsync();
+            await _coreDataService.SaveChanges();
 
             return Ok();
         }
@@ -181,13 +201,13 @@ namespace AusDdrApi.Controllers.Summer2021Event
         [Route("{dishId}")]
         public async Task<ActionResult> Post([FromRoute] Guid dishId, GradedDishRequest gradedDishRequest)
         {
-            await _context.GradedDishes.AddAsync(new GradedDish()
+            await _gradedDishService.Add(new GradedDish()
             {
                 DishId = dishId,
                 Description = gradedDishRequest.Description,
                 Grade = (Grade)gradedDishRequest.Grade
             });
-            await _context.SaveChangesAsync();
+            await _coreDataService.SaveChanges();
             return Ok();
         }
     }

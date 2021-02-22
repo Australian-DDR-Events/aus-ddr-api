@@ -6,12 +6,12 @@ namespace AusDdrApi.Models.Responses
     public class DancerResponse
     {
         public Guid Id { get; set; }
-        public string AuthenticationId { get; set; }
-        public string DdrName { get; set; }
-        public string DdrCode { get; set; }
-        public string PrimaryMachineLocation { get; set; }
-        public string State { get; set; }
-        public string ProfilePictureUrl { get; set; }
+        public string AuthenticationId { get; set; } = string.Empty;
+        public string DdrName { get; set; } = string.Empty;
+        public string DdrCode { get; set; } = string.Empty;
+        public string PrimaryMachineLocation { get; set; } = string.Empty;
+        public string State { get; set; } = string.Empty;
+        public string ProfilePictureUrl { get; set; } = string.Empty;
 
         public static DancerResponse FromEntity(Dancer dancer) => new DancerResponse
         {

@@ -14,7 +14,7 @@ namespace AusDdrApi.Models.Responses
 
         public DateTime SubmissionTime { get; set; }
         
-        public string ImageUrl { get; set; }
+        public string ImageUrl { get; set; } = string.Empty;
         
         public Guid DancerId { get; set; }
         

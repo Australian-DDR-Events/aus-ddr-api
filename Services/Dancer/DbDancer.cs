@@ -2,42 +2,42 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AusDdrApi.Entities;
+using DancerEntity = AusDdrApi.Entities.Dancer;
 using AusDdrApi.Persistence;
 
-namespace AusDdrApi.Services.Entities.DancerService
+namespace AusDdrApi.Services.Dancer
 {
-    public class DbDancerService : IDancerService
+    public class DbDancer : IDancer
     {
         private readonly DatabaseContext _context;
 
-        public DbDancerService(DatabaseContext context)
+        public DbDancer(DatabaseContext context)
         {
             _context = context;
         }
 
-        public IEnumerable<Dancer> GetAll()
+        public IEnumerable<AusDdrApi.Entities.Dancer> GetAll()
         {
             return _context.Dancers.ToList();
         }
 
-        public Dancer? Get(Guid dancerId)
+        public DancerEntity? Get(Guid dancerId)
         {
             return _context.Dancers.AsQueryable().SingleOrDefault(d => d.Id == dancerId);
         }
 
-        public Dancer? GetByAuthId(string authId)
+        public DancerEntity? GetByAuthId(string authId)
         {
             return _context.Dancers.AsQueryable().SingleOrDefault(d => d.AuthenticationId == authId);
         }
 
-        public async Task<Dancer> Add(Dancer dancer)
+        public async Task<DancerEntity> Add(DancerEntity dancer)
         {
             var newDancer = await _context.Dancers.AddAsync(dancer);
             return newDancer.Entity;
         }
 
-        public async Task<Dancer?> Update(Dancer dancer)
+        public DancerEntity? Update(DancerEntity dancer)
         {
             return _context.Dancers.Update(dancer).Entity;
         }

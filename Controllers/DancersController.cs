@@ -1,24 +1,19 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using AusDdrApi.Authentication;
 using AusDdrApi.Helpers;
 using AusDdrApi.Models.Requests;
 using AusDdrApi.Models.Responses;
-using AusDdrApi.Persistence;
-using AusDdrApi.Services.Entities.CoreService;
-using AusDdrApi.Services.Entities.DancerService;
+using AusDdrApi.Services.CoreData;
+using AusDdrApi.Services.Dancer;
 using AusDdrApi.Services.FileStorage;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Formats.Png;
-using SixLabors.ImageSharp.Processing;
 
 namespace AusDdrApi.Controllers
 {
@@ -27,14 +22,14 @@ namespace AusDdrApi.Controllers
     public class DancersController : ControllerBase
     {
         private readonly ILogger<DancersController> _logger;
-        private readonly ICoreService _coreService;
-        private readonly IDancerService _dancerService;
+        private readonly ICoreData _coreService;
+        private readonly IDancer _dancerService;
         private readonly IFileStorage _fileStorage;
 
         public DancersController(
             ILogger<DancersController> logger,
-            ICoreService coreService,
-            IDancerService dancerService,
+            ICoreData coreService,
+            IDancer dancerService,
             IFileStorage fileStorage)
         {
             _logger = logger;
@@ -100,7 +95,8 @@ namespace AusDdrApi.Controllers
 
             try
             {
-                var image = await Images.FormFileToPngMemoryStream(profilePicture, 256, 256);
+                var profileImage = await Image.LoadAsync(profilePicture.OpenReadStream());
+                var image = await Images.ImageToPngMemoryStream(profileImage, 256, 256);
                 
                 var destinationKey = $"profile/picture/{authId}.png";
                 await _fileStorage.UploadFileFromStream(image, destinationKey);
@@ -137,7 +133,11 @@ namespace AusDdrApi.Controllers
             existingDancer.DdrName = dancerRequest.DdrName;
             existingDancer.PrimaryMachineLocation = dancerRequest.PrimaryMachineLocation;
 
-            var newDancer = await _dancerService.Update(existingDancer);
+            var newDancer = _dancerService.Update(existingDancer);
+            if (newDancer == null)
+            {
+                return BadRequest();
+            }
             await _coreService.SaveChanges();
             return Ok(DancerResponse.FromEntity(newDancer));
         }

@@ -6,19 +6,16 @@ namespace AusDdrApi.Models.Responses
     public class GradedDancerIngredientResponse
     {
         public Guid Id { get; set; }
-        
-        public GradedIngredientResponse GradedIngredient { get; set; }
-        
-        public DancerResponse Dancer { get; set; }
-        
-        public ScoreResponse Score { get; set; }
+        public Guid GradedIngredientId { get; set; }
+        public Guid DancerId { get; set; }
+        public Guid ScoreId { get; set; }
 
         public static GradedDancerIngredientResponse FromEntity(GradedDancerIngredient entity) => new GradedDancerIngredientResponse()
         {
             Id = entity.Id,
-            GradedIngredient = GradedIngredientResponse.FromEntity(entity.GradedIngredient),
-            Dancer = DancerResponse.FromEntity(entity.Dancer),
-            Score = ScoreResponse.FromEntity(entity.Score),
+            GradedIngredientId = entity.GradedIngredientId,
+            DancerId = entity.DancerId,
+            ScoreId = entity.ScoreId
         };
     }
 }

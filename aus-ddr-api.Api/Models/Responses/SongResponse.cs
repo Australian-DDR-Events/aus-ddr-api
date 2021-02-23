@@ -22,17 +22,27 @@ namespace AusDdrApi.Models.Responses
             Level = song.Level
         };
 
-        public override bool Equals(object comparator)
+        public override bool Equals(object? comparator)
         {
             var comparatorAsSongResponse = comparator as SongResponse;
             if (comparatorAsSongResponse == null) return false;
+            return Equals(comparatorAsSongResponse);
+        }
+
+        public bool Equals(SongResponse comparator)
+        {
             return (
-                Id == comparatorAsSongResponse.Id &&
-                Name == comparatorAsSongResponse.Name &&
-                Artist == comparatorAsSongResponse.Artist &&
-                ImageUrl == comparatorAsSongResponse.ImageUrl &&
-                Difficulty == comparatorAsSongResponse.Difficulty &&
-                Level == comparatorAsSongResponse.Level);
+                Id == comparator.Id &&
+                Name == comparator.Name &&
+                Artist == comparator.Artist &&
+                ImageUrl == comparator.ImageUrl &&
+                Difficulty == comparator.Difficulty &&
+                Level == comparator.Level);
+        }
+
+        public override int GetHashCode()
+        {
+            return (Id, Name, Artist, ImageUrl, Difficulty, Level).GetHashCode();
         }
     }
 }

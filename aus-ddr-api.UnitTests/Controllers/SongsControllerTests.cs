@@ -11,10 +11,10 @@ using Microsoft.Extensions.Logging;
 using NSubstitute;
 using NUnit.Framework;
 
-namespace aus_ddr_api.UnitTests.Controllers
+namespace UnitTests.Controllers
 {
     [TestFixture]
-    public class SongsController_Tests
+    public class SongsControllerTests
     {
         private SongsController _songsController;
 

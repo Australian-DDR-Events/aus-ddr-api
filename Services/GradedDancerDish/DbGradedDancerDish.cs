@@ -33,7 +33,7 @@ namespace AusDdrApi.Services.GradedDancerDish
                 .Include(g => g.GradedDish)
                 .Include(g => g.Scores)
                 .AsQueryable()
-                .GroupBy(g => g.GradedDish.DishId)
+                .GroupBy(g => g.GradedDish!.DishId)
                 .Select(i => i
                     .OrderByDescending(g => g.Scores.Aggregate(0, (v, s) => v + s.Value))
                     .Single())
@@ -48,7 +48,7 @@ namespace AusDdrApi.Services.GradedDancerDish
                 .Include(g => g.Scores)
                 .AsQueryable()
                 .Where(g => g.DancerId == dancerId)
-                .Where(g => g.GradedDish.DishId == dishId)
+                .Where(g => g.GradedDish!.DishId == dishId)
                 .OrderByDescending(g => g.Scores.Aggregate(0, (v, s) => v + s.Value))
                 .SingleOrDefault();
         }

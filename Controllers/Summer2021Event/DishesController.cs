@@ -98,7 +98,7 @@ namespace AusDdrApi.Controllers.Summer2021Event
         }
 
         [HttpPost]
-        [Route("{dishId}")]
+        [Route("{dishId}/submission")]
         public async Task<ActionResult<GradedDancerDishResponse>> PostDishSubmission(
             [FromRoute] Guid dishId,
             [FromForm] GradedDancerDishRequest gradedDancerDishRequest)
@@ -155,7 +155,7 @@ namespace AusDdrApi.Controllers.Summer2021Event
             {
                 var firstSong = dishSongs.FirstOrDefault(i => i.SongId == scores[scoreIndex - 1].SongId);
                 var secondSong = dishSongs.FirstOrDefault(i => i.SongId == scores[scoreIndex].SongId);
-                if (firstSong.CookingOrder + 1 == secondSong.CookingOrder) orderVariance++;
+                if (firstSong?.CookingOrder + 1 == secondSong?.CookingOrder) orderVariance++;
             }
 
             var varianceMultiplier = 1 + (orderVariance / maxVariance) * 0.5;
@@ -165,6 +165,7 @@ namespace AusDdrApi.Controllers.Summer2021Event
             var grade = (Grade) (Math.Max(Math.Min(baseGrade, 5), 1));
             var gradedDish = _gradedDishService
                 .GetForDishIdAndGrade(dishId, grade);
+            if (gradedDish == null) return NotFound();
             var gradedDancerDish = await _gradedDancerDishService
                 .Add(new GradedDancerDish
                 {

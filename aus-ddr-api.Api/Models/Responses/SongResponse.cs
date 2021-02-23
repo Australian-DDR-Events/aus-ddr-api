@@ -21,5 +21,18 @@ namespace AusDdrApi.Models.Responses
             Difficulty = song.Difficulty,
             Level = song.Level
         };
+
+        public override bool Equals(object comparator)
+        {
+            var comparatorAsSongResponse = comparator as SongResponse;
+            if (comparatorAsSongResponse == null) return false;
+            return (
+                Id == comparatorAsSongResponse.Id &&
+                Name == comparatorAsSongResponse.Name &&
+                Artist == comparatorAsSongResponse.Artist &&
+                ImageUrl == comparatorAsSongResponse.ImageUrl &&
+                Difficulty == comparatorAsSongResponse.Difficulty &&
+                Level == comparatorAsSongResponse.Level);
+        }
     }
 }

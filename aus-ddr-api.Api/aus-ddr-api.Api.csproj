@@ -5,6 +5,7 @@
         <RootNamespace>AusDdrApi</RootNamespace>
         <UserSecretsId>6241a2f4-a414-44e2-a381-d8572551026a</UserSecretsId>
         <Nullable>enable</Nullable>
+        <AssemblyName>AusDdrApi.Api</AssemblyName>
     </PropertyGroup>
 
     <ItemGroup>

@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "aus-ddr-api", "aus-ddr-api.csproj", "{ED40EAAC-2AAE-45C9-8CA7-EB917D84DEC9}"
+Project("{BA7573B7-C56C-4EB9-A6ED-3E5A675EF266}") = "aus-ddr-api.Api", "aus-ddr-api.Api\aus-ddr-api.Api.csproj", "{370F6AF8-D444-40E6-A2DF-A34587423507}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "aus-ddr-api.UnitTests", "aus-ddr-api.UnitTests\aus-ddr-api.UnitTests.csproj", "{CA2B5F70-2BE1-4748-A163-A2CB2308FE4B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -8,9 +10,12 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{ED40EAAC-2AAE-45C9-8CA7-EB917D84DEC9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{ED40EAAC-2AAE-45C9-8CA7-EB917D84DEC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{ED40EAAC-2AAE-45C9-8CA7-EB917D84DEC9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{ED40EAAC-2AAE-45C9-8CA7-EB917D84DEC9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CA2B5F70-2BE1-4748-A163-A2CB2308FE4B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CA2B5F70-2BE1-4748-A163-A2CB2308FE4B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CA2B5F70-2BE1-4748-A163-A2CB2308FE4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{370F6AF8-D444-40E6-A2DF-A34587423507}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{370F6AF8-D444-40E6-A2DF-A34587423507}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{370F6AF8-D444-40E6-A2DF-A34587423507}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{370F6AF8-D444-40E6-A2DF-A34587423507}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

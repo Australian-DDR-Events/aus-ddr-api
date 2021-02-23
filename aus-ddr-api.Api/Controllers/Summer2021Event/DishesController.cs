@@ -174,6 +174,8 @@ namespace AusDdrApi.Controllers.Summer2021Event
                     Scores = scores
                 });
 
+            if (gradedDancerDish == null) return BadRequest();
+
             await _coreDataService.SaveChanges();
             return Ok(GradedDancerDishResponse.FromEntity(gradedDancerDish));
         }

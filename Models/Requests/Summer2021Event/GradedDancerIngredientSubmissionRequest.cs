@@ -7,9 +7,7 @@ namespace AusDdrApi.Models.Requests
     public class GradedDancerIngredientSubmissionRequest
     {
         [Required]
-        public int Score { get; set; }
-        [Required]
-        public IFormFile? ScoreImage { get; set; }
+        public ScoreSubmissionRequest? ScoreRequest { get; set; }
         [Required]
         public Guid IngredientId { get; set; }
     }

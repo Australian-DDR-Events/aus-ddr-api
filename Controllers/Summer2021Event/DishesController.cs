@@ -175,7 +175,7 @@ namespace AusDdrApi.Controllers.Summer2021Event
                 });
 
             await _coreDataService.SaveChanges();
-            return Ok(gradedDancerDish);
+            return Ok(GradedDancerDishResponse.FromEntity(gradedDancerDish));
         }
 
         [HttpPost]
@@ -208,6 +208,24 @@ namespace AusDdrApi.Controllers.Summer2021Event
                     }
                 )
             );
+            
+            try
+            {
+                int[] imageSizes = {32, 64, 128, 256};
+                var dishImage = await Image.LoadAsync(dishRequest.DishImage!.OpenReadStream());
+                foreach (var size in imageSizes)
+                {
+                    var image = await Images.ImageToPngMemoryStream(dishImage, size, size);
+
+                    var destinationKey = $"summer2021/dishes/{dish.Id}.{size}.png";
+                    await _fileStorage.UploadFileFromStream(image, destinationKey);
+                }
+            }
+            catch
+            {
+                return BadRequest();
+            }
+            
             await _coreDataService.SaveChanges();
 
             return Ok();

@@ -13,6 +13,7 @@ using AusDdrApi.Services.Dancer;
 using AusDdrApi.Services.FileStorage;
 using AusDdrApi.Services.GradedDancerIngredient;
 using AusDdrApi.Services.GradedIngredient;
+using AusDdrApi.Services.Ingredient;
 using AusDdrApi.Services.Score;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -31,6 +32,7 @@ namespace AusDdrApi.Controllers.Summer2021Event
         private readonly ICoreData _coreDataService;
         private readonly IDancer _dancerService;
         private readonly IScore _scoreService;
+        private readonly IIngredient _ingredientService;
         private readonly IGradedIngredient _gradedIngredientService;
         private readonly IGradedDancerIngredient _gradedDancerIngredientService;
         private readonly IFileStorage _fileStorage;
@@ -40,6 +42,7 @@ namespace AusDdrApi.Controllers.Summer2021Event
             ICoreData coreDataService,
             IDancer dancerService,
             IScore scoreService,
+            IIngredient ingredientService,
             IGradedIngredient gradedIngredientService,
             IGradedDancerIngredient gradedDancerIngredientService, 
             IFileStorage fileStorage)
@@ -48,6 +51,7 @@ namespace AusDdrApi.Controllers.Summer2021Event
             _coreDataService = coreDataService;
             _dancerService = dancerService;
             _scoreService = scoreService;
+            _ingredientService = ingredientService;
             _gradedIngredientService = gradedIngredientService;
             _gradedDancerIngredientService = gradedDancerIngredientService;
             _fileStorage = fileStorage;
@@ -108,7 +112,10 @@ namespace AusDdrApi.Controllers.Summer2021Event
                 return NotFound();
             }
 
-            var gradedIngredient = _gradedIngredientService.GetForScore(request.IngredientId, request.Score);
+            var ingredient = _ingredientService.Get(request.IngredientId);
+            if (ingredient == null || ingredient.SongId != request.ScoreRequest!.SongId) return BadRequest();
+
+            var gradedIngredient = _gradedIngredientService.GetForScore(ingredient.Id, request.ScoreRequest.Score);
             if (gradedIngredient?.Ingredient == null)
             {
                 return NotFound();
@@ -118,7 +125,7 @@ namespace AusDdrApi.Controllers.Summer2021Event
             {
                 SongId = gradedIngredient.Ingredient.SongId,
                 DancerId = existingDancer.Id,
-                Value = request.Score,
+                Value = request.ScoreRequest.Score,
             });
 
             var dancerIngredient = await _gradedDancerIngredientService.Add(new GradedDancerIngredient()
@@ -130,7 +137,7 @@ namespace AusDdrApi.Controllers.Summer2021Event
 
             try
             {
-                var scoreImage = await Image.LoadAsync(request.ScoreImage!.OpenReadStream());
+                var scoreImage = await Image.LoadAsync(request.ScoreRequest.ScoreImage!.OpenReadStream());
                 var image = await Images.ImageToPngMemoryStream(scoreImage);
 
                 var destinationKey = $"songs/{score.SongId}/scores/{score.Id}.png";

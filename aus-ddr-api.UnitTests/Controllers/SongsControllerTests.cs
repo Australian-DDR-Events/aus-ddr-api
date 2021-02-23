@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using AusDdrApi.Controllers;
@@ -6,24 +7,24 @@ using AusDdrApi.Entities;
 using AusDdrApi.Models.Responses;
 using AusDdrApi.Services.CoreData;
 using AusDdrApi.Services.Song;
+using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
-using NUnit.Framework;
+using NSubstitute.ReturnsExtensions;
+using Xunit;
 
 namespace UnitTests.Controllers
 {
-    [TestFixture]
     public class SongsControllerTests
     {
-        private SongsController _songsController;
+        private readonly SongsController _songsController;
 
-        private ILogger<SongsController> _logger;
-        private ICoreData _coreDataService;
-        private ISong _songService;
+        private readonly ILogger<SongsController> _logger;
+        private readonly ICoreData _coreDataService;
+        private readonly ISong _songService;
         
-        [SetUp]
-        public void Setup()
+        public SongsControllerTests()
         {
             _logger = Substitute.For<ILogger<SongsController>>();
             _songService = Substitute.For<ISong>();
@@ -32,8 +33,8 @@ namespace UnitTests.Controllers
             _songsController = new SongsController(_logger, _coreDataService, _songService);
         }
 
-        [Test]
-        public void Get_ReturnsAllSongs()
+        [Fact]
+        public void Get_ReturnsOkObjectResultWithEnumerableSongResponse()
         {
             var firstSong = new Song
             {
@@ -58,10 +59,43 @@ namespace UnitTests.Controllers
 
             var actionResult = _songsController.Get();
 
-            var result = actionResult.Result as OkObjectResult;
-            Assert.NotNull(result);
-            
-            Assert.AreEqual(expectedSongList, result.Value);
+            actionResult.Result
+                .Should().BeOfType<OkObjectResult>()
+                .Which.Value.Should().BeAssignableTo<IEnumerable>()
+                .Which.Should().Equal(expectedSongList);
+        }
+
+        [Fact]
+        public void GetSong_WhenSongNotFound_ReturnsNotFoundResult()
+        {
+            _songService.Get(Arg.Any<Guid>()).ReturnsNull();
+
+            var actionResult = _songsController.GetSong(Guid.NewGuid());
+
+            actionResult.Result
+                .Should().BeOfType<NotFoundResult>();
+        }
+
+        [Fact]
+        public void GetSong_WhenSongIsFound_ReturnsOkObjectResultWithSongResponse()
+        {
+            var song = new Song
+            {
+                Id = Guid.NewGuid(),
+                Artist = "Artist1",
+                Difficulty = "Difficulty",
+                Level = 15,
+                Name = "Name1"
+            };
+
+            var expectedSongResponse = SongResponse.FromEntity(song);
+            _songService.Get(Arg.Is<Guid>(song.Id)).Returns(song);
+
+            var actionResult = _songsController.GetSong(song.Id);
+
+            actionResult.Result
+                .Should().BeOfType<OkObjectResult>()
+                .Which.Value.Should().Equals(expectedSongResponse);
         }
     }
 }

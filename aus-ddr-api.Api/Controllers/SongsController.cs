@@ -35,7 +35,7 @@ namespace AusDdrApi.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult<IEnumerable<SongResponse>> Get()
         {
-            return Ok(_songService.GetAll().Select(SongResponse.FromEntity));
+            return Ok(_songService.GetAll().Select(SongResponse.FromEntity).AsEnumerable());
         }
 
         [HttpGet]

@@ -103,7 +103,7 @@ namespace AusDdrApi.Controllers.Summer2021Event
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<GradedDancerIngredientResponse>> SubmitScoreForIngredient(
-            GradedDancerIngredientSubmissionRequest request)
+            [FromForm] GradedDancerIngredientSubmissionRequest request)
         {
             var authId = HttpContext.GetUserId();
             var existingDancer = _dancerService.GetByAuthId(authId);

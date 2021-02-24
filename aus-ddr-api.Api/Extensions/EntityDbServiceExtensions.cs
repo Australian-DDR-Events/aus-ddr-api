@@ -1,6 +1,7 @@
 using AusDdrApi.Services.CoreData;
 using AusDdrApi.Services.Dancer;
 using AusDdrApi.Services.Dish;
+using AusDdrApi.Services.GradedDancerDish;
 using AusDdrApi.Services.GradedDancerIngredient;
 using AusDdrApi.Services.GradedDish;
 using AusDdrApi.Services.GradedIngredient;
@@ -20,6 +21,7 @@ namespace AusDdrApi.Extensions
             services.AddTransient<ISong, DbSong>();
             services.AddTransient<IScore, DbScore>();
             services.AddTransient<IDancer, DbDancer>();
+            services.AddTransient<IGradedDancerDish, DbGradedDancerDish>();
             services.AddTransient<IGradedDancerIngredient, DbGradedDancerIngredient>();
             services.AddTransient<IGradedIngredient, DbGradedIngredient>();
             services.AddTransient<IIngredient, DbIngredient>();

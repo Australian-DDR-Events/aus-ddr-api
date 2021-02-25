@@ -65,15 +65,15 @@ namespace AusDdrApi.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public ActionResult<IEnumerable<ScoreResponse>> Get(
-            [FromQuery(Name = "dancer_id")] Guid? dancerId,
-            [FromQuery(Name = "song_id")] Guid? songId
+            [FromQuery(Name = "dancer_id")] Guid?[] dancerIds,
+            [FromQuery(Name = "song_id")] Guid?[] songIds
         )
         {
-            if (dancerId == null && songId == null)
+            if (dancerIds.Length == 0 && songIds.Length == 0)
             {
                 return BadRequest();
             }
-            return Ok(_scoreService.GetScores(dancerId, songId).Select(ScoreResponse.FromEntity));
+            return Ok(_scoreService.GetScores(dancerIds, songIds).Select(ScoreResponse.FromEntity));
         }
         
         [HttpPost]

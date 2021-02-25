@@ -21,14 +21,13 @@ namespace AusDdrApi.Services.Score
             return _context.Scores.AsQueryable().SingleOrDefault(s => s.Id == scoreId);
         }
 
-        public IEnumerable<ScoreEntity> GetScores(Guid? dancerId, Guid? songId)
+        public IEnumerable<ScoreEntity> GetScores(Guid?[] dancerIds, Guid?[] songIds)
         {
             return _context
                 .Scores
                 .AsQueryable()
-                .Where(score => 
-                    (dancerId ?? score.DancerId) == score.DancerId &&
-                    (songId ?? score.SongId) == score.SongId)
+                .Where(score => dancerIds.Length <= 0 || dancerIds.Contains(score.DancerId))
+                .Where(score => songIds.Length <= 0 || songIds.Contains(score.SongId))
                 .ToList();
         }
 

@@ -34,7 +34,7 @@ namespace AusDdrApi.Services.GradedDancerIngredient
                 .GroupBy(ingredient => ingredient.Score!.SongId)
                 .Select(i => i
                     .OrderByDescending(g => g.Score!.Value)
-                    .SingleOrDefault())
+                    .Single())
                 .ToList();
         }
 
@@ -83,12 +83,12 @@ namespace AusDdrApi.Services.GradedDancerIngredient
             // on the database.
             return gradedDancerIngredients
                 .Where(g => g.DancerId == dancerId)
-                .Where(g => ingredientIds.Contains(g.GradedIngredient.IngredientId))
+                .Where(g => ingredientIds.Contains(g.GradedIngredient!.IngredientId))
                 .AsEnumerable()
-                .GroupBy(g => g.GradedIngredient.IngredientId)
+                .GroupBy(g => g.GradedIngredient!.IngredientId)
                 .Select(g => g
-                    .OrderByDescending(i => i.Score.Value)
-                    .SingleOrDefault())
+                    .OrderByDescending(i => i.Score!.Value)
+                    .Single())
                 .ToList();
         }
 

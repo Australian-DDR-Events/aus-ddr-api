@@ -162,6 +162,7 @@ namespace AusDdrApi.Controllers.Summer2021Event
 
             var top = (avgStars + 1) / 2 + ex * varianceMultiplier;
             var baseGrade = Math.Floor((top / 1.1) * (gradedDancerDishRequest.PairBonus ? 1.1 : 1.0));
+            Console.WriteLine($"top {top} variance {varianceMultiplier} orderVar {orderVariance} final {baseGrade}");
             var grade = (Grade) (Math.Max(Math.Min(baseGrade, 4), 0));
             var gradedDish = _gradedDishService
                 .GetForDishIdAndGrade(dishId, grade);

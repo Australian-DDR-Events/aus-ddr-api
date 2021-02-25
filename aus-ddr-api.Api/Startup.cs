@@ -107,8 +107,8 @@ namespace AusDdrApi
             }
             else
             {
-                app.UseHttpsRedirection();
                 app.UseHsts();
+                app.UseHttpsRedirection();
             }
 
             app.UseOptions();

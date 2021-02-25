@@ -147,6 +147,8 @@ namespace AusDdrApi.Controllers.Summer2021Event
                 .Aggregate(0, (acc, g) => acc + (int) g.GradedIngredient!.Grade);
             var avgStars = (float) ingredientStars / gradedIngredients.Count();
             var exPercent = (double)scores.Aggregate(0, (count, s) => count += s.Value) / dish.MaxScore;
+            Console.WriteLine($"{scores.Aggregate(0, (count, s) => count += s.Value)}");
+            Console.WriteLine($"{dish.MaxScore} {exPercent}");
             var ex = Math.Pow(0.00573 * Math.E, 5.73 * exPercent);
 
             var orderVariance = 0;

@@ -33,7 +33,7 @@ namespace AusDdrApi.Services.GradedDancerIngredient
                 .Include(s => s.Score)
                 .GroupBy(ingredient => ingredient.Score!.SongId)
                 .Select(i => i
-                    .OrderByDescending(i => i.Score!.Value)
+                    .OrderByDescending(g => g.Score!.Value)
                     .Single())
                 .AsEnumerable();
         }

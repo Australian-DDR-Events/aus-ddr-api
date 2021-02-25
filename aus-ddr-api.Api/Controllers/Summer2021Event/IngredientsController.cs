@@ -3,14 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Amazon.Auth.AccessControlPolicy;
+using AusDdrApi.Authentication;
+using AusDdrApi.Entities;
 using AusDdrApi.Helpers;
 using AusDdrApi.Models.Requests;
 using AusDdrApi.Models.Responses;
 using AusDdrApi.Persistence;
 using AusDdrApi.Services.CoreData;
+using AusDdrApi.Services.Dancer;
 using AusDdrApi.Services.FileStorage;
+using AusDdrApi.Services.GradedDancerIngredient;
 using AusDdrApi.Services.GradedIngredient;
 using AusDdrApi.Services.Ingredient;
+using AusDdrApi.Services.Score;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -26,20 +31,29 @@ namespace AusDdrApi.Controllers.Summer2021Event
     {
         private readonly ILogger<IngredientsController> _logger;
         private readonly ICoreData _coreDataService;
+        private readonly IDancer _dancerService;
+        private readonly IGradedDancerIngredient _gradedDancerIngredientService;
         private readonly IGradedIngredient _gradedIngredientService;
         private readonly IIngredient _ingredientService;
+        private readonly IScore _scoreService;
         private readonly IFileStorage _fileStorage;
 
         public IngredientsController(ILogger<IngredientsController> logger,
             ICoreData coreDataService,
+            IDancer dancerService,
+            IGradedDancerIngredient gradedDancerIngredientService,
             IGradedIngredient gradedIngredientService,
             IIngredient ingredientService,
+            IScore scoreService,
             IFileStorage fileStorage)
         {
             _logger = logger;
             _coreDataService = coreDataService;
+            _dancerService = dancerService;
+            _gradedDancerIngredientService = gradedDancerIngredientService;
             _gradedIngredientService = gradedIngredientService;
             _ingredientService = ingredientService;
+            _scoreService = scoreService;
             _fileStorage = fileStorage;
         }
 
@@ -112,6 +126,64 @@ namespace AusDdrApi.Controllers.Summer2021Event
 
             await _coreDataService.SaveChanges();
             return Ok(IngredientResponse.FromEntity(newIngredient));
+        }
+        
+        [HttpPost]
+        [Authorize]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [Route("{ingredientId}")]
+        public async Task<ActionResult<GradedDancerIngredientResponse>> SubmitScoreForIngredient(
+            [FromRoute] Guid ingredientId,
+            [FromForm] IngredientScoreRequest request)
+        {
+            var authId = HttpContext.GetUserId();
+            var existingDancer = _dancerService.GetByAuthId(authId);
+            if (existingDancer == null)
+            {
+                return NotFound("dancer does not exist");
+            }
+
+            var ingredient = _ingredientService.Get(ingredientId);
+            if (ingredient == null) return BadRequest("ingredient does not exist");
+
+            var gradedIngredient = _gradedIngredientService.GetForScore(ingredient.Id, request.Score);
+            if (gradedIngredient?.Ingredient == null)
+            {
+                return NotFound($"graded ingredient does not exist for {ingredientId} score {request.Score}");
+            }
+
+            var score = await _scoreService.Add(new Score()
+            {
+                SongId = ingredient.SongId,
+                DancerId = existingDancer.Id,
+                Value = request.Score,
+            });
+
+            var dancerIngredient = await _gradedDancerIngredientService.Add(new GradedDancerIngredient()
+            {
+                GradedIngredientId = gradedIngredient.Id,
+                DancerId = existingDancer.Id,
+                ScoreId = score.Id,
+            });
+
+            try
+            {
+                var scoreImage = await Image.LoadAsync(request.ScoreImage!.OpenReadStream());
+                var image = await Images.ImageToPngMemoryStream(scoreImage);
+
+                var destinationKey = $"songs/{score.SongId}/scores/{score.Id}.png";
+                await _fileStorage.UploadFileFromStream(image, destinationKey);
+            }
+            catch
+            {
+                return BadRequest("image was invalid or malformed");
+            }
+
+            await _coreDataService.SaveChanges();
+
+            return GradedDancerIngredientResponse.FromEntity(dancerIngredient);
         }
     }
 }

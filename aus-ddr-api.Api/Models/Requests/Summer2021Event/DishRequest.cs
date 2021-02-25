@@ -11,6 +11,8 @@ namespace AusDdrApi.Models.Requests
         
         public ICollection<Guid> SongIds { get; set; } = new List<Guid>();
         public ICollection<Guid> IngredientIds { get; set; } = new List<Guid>();
+        public IList<string> GradeDescriptions { get; set; } = new List<string>();
+
         [Required]
         public IFormFile? DishImage { get; set; }
     }

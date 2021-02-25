@@ -161,8 +161,8 @@ namespace AusDdrApi.Controllers.Summer2021Event
             var varianceMultiplier = 1 + (orderVariance / maxVariance) * 0.5;
 
             var top = (avgStars / 2) + ex * varianceMultiplier;
-            var baseGrade = Math.Ceiling((top / 1.1) * (gradedDancerDishRequest.PairBonus ? 1.1 : 1.0));
-            var grade = (Grade) (Math.Max(Math.Min(baseGrade, 5), 1));
+            var baseGrade = Math.Floor((top / 1.1) * (gradedDancerDishRequest.PairBonus ? 1.1 : 1.0));
+            var grade = (Grade) (Math.Max(Math.Min(baseGrade, 4), 0));
             var gradedDish = _gradedDishService
                 .GetForDishIdAndGrade(dishId, grade);
             if (gradedDish == null) return NotFound();
@@ -210,7 +210,17 @@ namespace AusDdrApi.Controllers.Summer2021Event
                     }
                 )
             );
-            
+
+            for (var gradeIndex = 0; gradeIndex < dishRequest.GradeDescriptions.Count; gradeIndex++)
+            {
+                await _gradedDishService.Add(new GradedDish
+                {
+                    DishId = dish.Id,
+                    Description = dishRequest.GradeDescriptions[gradeIndex],
+                    Grade = (Grade)gradeIndex
+                });
+            }
+
             try
             {
                 int[] imageSizes = {32, 64, 128, 256};
@@ -230,24 +240,6 @@ namespace AusDdrApi.Controllers.Summer2021Event
             
             await _coreDataService.SaveChanges();
 
-            return Ok();
-        }
-
-        [HttpPost]
-        [Authorize(Policy = "Admin")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [Route("{dishId}")]
-        public async Task<ActionResult> Post([FromRoute] Guid dishId, GradedDishRequest gradedDishRequest)
-        {
-            await _gradedDishService.Add(new GradedDish()
-            {
-                DishId = dishId,
-                Description = gradedDishRequest.Description,
-                Grade = (Grade)gradedDishRequest.Grade
-            });
-            await _coreDataService.SaveChanges();
             return Ok();
         }
     }

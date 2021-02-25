@@ -147,9 +147,7 @@ namespace AusDdrApi.Controllers.Summer2021Event
                 .Aggregate(0, (acc, g) => acc + (int) g.GradedIngredient!.Grade);
             var avgStars = (float) ingredientStars / gradedIngredients.Count();
             var exPercent = (double)scores.Aggregate(0, (count, s) => count += s.Value) / dish.MaxScore;
-            Console.WriteLine($"{scores.Aggregate(0, (count, s) => count += s.Value)}");
-            Console.WriteLine($"{dish.MaxScore} {exPercent}");
-            var ex = Math.Pow(0.00573 * Math.E, 5.73 * exPercent);
+            var ex = 0.00573 * Math.Pow(Math.E, 5.73 * exPercent);
 
             var orderVariance = 0;
             var maxVariance = scores.Count - 1;
@@ -163,9 +161,7 @@ namespace AusDdrApi.Controllers.Summer2021Event
             var varianceMultiplier = 1 + (orderVariance / maxVariance) * 0.5;
 
             var top = (avgStars + 1) / 2 + ex * varianceMultiplier;
-            Console.WriteLine($"s {avgStars} e {ex} v {varianceMultiplier}");
             var baseGrade = Math.Floor((top / 1.1) * (gradedDancerDishRequest.PairBonus ? 1.1 : 1.0));
-            Console.WriteLine($"top {top} variance {varianceMultiplier} orderVar {orderVariance} final {baseGrade}");
             var grade = (Grade) (Math.Max(Math.Min(baseGrade, 4), 0));
             var gradedDish = _gradedDishService
                 .GetForDishIdAndGrade(dishId, grade);

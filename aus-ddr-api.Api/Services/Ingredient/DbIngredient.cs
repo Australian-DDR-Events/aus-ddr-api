@@ -28,7 +28,7 @@ namespace AusDdrApi.Services.Ingredient
         
         public IEnumerable<IngredientEntity> Get(IEnumerable<Guid> ingredientIds)
         {
-            return _context.Ingredients.AsQueryable().Where(i => ingredientIds.Contains(i.Id));
+            return _context.Ingredients.AsQueryable().Where(i => ingredientIds.Contains(i.Id)).ToList();
         }
 
         public async Task<IngredientEntity> Add(IngredientEntity ingredient)

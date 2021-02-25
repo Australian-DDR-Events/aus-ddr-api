@@ -23,7 +23,7 @@ namespace AusDdrApi.Services.GradedDancerIngredient
                 .GradedDancerIngredients
                 .AsQueryable()
                 .Where(g => g.DancerId == dancerId)
-                .AsEnumerable();
+                .ToList();
         }
 
         public IEnumerable<GradedDancerIngredientEntity> GetTopForDancer(Guid dancerId)
@@ -34,8 +34,8 @@ namespace AusDdrApi.Services.GradedDancerIngredient
                 .GroupBy(ingredient => ingredient.Score!.SongId)
                 .Select(i => i
                     .OrderByDescending(g => g.Score!.Value)
-                    .Single())
-                .AsEnumerable();
+                    .SingleOrDefault())
+                .ToList();
         }
 
         public IEnumerable<GradedDancerIngredientEntity> GetAllForIngredient(Guid ingredientId)
@@ -45,7 +45,7 @@ namespace AusDdrApi.Services.GradedDancerIngredient
                 .AsQueryable()
                 .Include(g => g.GradedIngredient)
                 .Where(g => g.GradedIngredient!.IngredientId == ingredientId)
-                .AsEnumerable();
+                .ToList();
         }
 
         public GradedDancerIngredientEntity? Get(Guid gradedDancerIngredientId)
@@ -72,17 +72,24 @@ namespace AusDdrApi.Services.GradedDancerIngredient
         public IEnumerable<GradedDancerIngredientEntity> GetIngredientsForDancer(IEnumerable<Guid> ingredientIds,
             Guid dancerId)
         {
-            return _context
+            var gradedDancerIngredients = _context
                 .GradedDancerIngredients
                 .Include(g => g.GradedIngredient)
                 .Include(g => g.Score)
-                .AsQueryable()
-                .Where(g => ingredientIds.Contains(g.GradedIngredient!.IngredientId))
-                .GroupBy(g => g.GradedIngredient!.IngredientId)
+                .AsQueryable();
+
+            // TODO: this performs grouping locally rather than on the database. This can
+            // result in poor performance. This will need to be reworked to instead run 
+            // on the database.
+            return gradedDancerIngredients
+                .Where(g => g.DancerId == dancerId)
+                .Where(g => ingredientIds.Contains(g.GradedIngredient.IngredientId))
+                .AsEnumerable()
+                .GroupBy(g => g.GradedIngredient.IngredientId)
                 .Select(g => g
-                    .OrderByDescending(i => i.Score!.Value)
-                    .Single())
-                .AsEnumerable();
+                    .OrderByDescending(i => i.Score.Value)
+                    .SingleOrDefault())
+                .ToList();
         }
 
         public async Task<GradedDancerIngredientEntity> Add(GradedDancerIngredientEntity gradedDancerIngredient)

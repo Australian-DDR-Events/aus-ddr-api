@@ -32,13 +32,14 @@ namespace AusDdrApi.Services.Dish
 
         public IEnumerable<IngredientEntity> GetIngredientsForDish(Guid dishId)
         {
-            return _context
+            var ingredients = _context
                 .DishIngredients
                 .Include(d => d.Ingredient)
                 .AsQueryable()
                 .Where(d => d.DishId == dishId)
                 .Select(d => d.Ingredient!)
-                .AsEnumerable();
+                .ToList();
+            return ingredients;
         }
 
         public IEnumerable<DishSongEntity> GetSongsForDish(Guid dishId)
@@ -47,7 +48,7 @@ namespace AusDdrApi.Services.Dish
                 .DishSongs
                 .AsQueryable()
                 .Where(d => d.DishId == dishId)
-                .AsEnumerable();
+                .ToList();
         }
 
         public async Task<DishEntity> Add(DishEntity dish)

@@ -112,7 +112,7 @@ namespace AusDdrApi.Controllers.Summer2021Event
 
             var ingredients = _dishService.GetIngredientsForDish(dish.Id);
             var gradedIngredients = _gradedDancerIngredientService.GetIngredientsForDancer(
-                ingredients.Select(i => i.Id),
+                ingredients.Select(i => i.Id).ToList(),
                 existingDancer.Id);
             if (ingredients.Count() != gradedIngredients.Count()) return BadRequest();
             

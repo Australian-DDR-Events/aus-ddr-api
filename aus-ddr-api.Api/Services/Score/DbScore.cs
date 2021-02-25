@@ -29,7 +29,7 @@ namespace AusDdrApi.Services.Score
                 .Where(score => 
                     (dancerId ?? score.DancerId) == score.DancerId &&
                     (songId ?? score.SongId) == score.SongId)
-                .AsEnumerable();
+                .ToList();
         }
 
         public async Task<ScoreEntity> Add(ScoreEntity score)

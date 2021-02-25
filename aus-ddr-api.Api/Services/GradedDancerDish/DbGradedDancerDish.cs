@@ -23,7 +23,7 @@ namespace AusDdrApi.Services.GradedDancerDish
                 .GradedDancerDishes
                 .AsQueryable()
                 .Where(g => g.DancerId == dancerId)
-                .AsEnumerable();
+                .ToList();
         }
 
         public IEnumerable<GradedDancerDishEntity> GetTopForDancer(Guid dancerId)
@@ -36,8 +36,8 @@ namespace AusDdrApi.Services.GradedDancerDish
                 .GroupBy(g => g.GradedDish!.DishId)
                 .Select(i => i
                     .OrderByDescending(g => g.Scores.Aggregate(0, (v, s) => v + s.Value))
-                    .Single())
-                .AsEnumerable();
+                    .SingleOrDefault())
+                .ToList();
         }
 
         public GradedDancerDishEntity? GetDishForDancer(Guid dishId, Guid dancerId)

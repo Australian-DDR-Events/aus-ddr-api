@@ -24,7 +24,7 @@ namespace AusDdrApi.Services.GradedDish
                 .GradedDishes
                 .AsQueryable()
                 .Where(g => g.DishId == dishId)
-                .AsEnumerable();
+                .ToList();
         }
 
         public GradedDishEntity? Get(Guid gradedDishId)

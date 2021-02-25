@@ -18,7 +18,7 @@ namespace AusDdrApi.Services.Song
 
         public IEnumerable<SongEntity> GetAll()
         {
-            return _context.Songs.AsQueryable().ToArray();
+            return _context.Songs.AsQueryable().ToList();
         }
 
         public SongEntity? Get(Guid songId)

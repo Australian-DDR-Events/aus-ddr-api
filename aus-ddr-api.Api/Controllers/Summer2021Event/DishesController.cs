@@ -87,7 +87,7 @@ namespace AusDdrApi.Controllers.Summer2021Event
         [HttpGet]
         [Route("{dishId}/ingredients")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public ActionResult<IEnumerable<GradedDishResponse>> GetIngredients(Guid dishId)
+        public ActionResult<IEnumerable<Ingredient>> GetIngredients(Guid dishId)
         {
             return Ok(_dishService.GetIngredientsForDish(dishId).AsEnumerable());
         }

@@ -22,16 +22,13 @@ jobs:
           process-types: web
       - heroku/release-docker-image:
           process-types: web
-  integration_tests:
+  test:
     working_directory: ~/aus-ddr-api
     machine:
       image: ubuntu-2004:202010-01
     resource_class: medium
     steps:
       - checkout
-      - run: 
-          name: Spin up Postgres
-          command: docker-compose --env-file ./.integration.env up -d
       - run:
           name: Add signing keys
           command: |
@@ -48,7 +45,13 @@ jobs:
           name: Restore packages
           command: dotnet restore
       - run:
-          name: Run tests
+          name: Run unit tests
+          command: dotnet test aus-ddr-api.UnitTests -v n
+      - run:
+          name: Spin up Postgres
+          command: docker-compose --env-file ./.integration.env up -d
+      - run:
+          name: Run integration tests
           command: dotnet test aus-ddr-api.IntegrationTests -v n
       - run:
           name: Bring down Postgres
@@ -56,7 +59,7 @@ jobs:
 workflows:
   build_and_deploy:
     jobs:
-      - integration_tests:
+      - test:
           filters:
             branches:
               only: master

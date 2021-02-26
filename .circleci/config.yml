@@ -22,9 +22,38 @@ jobs:
           process-types: web
       - heroku/release-docker-image:
           process-types: web
+  integration_tests:
+    working_directory: ~/aus-ddr-api
+    machine:
+      image: ubuntu-2004:202010-01
+    resource_class: medium
+    steps:
+      - checkout
+      - run: 
+          name: Spin up Postgres
+          command: docker-compose --env-file ./.integration.env up -d
+      - run:
+          name: Install dotnet-sdk-5.0
+          command: |
+            sudo apt-get update; \
+            sudo apt-get install -y apt-transport-https && \
+            sudo apt-get update && \
+            sudo apt-get install -y dotnet-sdk-5.0
+      - run:
+          name: Restore packages
+          command: dotnet restore
+      - run:
+          name: Run tests
+          command: dotnet test aus-ddr-api.IntegrationTests -v n
+      - run:
+          name: Bring down Postgres
+          command: docker-compose down
 workflows:
   build_and_deploy:
     jobs:
+      - integration_tests:
+          branches:
+            only: master
       - build:
           context:
             - production
@@ -33,3 +62,5 @@ workflows:
           filters:
             branches:
               only: master
+          requires:
+            - integration_tests

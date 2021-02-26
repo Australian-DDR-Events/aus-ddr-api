@@ -1,6 +1,7 @@
 
 using System;
 using AusDdrApi.Persistence;
+using Microsoft.EntityFrameworkCore;
 
 namespace aus_ddr_api.IntegrationTests
 {
@@ -18,6 +19,7 @@ namespace aus_ddr_api.IntegrationTests
         public void Dispose()
         {
             Setup.DropAllRows(_context);
+            _context.Database.CloseConnection();
         }
     }
 }

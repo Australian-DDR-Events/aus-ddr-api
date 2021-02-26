@@ -143,6 +143,33 @@ namespace AusDdrApi.Controllers.Summer2021Event
                 }
             }
 
+            var grade = calculateGrade(gradedIngredients, scores, dish, dishSongs, gradedDancerDishRequest.PairBonus);
+
+            var gradedDish = _gradedDishService
+                .GetForDishIdAndGrade(dishId, grade);
+            if (gradedDish == null) return NotFound();
+            var gradedDancerDish = await _gradedDancerDishService
+                .Add(new GradedDancerDish
+                {
+                    DancerId = existingDancer.Id,
+                    GradedDishId = gradedDish.Id,
+                    Scores = scores
+                });
+
+            if (gradedDancerDish == null) return BadRequest();
+
+            await _coreDataService.SaveChanges();
+            return Ok(GradedDancerDishResponse.FromEntity(gradedDancerDish));
+        }
+
+        public Grade calculateGrade(
+            IEnumerable<GradedDancerIngredient> gradedIngredients,
+            IList<Score> scores,
+            Dish dish,
+            IEnumerable<DishSong> dishSongs,
+            bool pairBonus
+            )
+        {            
             var ingredientStars = gradedIngredients
                 .Aggregate(0, (acc, g) => acc + (int) g.GradedIngredient!.Grade);
             var avgStars = (float) ingredientStars / gradedIngredients.Count();
@@ -161,23 +188,8 @@ namespace AusDdrApi.Controllers.Summer2021Event
             var varianceMultiplier = 1 + (orderVariance / maxVariance) * 0.5;
 
             var top = (avgStars + 1) / 2 + ex * varianceMultiplier;
-            var baseGrade = Math.Floor((top / 1.1) * (gradedDancerDishRequest.PairBonus ? 1.1 : 1.0));
-            var grade = (Grade) (Math.Max(Math.Min(baseGrade, 4), 0));
-            var gradedDish = _gradedDishService
-                .GetForDishIdAndGrade(dishId, grade);
-            if (gradedDish == null) return NotFound();
-            var gradedDancerDish = await _gradedDancerDishService
-                .Add(new GradedDancerDish
-                {
-                    DancerId = existingDancer.Id,
-                    GradedDishId = gradedDish.Id,
-                    Scores = scores
-                });
-
-            if (gradedDancerDish == null) return BadRequest();
-
-            await _coreDataService.SaveChanges();
-            return Ok(GradedDancerDishResponse.FromEntity(gradedDancerDish));
+            var baseGrade = Math.Floor((top / 1.1) * (pairBonus ? 1.1 : 1.0));
+            return (Grade) (Math.Max(Math.Min(baseGrade, 4), 0));
         }
 
         [HttpPost]

@@ -33,10 +33,10 @@ jobs:
           name: Spin up Postgres
           command: docker-compose --env-file ./.integration.env up -d
       - run:
-          name: Purge package list
+          name: Add signing keys
           command: |
-            sudo dpkg --purge packages-microsoft-prod && sudo dpkg -i packages-microsoft-prod.deb
-            sudo apt-get update
+            wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
+            sudo dpkg -i packages-microsoft-prod.deb
       - run:
           name: Install dotnet-sdk-5.0
           command: |

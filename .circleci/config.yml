@@ -52,8 +52,9 @@ workflows:
   build_and_deploy:
     jobs:
       - integration_tests:
-          branches:
-            only: master
+          filters:
+            branches:
+              only: master
       - build:
           context:
             - production

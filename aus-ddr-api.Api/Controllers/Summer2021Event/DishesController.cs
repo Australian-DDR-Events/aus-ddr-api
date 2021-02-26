@@ -83,6 +83,14 @@ namespace AusDdrApi.Controllers.Summer2021Event
             }
             return Ok(DishResponse.FromEntity(dish));
         }
+
+        [HttpGet]
+        [Route("{dishId}/ingredients")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public ActionResult<IEnumerable<GradedDishResponse>> GetIngredients(Guid dishId)
+        {
+            return Ok(_dishService.GetIngredientsForDish(dishId).AsEnumerable());
+        }
         
         [HttpGet]
         [Route("{dishId}/grades")]
@@ -162,7 +170,7 @@ namespace AusDdrApi.Controllers.Summer2021Event
             return Ok(GradedDancerDishResponse.FromEntity(gradedDancerDish));
         }
 
-        public Grade calculateGrade(
+        private Grade calculateGrade(
             IEnumerable<GradedDancerIngredient> gradedIngredients,
             IList<Score> scores,
             Dish dish,

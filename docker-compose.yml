@@ -4,6 +4,7 @@ services:
     container_name: aus-ddr-events-db
     image: postgres:latest
     environment:
+      POSTGRES_DB: ${AUS_DDR_EVENTS_DB_DB}
       POSTGRES_USER: ${AUS_DDR_EVENTS_DB_USERNAME}
       POSTGRES_PASSWORD: ${AUS_DDR_EVENTS_DB_PASSWORD}
     ports:

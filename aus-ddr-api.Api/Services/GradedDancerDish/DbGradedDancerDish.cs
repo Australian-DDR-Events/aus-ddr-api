@@ -36,7 +36,7 @@ namespace AusDdrApi.Services.GradedDancerDish
                 .GroupBy(g => g.GradedDish!.DishId)
                 .Select(i => i
                     .OrderByDescending(g => g.Scores.Aggregate(0, (v, s) => v + s.Value))
-                    .Single())
+                    .First())
                 .ToList();
         }
 

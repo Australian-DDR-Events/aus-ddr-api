@@ -34,7 +34,7 @@ namespace AusDdrApi.Services.GradedDancerIngredient
                 .GroupBy(ingredient => ingredient.Score!.SongId)
                 .Select(i => i
                     .OrderByDescending(g => g.Score!.Value)
-                    .Single())
+                    .First())
                 .ToList();
         }
 
@@ -88,7 +88,7 @@ namespace AusDdrApi.Services.GradedDancerIngredient
                 .GroupBy(g => g.GradedIngredient!.IngredientId)
                 .Select(g => g
                     .OrderByDescending(i => i.Score!.Value)
-                    .Single())
+                    .First())
                 .ToList();
         }
 

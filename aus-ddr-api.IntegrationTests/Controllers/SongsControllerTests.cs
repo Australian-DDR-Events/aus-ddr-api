@@ -183,14 +183,7 @@ namespace aus_ddr_api.IntegrationTests.Controllers
             };
             var songEntity = await _fixture._context.Songs.AddAsync(song);
             await _fixture._context.SaveChangesAsync();
-
-            var updateSongRequest = new SongRequest
-            {
-                Artist = "newArtist",
-                Difficulty = "difficulty",
-                Level = 15,
-                Name = "name",
-            };
+            song = songEntity.Entity;
 
             var expectedSongResponse = new SongResponse
             {
@@ -198,12 +191,20 @@ namespace aus_ddr_api.IntegrationTests.Controllers
                 Difficulty = "difficulty",
                 Level = 15,
                 Name = "name",
-                Id = songEntity.Entity.Id
+                Id = song.Id
             };
 
-            var actionResult = await _songsController.Put(songEntity.Entity.Id, updateSongRequest);
+            var actionResult = await _songsController.Put(
+                song.Id, 
+                new SongRequest
+                {
+                    Artist = "newArtist",
+                    Difficulty = "difficulty",
+                    Level = 15,
+                    Name = "name",
+                });
 
-            var songFromDatabase = await _fixture._context.Songs.FindAsync(songEntity.Entity.Id);
+            var songFromDatabase = await _fixture._context.Songs.FindAsync(song.Id);
             var songFromDatabaseAsResponse = SongResponse.FromEntity(songFromDatabase);
             
             var okObjectResult = Assert.IsType<OkObjectResult>(actionResult.Result);

@@ -70,7 +70,9 @@ namespace aus_ddr_api.IntegrationTests.Controllers
             
             var okObjectResult = Assert.IsType<OkObjectResult>(actionResult.Result);
             var songs = Assert.IsAssignableFrom<IEnumerable<SongResponse>>(okObjectResult.Value);
-            Assert.Equal(2, songs.Count());
+            Assert.Collection(songs,
+                Assert.NotNull, Assert.NotNull
+                );
         }
 
         [Fact]
@@ -100,8 +102,9 @@ namespace aus_ddr_api.IntegrationTests.Controllers
             
             var okObjectResult = Assert.IsType<OkObjectResult>(actionResult.Result);
             var songs = Assert.IsAssignableFrom<IEnumerable<SongResponse>>(okObjectResult.Value);
-            Assert.Equal(1, songs.Count());
-            Assert.Equal(expectedResponse, songs.ElementAt(0));
+            Assert.Collection(songs,
+                element => Assert.Equal(expectedResponse, element)
+                );
         }
 
         [Fact]

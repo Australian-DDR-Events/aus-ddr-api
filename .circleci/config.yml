@@ -72,4 +72,4 @@ workflows:
             branches:
               only: master
           requires:
-            - integration_tests
+            - test

@@ -152,16 +152,6 @@ namespace AusDdrApi.Controllers.Summer2021Event
                 }
             }
 
-            var t = Task.WhenAll(uploadTasks);
-            try
-            {
-                t.Wait();
-            }
-            catch
-            {
-                return BadRequest();
-            }
-
             var grade = calculateGrade(gradedIngredients, scores, dish, dishSongs, gradedDancerDishRequest.PairBonus);
 
             var gradedDish = _gradedDishService
@@ -176,9 +166,32 @@ namespace AusDdrApi.Controllers.Summer2021Event
                 });
 
             if (gradedDancerDish == null) return BadRequest();
+            
+            try
+            {
+                var scoreImage = await Image.LoadAsync(gradedDancerDishRequest.FinalImage!.OpenReadStream());
+                var image = await Images.ImageToPngMemoryStream(scoreImage);
+
+                var destinationKey = $"dishes/{dish.Id}/final/{gradedDancerDish.Id}.png";
+                uploadTasks.Add(_fileStorage.UploadFileFromStream(image, destinationKey));
+            }
+            catch
+            {
+                return BadRequest();
+            }
+
+            var t = Task.WhenAll(uploadTasks);
+            try
+            {
+                t.Wait();
+            }
+            catch
+            {
+                return BadRequest();
+            }
 
             await _coreDataService.SaveChanges();
-            return Ok(GradedDancerDishResponse.FromEntity(gradedDancerDish));
+            return Ok(GradedDancerDishResponse.FromEntity(gradedDancerDish, dish.Id));
         }
 
         private Grade calculateGrade(

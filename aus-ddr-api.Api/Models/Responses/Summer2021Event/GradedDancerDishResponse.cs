@@ -9,11 +9,14 @@ namespace AusDdrApi.Models.Responses
         public Guid GradedDishId { get; set; }
         public Guid DancerId { get; set; }
 
-        public static GradedDancerDishResponse FromEntity(GradedDancerDish dish) => new GradedDancerDishResponse
+        public string ResultImage { get; set; } = string.Empty;
+
+        public static GradedDancerDishResponse FromEntity(GradedDancerDish dish, Guid dishId) => new GradedDancerDishResponse
         {
             Id = dish.Id,
             GradedDishId = dish.GradedDishId,
-            DancerId = dish.DancerId
+            DancerId = dish.DancerId,
+            ResultImage = $"dishes/{dishId}/final/{dish.Id}.png"
         };
     }
 }

@@ -128,6 +128,7 @@ namespace AusDdrApi.Controllers.Summer2021Event
             if (gradedDancerDishRequest.Scores.Count() != dishSongs.Count()) return BadRequest();
 
             var scores = new List<Score>();
+            var uploadTasks = new List<Task<string>>();
             foreach (var scoreRequest in gradedDancerDishRequest.Scores)
             {
                 var score = await _scoreSerivce.Add(new Score
@@ -143,12 +144,22 @@ namespace AusDdrApi.Controllers.Summer2021Event
                     var image = await Images.ImageToPngMemoryStream(scoreImage);
 
                     var destinationKey = $"songs/{score.SongId}/scores/{score.Id}.png";
-                    await _fileStorage.UploadFileFromStream(image, destinationKey);
+                    uploadTasks.Add(_fileStorage.UploadFileFromStream(image, destinationKey));
                 }
                 catch
                 {
                     return BadRequest();
                 }
+            }
+
+            var t = Task.WhenAll(uploadTasks);
+            try
+            {
+                t.Wait();
+            }
+            catch
+            {
+                return BadRequest();
             }
 
             var grade = calculateGrade(gradedIngredients, scores, dish, dishSongs, gradedDancerDishRequest.PairBonus);

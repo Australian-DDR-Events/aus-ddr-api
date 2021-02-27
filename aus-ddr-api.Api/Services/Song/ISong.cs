@@ -11,7 +11,7 @@ namespace AusDdrApi.Services.Song
         public SongEntity? Get(Guid songId);
 
         public Task<SongEntity> Add(SongEntity song);
-        public SongEntity Update(SongEntity song);
+        public SongEntity? Update(SongEntity song);
         public bool Delete(Guid songId);
     }
 }

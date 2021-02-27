@@ -71,6 +71,10 @@ namespace AusDdrApi.Controllers
             var song = songRequest.ToEntity();
             song.Id = songId;
             var updatedSong = _songService.Update(song);
+            if (updatedSong == null)
+            {
+                return NotFound($"song {songId} does not exist");
+            }
             await _coreService.SaveChanges();
             return Ok(SongResponse.FromEntity(updatedSong));
         }

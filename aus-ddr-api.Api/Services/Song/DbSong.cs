@@ -32,9 +32,12 @@ namespace AusDdrApi.Services.Song
             return songEntity.Entity;
         }
 
-        public SongEntity Update(SongEntity song)
+        public SongEntity? Update(SongEntity song)
         {
-            return _context.Songs.Update(song).Entity;
+            var currentSong = Get(song.Id);
+            if (currentSong == null) return null;
+            _context.Entry(currentSong).CurrentValues.SetValues(song);
+            return currentSong;
         }
 
         public bool Delete(Guid songId)

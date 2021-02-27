@@ -35,13 +35,13 @@ namespace aus_ddr_api.IntegrationTests.Controllers
             _songService = new DbSong(_fixture._context);
             
             _songsController = new SongsController(_logger, _coreDataService, _songService);
+            
+            Setup.DropAllRows(_fixture._context);
         }
 
         [Fact]
         public void Get_WhenDatabaseIsEmpty_Returns_EmptyListOfSongResponses()
         {
-            Setup.DropAllRows(_fixture._context);
-
             var actionResult = _songsController.Get();
             
             var okObjectResult = Assert.IsType<OkObjectResult>(actionResult.Result);
@@ -52,8 +52,6 @@ namespace aus_ddr_api.IntegrationTests.Controllers
         [Fact]
         public void Get_WhenDatabaseHasSongs_Returns_ListOfSongResponses()
         {
-            Setup.DropAllRows(_fixture._context);
-
             var song1 = new Song
             {
                 Id = Guid.NewGuid(),
@@ -116,7 +114,7 @@ namespace aus_ddr_api.IntegrationTests.Controllers
 
         [Fact]
         public void GetSong_When_SongExists_Returns_SongResponse()
-        {           
+        {
             var song = new Song
             {
                 Id = Guid.NewGuid(),
@@ -171,6 +169,85 @@ namespace aus_ddr_api.IntegrationTests.Controllers
 
             var newSong = await _fixture._context.Songs.FindAsync(id);
             Assert.Equal(expectedSong, newSong);
+        }
+
+        [Fact]
+        public async Task Put_GivenSongExists_UpdateExistingSongInDatabase()
+        {
+            var song = new Song
+            {
+                Artist = "artist",
+                Difficulty = "difficulty",
+                Level = 5,
+                Name = "name"
+            };
+            var songEntity = await _fixture._context.Songs.AddAsync(song);
+            await _fixture._context.SaveChangesAsync();
+
+            var updateSongRequest = new SongRequest
+            {
+                Artist = "newArtist",
+                Difficulty = "difficulty",
+                Level = 15,
+                Name = "name",
+            };
+
+            var expectedSongResponse = new SongResponse
+            {
+                Artist = "newArtist",
+                Difficulty = "difficulty",
+                Level = 15,
+                Name = "name",
+                Id = songEntity.Entity.Id
+            };
+
+            var actionResult = await _songsController.Put(songEntity.Entity.Id, updateSongRequest);
+
+            var songFromDatabase = await _fixture._context.Songs.FindAsync(songEntity.Entity.Id);
+            var songFromDatabaseAsResponse = SongResponse.FromEntity(songFromDatabase);
+            
+            var okObjectResult = Assert.IsType<OkObjectResult>(actionResult.Result);
+            var songResponse = Assert.IsAssignableFrom<SongResponse>(okObjectResult.Value);
+            Assert.Equal(songFromDatabaseAsResponse, songResponse);
+            Assert.Equal(expectedSongResponse, songResponse);
+        }
+
+        [Fact]
+        public async Task Put_GivenSongDoesNotExist_ReturnNotFoundResponse()
+        {
+            var actionResult = await _songsController.Put(Guid.NewGuid(), new SongRequest());
+            
+            Assert.IsType<NotFoundObjectResult>(actionResult.Result);
+        }
+
+        [Fact]
+        public async Task Delete_GivenSongExists_DeletesSongFromDatabase()
+        {
+            var song = new Song
+            {
+                Artist = "artist",
+                Difficulty = "difficulty",
+                Level = 5,
+                Name = "name"
+            };
+            var songEntity = await _fixture._context.Songs.AddAsync(song);
+            await _fixture._context.SaveChangesAsync();
+            song = songEntity.Entity;
+
+            var actionResult = await _songsController.Delete(song.Id);
+            
+            var songFromDatabase = _fixture._context.Songs.FirstOrDefault(s => s.Id == song.Id);
+            
+            Assert.IsType<OkResult>(actionResult);
+            Assert.Null(songFromDatabase);
+        }
+
+        [Fact]
+        public async Task Delete_GivenSongDoesNotExist_ReturnNotFoundResponse()
+        {
+            var actionResult = await _songsController.Delete(Guid.NewGuid());
+            
+            Assert.IsType<NotFoundResult>(actionResult);
         }
     }
 }

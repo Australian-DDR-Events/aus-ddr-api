@@ -11,5 +11,7 @@ namespace AusDdrApi.Entities
         public string DdrCode { get; set; } = string.Empty;
         public string PrimaryMachineLocation { get; set; } = string.Empty;
         public string State { get; set; } = string.Empty;
+        
+        public virtual ICollection<Badge> Badges { get; set; } = new HashSet<Badge>();
     }
 }

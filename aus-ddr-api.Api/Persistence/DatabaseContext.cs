@@ -11,6 +11,7 @@ namespace AusDdrApi.Persistence
         public DbSet<Score> Scores { get; set; }
         public DbSet<Song> Songs { get; set; }
         public DbSet<Event> Events { get; set; }
+        public DbSet<Badge> Badges { get; set; }
         public DbSet<Ingredient> Ingredients { get; set; }
         public DbSet<GradedIngredient> GradedIngredients { get; set; }
         public DbSet<Dish> Dishes { get; set; }

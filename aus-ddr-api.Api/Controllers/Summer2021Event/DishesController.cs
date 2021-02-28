@@ -286,5 +286,53 @@ namespace AusDdrApi.Controllers.Summer2021Event
 
             return Ok();
         }
+        
+        [HttpPost]
+        [Route("{dishId}/adddishimage")]
+        public async Task<ActionResult> PostDishImage([FromForm] IFormFile formImage, [FromRoute] string dishId)
+        {
+            try
+            {
+                int[] imageSizes = {32, 64, 128, 256};
+                var dishImage = await Image.LoadAsync(formImage.OpenReadStream());
+                foreach (var size in imageSizes)
+                {
+                    var image = await Images.ImageToPngMemoryStream(dishImage, size, size);
+
+                    var destinationKey = $"summer2021/dishes/{dishId}.{size}.png";
+                    await _fileStorage.UploadFileFromStream(image, destinationKey);
+                }
+            }
+            catch
+            {
+                return BadRequest();
+            }
+
+            return Ok();
+        }
+        
+        [HttpPost]
+        [Route("{dishId}/addgradeddishimage")]
+        public async Task<ActionResult> PostGradedDishImage([FromForm] IFormFile formImage, [FromRoute] string dishId)
+        {
+            try
+            {
+                int[] imageSizes = {32, 64, 128, 256};
+                var dishImage = await Image.LoadAsync(formImage.OpenReadStream());
+                foreach (var size in imageSizes)
+                {
+                    var image = await Images.ImageToPngMemoryStream(dishImage, size, size);
+
+                    var destinationKey = $"summer2021/gradeddishes/{dishId}.{size}.png";
+                    await _fileStorage.UploadFileFromStream(image, destinationKey);
+                }
+            }
+            catch
+            {
+                return BadRequest();
+            }
+
+            return Ok();
+        }
     }
 }

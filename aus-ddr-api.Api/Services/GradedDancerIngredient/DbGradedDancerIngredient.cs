@@ -28,9 +28,13 @@ namespace AusDdrApi.Services.GradedDancerIngredient
 
         public IEnumerable<GradedDancerIngredientEntity> GetTopForDancer(Guid dancerId)
         {
+            // TODO: this performs grouping locally rather than on the database. This can
+            // result in poor performance. This will need to be reworked to instead run 
+            // on the database.
             return _context
                 .GradedDancerIngredients
                 .Include(s => s.Score)
+                .AsEnumerable()
                 .GroupBy(ingredient => ingredient.Score!.SongId)
                 .Select(i => i
                     .OrderByDescending(g => g.Score!.Value)

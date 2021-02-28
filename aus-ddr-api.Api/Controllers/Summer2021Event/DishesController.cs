@@ -91,6 +91,14 @@ namespace AusDdrApi.Controllers.Summer2021Event
         {
             return Ok( _dishService.GetIngredientsForDish(dishId).AsEnumerable().Select(IngredientResponse.FromEntity));
         }
+
+        [HttpGet]
+        [Route("{dishId}/songs")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public ActionResult<IEnumerable<IngredientResponse>> GetDishSongs(Guid dishId)
+        {
+            return Ok( _dishService.GetSongsForDish(dishId).AsEnumerable().Select(DishSongResponse.FromEntity));
+        }
         
         [HttpGet]
         [Route("{dishId}/grades")]

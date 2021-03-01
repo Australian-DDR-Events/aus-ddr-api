@@ -102,7 +102,7 @@ namespace AusDdrApi.Controllers
         
         [HttpPost]
         [Route("{songId}/addimage")]
-        public async Task<ActionResult> PostGradedIngredientImage([FromForm] IFormFile formImage, [FromRoute] string songId)
+        public async Task<ActionResult> PostSongImage([FromForm] IFormFile formImage, [FromRoute] string songId)
         {
             try
             {

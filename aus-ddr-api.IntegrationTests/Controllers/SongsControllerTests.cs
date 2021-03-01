@@ -7,10 +7,12 @@ using AusDdrApi.Entities;
 using AusDdrApi.Models.Requests;
 using AusDdrApi.Models.Responses;
 using AusDdrApi.Services.CoreData;
+using AusDdrApi.Services.FileStorage;
 using AusDdrApi.Services.Song;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using NSubstitute;
 using Xunit;
 
 namespace aus_ddr_api.IntegrationTests.Controllers
@@ -22,6 +24,7 @@ namespace aus_ddr_api.IntegrationTests.Controllers
 
         private readonly ILogger<SongsController> _logger;
         private readonly ICoreData _coreDataService;
+        private readonly IFileStorage _fileStorage;
         private readonly ISong _songService;
 
         private readonly SongsController _songsController;
@@ -32,9 +35,10 @@ namespace aus_ddr_api.IntegrationTests.Controllers
 
             _logger = new Logger<SongsController>(new NullLoggerFactory());
             _coreDataService = new DbCoreData(_fixture._context);
+            _fileStorage = Substitute.For<IFileStorage>();
             _songService = new DbSong(_fixture._context);
             
-            _songsController = new SongsController(_logger, _coreDataService, _songService);
+            _songsController = new SongsController(_logger, _coreDataService, _fileStorage, _songService);
             
             Setup.DropAllRows(_fixture._context);
         }

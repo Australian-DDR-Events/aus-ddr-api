@@ -7,6 +7,7 @@ using AusDdrApi.Entities;
 using AusDdrApi.Models.Requests;
 using AusDdrApi.Models.Responses;
 using AusDdrApi.Services.CoreData;
+using AusDdrApi.Services.FileStorage;
 using AusDdrApi.Services.Song;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -22,15 +23,17 @@ namespace UnitTests.Controllers
 
         private readonly ILogger<SongsController> _logger;
         private readonly ICoreData _coreDataService;
+        private readonly IFileStorage _fileStorage;
         private readonly ISong _songService;
         
         public SongsControllerTests()
         {
             _logger = Substitute.For<ILogger<SongsController>>();
             _songService = Substitute.For<ISong>();
+            _fileStorage = Substitute.For<IFileStorage>();
             _coreDataService = Substitute.For<ICoreData>();
 
-            _songsController = new SongsController(_logger, _coreDataService, _songService);
+            _songsController = new SongsController(_logger, _coreDataService, _fileStorage, _songService);
         }
 
         [Fact]

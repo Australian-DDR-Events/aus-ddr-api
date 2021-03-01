@@ -2,14 +2,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AusDdrApi.Helpers;
 using AusDdrApi.Models.Requests;
 using AusDdrApi.Models.Responses;
 using AusDdrApi.Services.CoreData;
+using AusDdrApi.Services.FileStorage;
 using AusDdrApi.Services.Song;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using SixLabors.ImageSharp;
 
 namespace AusDdrApi.Controllers
 {
@@ -19,15 +22,18 @@ namespace AusDdrApi.Controllers
     {
         private readonly ILogger<SongsController> _logger;
         private readonly ICoreData _coreService;
+        private readonly IFileStorage _fileStorage;
         private readonly ISong _songService;
 
         public SongsController(
             ILogger<SongsController> logger, 
             ICoreData coreService,
+            IFileStorage fileStorage,
             ISong songService)
         {
             _logger = logger;
             _coreService = coreService;
+            _fileStorage = fileStorage;
             _songService = songService;
         }
 
@@ -91,6 +97,30 @@ namespace AusDdrApi.Controllers
                 return NotFound();
             }
             await _coreService.SaveChanges();
+            return Ok();
+        }
+        
+        [HttpPost]
+        [Route("{songId}/addimage")]
+        public async Task<ActionResult> PostGradedIngredientImage([FromForm] IFormFile formImage, [FromRoute] string songId)
+        {
+            try
+            {
+                int[] imageSizes = {32, 64, 128, 256, 512};
+                var ingredientImage = await Image.LoadAsync(formImage.OpenReadStream());
+                foreach (var size in imageSizes)
+                {
+                    var image = await Images.ImageToPngMemoryStream(ingredientImage, size, size);
+
+                    var destinationKey = $"songs/{songId}.{size}.png";
+                    await _fileStorage.UploadFileFromStream(image, destinationKey);
+                }
+            }
+            catch
+            {
+                return BadRequest();
+            }
+
             return Ok();
         }
     }

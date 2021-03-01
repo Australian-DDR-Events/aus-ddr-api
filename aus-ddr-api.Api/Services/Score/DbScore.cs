@@ -31,6 +31,17 @@ namespace AusDdrApi.Services.Score
                 .ToList();
         }
 
+        public IEnumerable<ScoreEntity> GetTopScores(Guid songId)
+        {
+            var songs = GetScores(null, new Guid?[]{songId});
+            return songs
+                .GroupBy(s => s.DancerId)
+                .Select(g =>
+                    g.OrderByDescending(s => s.Value)
+                        .FirstOrDefault())
+                .ToList();
+        }
+
         public async Task<ScoreEntity> Add(ScoreEntity score)
         {
             score.SubmissionTime = DateTime.Now;

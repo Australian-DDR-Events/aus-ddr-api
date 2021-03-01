@@ -75,6 +75,19 @@ namespace AusDdrApi.Controllers
             }
             return Ok(_scoreService.GetScores(dancerIds, songIds).Select(ScoreResponse.FromEntity));
         }
+
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [Route("{songId}")]
+        public ActionResult<IEnumerable<ScoreResponse>> Get(
+            Guid songId,
+            bool topScoresOnly = true)
+        {
+            var scores = topScoresOnly
+                ? _scoreService.GetTopScores(songId)
+                : _scoreService.GetScores(null, new Guid?[] {songId});
+            return Ok(scores.Select(ScoreResponse.FromEntity));
+        }
         
         [HttpPost]
         [Authorize]

@@ -125,7 +125,6 @@ namespace UnitTests.Controllers
                     Id = songGuid,
                     Artist = args.ArgAt<Song>(0).Artist,
                     Difficulty = args.ArgAt<Song>(0).Difficulty,
-                    ImageUrl = args.ArgAt<Song>(0).ImageUrl,
                     Level = args.ArgAt<Song>(0).Level,
                     Name = args.ArgAt<Song>(0).Name
                 }));

@@ -12,7 +12,7 @@ namespace AusDdrApi.Services.Badges
     {
         private readonly DatabaseContext _context;
 
-        DbBadge(DatabaseContext context)
+        public DbBadge(DatabaseContext context)
         {
             _context = context;
         }

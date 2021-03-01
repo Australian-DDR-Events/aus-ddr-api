@@ -11,7 +11,7 @@ namespace AusDdrApi.Services.Event
     {   
         private DatabaseContext _context;
 
-        DbEvent(DatabaseContext context)
+        public DbEvent(DatabaseContext context)
         {
             _context = context;
         }

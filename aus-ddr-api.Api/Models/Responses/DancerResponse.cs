@@ -23,5 +23,27 @@ namespace AusDdrApi.Models.Responses
             State = dancer.State,
             ProfilePictureUrl = $"/profile/picture/{dancer.AuthenticationId}.png"
         };
+        public override bool Equals(object? comparator)
+        {
+            var comparatorAsSongResponse = comparator as DancerResponse;
+            if (comparatorAsSongResponse == null) return false;
+            return Equals(comparatorAsSongResponse);
+        }
+
+        public bool Equals(DancerResponse comparator)
+        {
+            return (
+                Id == comparator.Id &&
+                AuthenticationId == comparator.AuthenticationId &&
+                DdrName == comparator.DdrName &&
+                DdrCode == comparator.DdrCode &&
+                PrimaryMachineLocation == comparator.PrimaryMachineLocation &&
+                State == comparator.State);
+        }
+
+        public override int GetHashCode()
+        {
+            return (Id, AuthenticationId, DdrName, DdrCode, PrimaryMachineLocation, State).GetHashCode();
+        }
     }
 }

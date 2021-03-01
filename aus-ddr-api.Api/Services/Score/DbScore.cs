@@ -21,24 +21,23 @@ namespace AusDdrApi.Services.Score
             return _context.Scores.AsQueryable().SingleOrDefault(s => s.Id == scoreId);
         }
 
-        public IEnumerable<ScoreEntity> GetScores(Guid?[] dancerIds, Guid?[] songIds)
+        public IEnumerable<ScoreEntity> GetScores(Guid[]? dancerIds, Guid[]? songIds)
         {
             return _context
                 .Scores
                 .AsQueryable()
-                .Where(score => dancerIds.Length <= 0 || dancerIds.Contains(score.DancerId))
-                .Where(score => songIds.Length <= 0 || songIds.Contains(score.SongId))
+                .Where(score => dancerIds == null || dancerIds.Length <= 0 || dancerIds.Contains(score.DancerId))
+                .Where(score => songIds == null || songIds.Length <= 0 || songIds.Contains(score.SongId))
                 .ToList();
         }
 
         public IEnumerable<ScoreEntity> GetTopScores(Guid songId)
         {
-            var songs = GetScores(null, new Guid?[]{songId});
+            var songs = GetScores(null, new Guid[]{songId});
             return songs
                 .GroupBy(s => s.DancerId)
                 .Select(g =>
-                    g.OrderByDescending(s => s.Value)
-                        .FirstOrDefault())
+                    g.OrderByDescending(s => s.Value).First())
                 .ToList();
         }
 

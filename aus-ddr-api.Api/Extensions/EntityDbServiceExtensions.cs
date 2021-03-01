@@ -1,6 +1,8 @@
+using AusDdrApi.Services.Badges;
 using AusDdrApi.Services.CoreData;
 using AusDdrApi.Services.Dancer;
 using AusDdrApi.Services.Dish;
+using AusDdrApi.Services.Event;
 using AusDdrApi.Services.GradedDancerDish;
 using AusDdrApi.Services.GradedDancerIngredient;
 using AusDdrApi.Services.GradedDish;
@@ -27,6 +29,8 @@ namespace AusDdrApi.Extensions
             services.AddTransient<IIngredient, DbIngredient>();
             services.AddTransient<IGradedDish, DbGradedDish>();
             services.AddTransient<IDish, DbDish>();
+            services.AddTransient<IEvent, DbEvent>();
+            services.AddTransient<IBadge, DbBadge>();
             
             return services;
         }

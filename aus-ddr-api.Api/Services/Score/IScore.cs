@@ -8,7 +8,7 @@ namespace AusDdrApi.Services.Score
     public interface IScore
     {
         public ScoreEntity? Get(Guid scoreId);
-        public IEnumerable<ScoreEntity> GetScores(Guid?[] dancerIds, Guid?[] songIds);
+        public IEnumerable<ScoreEntity> GetScores(Guid[]? dancerIds, Guid[]? songIds);
         public IEnumerable<ScoreEntity> GetTopScores(Guid songId);
 
 

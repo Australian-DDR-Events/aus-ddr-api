@@ -33,6 +33,7 @@ namespace AusDdrApi.Services.Score
 
         public async Task<ScoreEntity> Add(ScoreEntity score)
         {
+            score.SubmissionTime = DateTime.Now;
             var scoreEntity = await _context.Scores.AddAsync(score);
             return scoreEntity.Entity;
         }

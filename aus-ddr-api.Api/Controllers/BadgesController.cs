@@ -1,5 +1,8 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using AusDdrApi.Entities;
 using AusDdrApi.Helpers;
 using AusDdrApi.Models.Requests;
 using AusDdrApi.Models.Responses;
@@ -36,6 +39,13 @@ namespace AusDdrApi.Controllers
             _dancerService = dancerService;
             _fileStorage = fileStorage;
             _badgeService = badgeService;
+        }
+
+        [HttpGet]
+        public ActionResult<IEnumerable<BadgeResponse>> Get([FromQuery(Name = "dancer_id")] Guid? dancerId)
+        {
+            var badges = dancerId != null ? _badgeService.GetAssigned(dancerId.Value) : _badgeService.GetAll();
+            return Ok(badges.Select(BadgeResponse.FromEntity));
         }
 
         [HttpPost]

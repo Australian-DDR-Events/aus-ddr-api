@@ -8,6 +8,8 @@ namespace AusDdrApi.Services.Badges
     public interface IBadge
     {
         public IEnumerable<BadgeEntity> GetAll();
+        public IEnumerable<BadgeEntity> GetAssigned(Guid dancerId);
+
         public BadgeEntity? Get(Guid badgeId);
 
         public Task<BadgeEntity?> Add(BadgeEntity badge);

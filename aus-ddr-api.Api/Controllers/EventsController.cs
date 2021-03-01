@@ -30,9 +30,10 @@ namespace AusDdrApi.Controllers
         }
 
         [HttpGet]
-        public IEnumerable<EventResponse> GetActive()
+        public IEnumerable<EventResponse> Get([FromQuery(Name = "active_only")] bool activeOnly = true)
         {
-            return _eventService.GetActiveEvents().Select(EventResponse.FromEntity).ToList();
+            var events = activeOnly ? _eventService.GetActiveEvents() : _eventService.GetAll();
+            return events.Select(EventResponse.FromEntity).ToList();
         }
 
         [HttpPost]

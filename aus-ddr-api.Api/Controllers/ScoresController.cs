@@ -66,14 +66,15 @@ namespace AusDdrApi.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public ActionResult<IEnumerable<ScoreResponse>> Get(
             [FromQuery(Name = "dancer_id")] Guid[]? dancerIds,
-            [FromQuery(Name = "song_id")] Guid[]? songIds
+            [FromQuery(Name = "song_id")] Guid[]? songIds,
+            [FromQuery(Name = "top_scores_only")] bool topScoresOnly = true
         )
         {
             if (dancerIds?.Length == 0 && songIds?.Length == 0)
             {
                 return BadRequest();
             }
-            return Ok(_scoreService.GetScores(dancerIds, songIds).Select(ScoreResponse.FromEntity));
+            return Ok(_scoreService.GetScores(dancerIds, songIds, topScoresOnly).Select(ScoreResponse.FromEntity));
         }
 
         [HttpGet]
@@ -85,7 +86,7 @@ namespace AusDdrApi.Controllers
         {
             var scores = topScoresOnly
                 ? _scoreService.GetTopScores(songId)
-                : _scoreService.GetScores(null, new Guid[] {songId});
+                : _scoreService.GetScores(null, new Guid[] {songId}, false);
             return Ok(scores.Select(ScoreResponse.FromEntity));
         }
         

@@ -22,6 +22,8 @@ namespace AusDdrApi.Persistence
         public DbSet<GradedDish> GradedDishes { get; set; }
         public DbSet<GradedDancerDish> GradedDancerDishes { get; set; }
         
+        public DbSet<BadgeThreshold> BadgeThresholds { get; set; }
+        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Dancer>()

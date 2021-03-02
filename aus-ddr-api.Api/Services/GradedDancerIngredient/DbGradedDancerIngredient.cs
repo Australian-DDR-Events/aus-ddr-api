@@ -70,7 +70,7 @@ namespace AusDdrApi.Services.GradedDancerIngredient
                 .Where(g => g.DancerId == dancerId)
                 .Where(g => g.GradedIngredient!.IngredientId == ingredientId)
                 .OrderByDescending(g => g.Score!.Value)
-                .SingleOrDefault();
+                .FirstOrDefault();
         }
 
         public IEnumerable<GradedDancerIngredientEntity> GetIngredientsForDancer(IEnumerable<Guid> ingredientIds,

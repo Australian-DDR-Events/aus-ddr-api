@@ -53,7 +53,7 @@ namespace AusDdrApi.Services.GradedDancerDish
                 .Where(g => g.DancerId == dancerId)
                 .Where(g => g.GradedDish!.DishId == dishId)
                 .OrderByDescending(g => g.Scores.Aggregate(0, (v, s) => v + s.Value))
-                .SingleOrDefault();
+                .FirstOrDefault();
         }
 
         public GradedDancerDishEntity? Get(Guid gradedDancerDishId)

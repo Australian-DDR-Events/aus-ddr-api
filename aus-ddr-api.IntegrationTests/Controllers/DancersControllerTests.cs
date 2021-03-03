@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using AusDdrApi.Controllers;
 using AusDdrApi.Entities;
 using AusDdrApi.Models.Responses;
+using AusDdrApi.Services.Badges;
 using AusDdrApi.Services.CoreData;
 using AusDdrApi.Services.Dancer;
 using AusDdrApi.Services.FileStorage;
@@ -21,6 +22,7 @@ namespace aus_ddr_api.IntegrationTests.Controllers
         private readonly ILogger<DancersController> _logger;
         private readonly ICoreData _coreService;
         private readonly IDancer _dancerService;
+        private readonly IBadge _badgeService;
         private readonly IFileStorage _fileStorage;
         
         private readonly DancersController _dancersController;
@@ -32,12 +34,14 @@ namespace aus_ddr_api.IntegrationTests.Controllers
             _logger = new Logger<DancersController>(new NullLoggerFactory());
             _coreService = new DbCoreData(_fixture._context);
             _dancerService = new DbDancer(_fixture._context);
+            _badgeService = new DbBadge(_fixture._context);
             _fileStorage = new LocalFileStorage(".");
             
             _dancersController = new DancersController(
                 _logger,
                 _coreService,
                 _dancerService,
+                _badgeService,
                 _fileStorage);
             
             Setup.DropAllRows(_fixture._context);

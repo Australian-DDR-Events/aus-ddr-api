@@ -7,6 +7,7 @@ using AusDdrApi.Entities;
 using AusDdrApi.Helpers;
 using AusDdrApi.Models.Requests;
 using AusDdrApi.Models.Responses;
+using AusDdrApi.Services.Badges;
 using AusDdrApi.Services.CoreData;
 using AusDdrApi.Services.Dancer;
 using AusDdrApi.Services.Dish;
@@ -38,6 +39,7 @@ namespace AusDdrApi.Controllers.Summer2021Event
         private readonly IGradedDancerDish _gradedDancerDishService;
         private readonly IGradedDish _gradedDishService;
         private readonly IScore _scoreSerivce;
+        private readonly IBadge _badgeService;
         private IFileStorage _fileStorage;
 
         public DishesController(
@@ -50,6 +52,7 @@ namespace AusDdrApi.Controllers.Summer2021Event
             IGradedDancerDish gradedDancerDishService,
             IGradedDish gradedDishService,
             IScore scoreService,
+            IBadge badgeService,
             IFileStorage fileStorage)
         {
             _logger = logger;
@@ -61,6 +64,7 @@ namespace AusDdrApi.Controllers.Summer2021Event
             _gradedDancerDishService = gradedDancerDishService;
             _gradedDishService = gradedDishService;
             _scoreSerivce = scoreService;
+            _badgeService = badgeService;
             _fileStorage = fileStorage;
         }
 
@@ -197,6 +201,8 @@ namespace AusDdrApi.Controllers.Summer2021Event
             {
                 return BadRequest();
             }
+            
+            issueBadge(existingDancer.Id);
 
             await _coreDataService.SaveChanges();
             return Ok(GradedDancerDishResponse.FromEntity(gradedDancerDish, dish.Id));
@@ -230,6 +236,49 @@ namespace AusDdrApi.Controllers.Summer2021Event
             var top = (avgStars + 1) / 2 + ex * varianceMultiplier;
             var baseGrade = Math.Floor((top / 1.1) * (pairBonus ? 1.1 : 1.0));
             return (Grade) (Math.Max(Math.Min(baseGrade, 4), 0));
+        }
+
+        private void issueBadge(Guid dancerId)
+        {
+            var badgeThresholds = new List<Tuple<string, int>>
+            {
+                new Tuple<string, int>("DDR-Beque Badge", 0),
+                new Tuple<string, int>("DDR-Beque Red (I) Badge", 3),
+                new Tuple<string, int>("DDR-Beque Red (II) Badge", 6),
+                new Tuple<string, int>("DDR-Beque Blue (I) Badge", 8),
+                new Tuple<string, int>("DDR-Beque Blue (II) Badge", 11),
+                new Tuple<string, int>("DDR-Beque Green (I) Badge", 13),
+                new Tuple<string, int>("DDR-Beque Green (II) Badge", 16),
+                new Tuple<string, int>("DDR-Beque Gold (I) Badge", 18),
+                new Tuple<string, int>("DDR-Beque Gold (II) Badge", 21),
+                new Tuple<string, int>("DDR-Beque Opal Badge", 23),
+            };
+            var score = calculateSeasonScore(dancerId);
+
+            var badgeName = badgeThresholds
+                .Where(b => b.Item2 <= score)
+                .OrderByDescending(b => b.Item2)
+                .First()
+                .Item1;
+            var badge = _badgeService.GetByName(badgeName);
+            if (badge != null)
+            {
+                var badges = _badgeService.GetAssigned(dancerId);
+                foreach (var assignedBadge in badges)
+                {
+                    if (badgeThresholds.Exists(b => b.Item1 == assignedBadge.Name))
+                        _badgeService.RevokeBadge(assignedBadge.Id, dancerId);
+                }
+
+                _badgeService.AssignBadge(badge.Id, dancerId);
+            }
+        }
+
+        private int calculateSeasonScore(Guid dancerId)
+        {
+            var dishes = _gradedDancerDishService.GetAllForDancer(dancerId);
+            var score = dishes.Aggregate(0, (v, s) => v + (int) s.GradedDish.Grade + 1);
+            return score;
         }
 
         [HttpPost]

@@ -11,6 +11,8 @@ namespace AusDdrApi.Services.Badges
         public IEnumerable<BadgeEntity> GetAssigned(Guid dancerId);
 
         public BadgeEntity? Get(Guid badgeId);
+        public BadgeEntity? GetByName(string name);
+
 
         public Task<BadgeEntity?> Add(BadgeEntity badge);
         public BadgeEntity? Update(BadgeEntity badge);

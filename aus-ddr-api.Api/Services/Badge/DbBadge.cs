@@ -37,6 +37,11 @@ namespace AusDdrApi.Services.Badges
             return _context.Badges.Find(badgeId);
         }
 
+        public Badge? GetByName(string name)
+        {
+            return _context.Badges.First(b => b.Name == name);
+        }
+
         public async Task<Badge?> Add(Badge badge)
         {
             var badgeResult = await _context.Badges.AddAsync(badge);

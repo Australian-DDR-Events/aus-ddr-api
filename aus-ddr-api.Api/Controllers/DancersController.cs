@@ -6,6 +6,7 @@ using AusDdrApi.Authentication;
 using AusDdrApi.Helpers;
 using AusDdrApi.Models.Requests;
 using AusDdrApi.Models.Responses;
+using AusDdrApi.Services.Badges;
 using AusDdrApi.Services.CoreData;
 using AusDdrApi.Services.Dancer;
 using AusDdrApi.Services.FileStorage;
@@ -24,17 +25,20 @@ namespace AusDdrApi.Controllers
         private readonly ILogger<DancersController> _logger;
         private readonly ICoreData _coreService;
         private readonly IDancer _dancerService;
+        private readonly IBadge _badgeService;
         private readonly IFileStorage _fileStorage;
 
         public DancersController(
             ILogger<DancersController> logger,
             ICoreData coreService,
             IDancer dancerService,
+            IBadge badgeService,
             IFileStorage fileStorage)
         {
             _logger = logger;
             _coreService = coreService;
             _dancerService = dancerService;
+            _badgeService = badgeService;
             _fileStorage = fileStorage;
         }
 
@@ -74,6 +78,8 @@ namespace AusDdrApi.Controllers
             var dancer = dancerRequest.ToEntity();
             dancer.AuthenticationId = authId;
             var newDancer = await _dancerService.Add(dancer);
+            var baseBadge = _badgeService.GetByName("DDR-Beque Badge");
+            if (baseBadge != null) _badgeService.AssignBadge(baseBadge.Id, newDancer.Id);
             await _coreService.SaveChanges();
             return DancerResponse.FromEntity(newDancer);
         }

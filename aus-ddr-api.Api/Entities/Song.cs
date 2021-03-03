@@ -9,6 +9,7 @@ namespace AusDdrApi.Entities
         public string Artist { get; set; } = string.Empty;
         public string Difficulty { get; set; } = string.Empty;
         public int Level { get; set; }
+        public int MaxScore { get; set; }
         
         public override bool Equals(object? comparator)
         {
@@ -24,12 +25,13 @@ namespace AusDdrApi.Entities
                 Name == comparator.Name &&
                 Artist == comparator.Artist &&
                 Difficulty == comparator.Difficulty &&
-                Level == comparator.Level);
+                Level == comparator.Level &&
+                MaxScore == comparator.MaxScore);
         }
 
         public override int GetHashCode()
         {
-            return (Id, Name, Artist, Difficulty, Level).GetHashCode();
+            return (Id, Name, Artist, Difficulty, Level, MaxScore).GetHashCode();
         }
     }
 }

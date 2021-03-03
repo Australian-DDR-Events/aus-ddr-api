@@ -11,13 +11,15 @@ namespace AusDdrApi.Models.Requests
         public string Artist { get; set; } = string.Empty;
         public string Difficulty { get; set; } = string.Empty;
         public int Level { get; set; }
+        public int MaxScore { get; set; }
 
         public Song ToEntity() => new Song
         {
             Name = Name,
             Artist = Artist,
             Difficulty = Difficulty,
-            Level = Level
+            Level = Level,
+            MaxScore = MaxScore
         };
         
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)

@@ -10,6 +10,7 @@ namespace AusDdrApi.Models.Responses
         public string Artist { get; set; } = string.Empty;
         public string Difficulty { get; set; } = string.Empty;
         public int Level { get; set; }
+        public int MaxScore { get; set; }
         public string Image32 { get; set; } = string.Empty;
         public string Image64 { get; set; } = string.Empty;
         public string Image128 { get; set; } = string.Empty;
@@ -23,6 +24,7 @@ namespace AusDdrApi.Models.Responses
             Artist = song.Artist,
             Difficulty = song.Difficulty,
             Level = song.Level,
+            MaxScore = song.MaxScore,
             Image32 = $"/songs/{song.Id}.32.png",
             Image64 = $"/songs/{song.Id}.64.png",
             Image128 = $"/songs/{song.Id}.128.png",
@@ -44,12 +46,13 @@ namespace AusDdrApi.Models.Responses
                 Name == comparator.Name &&
                 Artist == comparator.Artist &&
                 Difficulty == comparator.Difficulty &&
-                Level == comparator.Level);
+                Level == comparator.Level &&
+                MaxScore == comparator.MaxScore);
         }
 
         public override int GetHashCode()
         {
-            return (Id, Name, Artist, Difficulty, Level).GetHashCode();
+            return (Id, Name, Artist, Difficulty, Level, MaxScore).GetHashCode();
         }
     }
 }

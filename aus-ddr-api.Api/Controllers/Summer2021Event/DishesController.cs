@@ -256,22 +256,22 @@ namespace AusDdrApi.Controllers.Summer2021Event
             var score = calculateSeasonScore(dancerId);
 
             var badgeName = badgeThresholds
-                .Where(b => b.Item2 <= score)
                 .OrderByDescending(b => b.Item2)
-                .First()
+                .First(b => b.Item2 <= score)
                 .Item1;
+            Console.WriteLine($"{score} {badgeName}");
             var badge = _badgeService.GetByName(badgeName);
-            if (badge != null)
-            {
-                var badges = _badgeService.GetAssigned(dancerId);
-                foreach (var assignedBadge in badges)
-                {
-                    if (badgeThresholds.Exists(b => b.Item1 == assignedBadge.Name))
-                        _badgeService.RevokeBadge(assignedBadge.Id, dancerId);
-                }
+            if (badge == null) return;
 
-                _badgeService.AssignBadge(badge.Id, dancerId);
+            var badges = _badgeService.GetAssigned(dancerId);
+            foreach (var assignedBadge in badges)
+            {
+                if (badgeThresholds.Exists(b => b.Item1 == assignedBadge.Name))
+                    _badgeService.RevokeBadge(assignedBadge.Id, dancerId);
             }
+
+            _badgeService.AssignBadge(badge.Id, dancerId);
+
         }
 
         private int calculateSeasonScore(Guid dancerId)

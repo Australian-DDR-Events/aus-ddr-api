@@ -22,6 +22,7 @@ namespace AusDdrApi.Services.GradedDancerDish
             return _context
                 .GradedDancerDishes
                 .AsQueryable()
+                .Include(g => g.GradedDish)
                 .Where(g => g.DancerId == dancerId)
                 .ToList();
         }

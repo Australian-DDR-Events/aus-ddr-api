@@ -7,16 +7,10 @@ namespace AusDdrApi.Models.Requests
 {
     public class DancerRequest : IValidatableObject
     {
-        [Required]
         public string DdrName { get; set; } = string.Empty;
-        [Required]
-        public string DdrCode { get; set; } = string.Empty;
-        [Required]
+        public string DdrCode { get; set; } = "573";
         public string PrimaryMachineLocation { get; set; } = string.Empty;
-        [Required]
-        public string State { get; set; } = string.Empty;
-        [Required]
-        public string ProfilePictureUrl { get; set; } = string.Empty;
+        public string State { get; set; } = "n/a";
 
         public Dancer ToEntity() => new Dancer
         {
@@ -28,7 +22,7 @@ namespace AusDdrApi.Models.Requests
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            if (!new[] {"vic", "act", "nsw", "sa", "nt", "tas", "qld", "wa"}.Contains(State))
+            if (!new[] {"n/a", "vic", "act", "nsw", "sa", "nt", "tas", "qld", "wa"}.Contains(State))
                 yield return new ValidationResult("Invalid state");
             
             if (!int.TryParse(DdrCode, out _))

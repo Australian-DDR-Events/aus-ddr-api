@@ -8,8 +8,6 @@ jobs:
     docker:
       - image: cimg/base:2020.01
     resource_class: medium
-    environment:
-      - HEROKU_APP_NAME: aus-ddr-api
     steps:
       - checkout
       - setup_remote_docker
@@ -64,6 +62,22 @@ workflows:
             branches:
               only: master
       - build:
+          name: deploy-staging
+          context:
+            - staging
+          post-steps:
+            - jira/notify
+          filters:
+            branches:
+              only: master
+          requires:
+            - test
+      - block_production:
+          type: approval
+          requires:
+            - deploy-staging
+      - build:
+          name: deploy-production
           context:
             - production
           post-steps:
@@ -72,4 +86,4 @@ workflows:
             branches:
               only: master
           requires:
-            - test
+            - block_production

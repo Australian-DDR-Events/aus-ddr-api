@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AusDdrApi.Authentication;
+using AusDdrApi.Entities;
 using AusDdrApi.Helpers;
 using AusDdrApi.Models.Requests;
 using AusDdrApi.Models.Responses;
@@ -49,12 +50,12 @@ namespace AusDdrApi.Controllers
             return Ok(_dancerService.GetAll().Select(DancerResponse.FromEntity));
         }
 
-        [HttpGet("{authId}")]
+        [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public ActionResult<DancerResponse> GetDancer(string authId)
+        public ActionResult<DancerResponse> GetDancer(string id)
         {
-            var dancer = _dancerService.GetByAuthId(authId);
+            Dancer dancer = Guid.TryParse(id, out var dancerId) ? _dancerService.Get(dancerId) : _dancerService.GetByAuthId(id);
             if (dancer == null)
             {
                 return NotFound();

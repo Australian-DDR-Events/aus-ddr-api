@@ -259,7 +259,6 @@ namespace AusDdrApi.Controllers.Summer2021Event
                 .OrderByDescending(b => b.Item2)
                 .First(b => b.Item2 <= score)
                 .Item1;
-            Console.WriteLine($"{score} {badgeName}");
             var badge = _badgeService.GetByName(badgeName);
             if (badge == null) return;
 
@@ -276,7 +275,7 @@ namespace AusDdrApi.Controllers.Summer2021Event
 
         private int calculateSeasonScore(Guid dancerId)
         {
-            var dishes = _gradedDancerDishService.GetAllForDancer(dancerId);
+            var dishes = _gradedDancerDishService.GetTopForDancer(dancerId);
             var score = dishes.Aggregate(0, (v, s) => v + (int) s.GradedDish.Grade + 1);
             return score;
         }

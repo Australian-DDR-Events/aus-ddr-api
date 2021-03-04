@@ -242,16 +242,16 @@ namespace AusDdrApi.Controllers.Summer2021Event
         {
             var badgeThresholds = new List<Tuple<string, int>>
             {
-                new Tuple<string, int>("DDR-Beque Badge", 0),
-                new Tuple<string, int>("DDR-Beque Red (I) Badge", 3),
-                new Tuple<string, int>("DDR-Beque Red (II) Badge", 6),
-                new Tuple<string, int>("DDR-Beque Blue (I) Badge", 8),
-                new Tuple<string, int>("DDR-Beque Blue (II) Badge", 11),
-                new Tuple<string, int>("DDR-Beque Green (I) Badge", 13),
-                new Tuple<string, int>("DDR-Beque Green (II) Badge", 16),
-                new Tuple<string, int>("DDR-Beque Gold (I) Badge", 18),
-                new Tuple<string, int>("DDR-Beque Gold (II) Badge", 21),
-                new Tuple<string, int>("DDR-Beque Opal Badge", 23),
+                new Tuple<string, int>("Base", 0),
+                new Tuple<string, int>("Red (I)", 3),
+                new Tuple<string, int>("Red (II)", 6),
+                new Tuple<string, int>("Blue (I)", 8),
+                new Tuple<string, int>("Blue (II)", 11),
+                new Tuple<string, int>("Green (I)", 13),
+                new Tuple<string, int>("Green (II)", 16),
+                new Tuple<string, int>("Gold (I)", 18),
+                new Tuple<string, int>("Gold (II)", 21),
+                new Tuple<string, int>("Opal", 23),
             };
             var score = calculateSeasonScore(dancerId);
 

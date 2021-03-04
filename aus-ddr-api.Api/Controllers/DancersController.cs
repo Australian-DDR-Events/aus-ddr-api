@@ -78,7 +78,7 @@ namespace AusDdrApi.Controllers
             var dancer = dancerRequest.ToEntity();
             dancer.AuthenticationId = authId;
             var newDancer = await _dancerService.Add(dancer);
-            var baseBadge = _badgeService.GetByName("DDR-Beque Badge");
+            var baseBadge = _badgeService.GetByName("Base");
             if (baseBadge != null) _badgeService.AssignBadge(baseBadge.Id, newDancer.Id);
             await _coreService.SaveChanges();
             return DancerResponse.FromEntity(newDancer);

@@ -45,9 +45,9 @@ jobs:
               sed -e 's/^"//' -e 's/"$//')
             aws --region ${AWS_REGION} ecr get-login-password | \
               docker login --username AWS --password-stdin ${user_id}.dkr.ecr.${AWS_REGION}.amazonaws.com
-            docker build -t ${ecr_repository}:${API_IMAGE_TAG}/latest .
-            docker tag ${ecr_repository}/${API_IMAGE_TAG}:latest ${user_id}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ecr_repository}:${API_IMAGE_TAG}/latest
-            docker push ${user_id}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ecr_repository}:${API_IMAGE_TAG}/latest
+            docker build -t ${ecr_repository}:${API_IMAGE_TAG} .
+            docker tag ${ecr_repository}:${API_IMAGE_TAG} ${user_id}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ecr_repository}:${API_IMAGE_TAG}
+            docker push ${user_id}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ecr_repository}:${API_IMAGE_TAG}
   test:
     working_directory: ~/aus-ddr-api
     machine:

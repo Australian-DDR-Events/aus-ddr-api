@@ -2,6 +2,7 @@ version: 2.1
 orbs:
   heroku: circleci/heroku@1.2.5
   jira: circleci/jira@1.3.0
+  aws-cli: circleci/aws-cli@1.3.2
 jobs:
   build:
     working_directory: ~/aus-ddr-api
@@ -20,6 +21,29 @@ jobs:
           process-types: web
       - heroku/release-docker-image:
           process-types: web
+  deploy_to_ecr:
+    working_directory: ~/aus-ddr-api
+    docker:
+      - image: cimg/base:2020.01
+    resource_class: medium
+    steps:
+      - checkout
+      - setup_remote_docker
+      - attach_workspace:
+          at: ~/aus-ddr-api
+      - aws-cli/setup:
+          aws-access-key-id: AWS_ACCESS_KEY_ID
+          aws-secret-access-key: AWS_SECRET_ACCESS_KEY
+          aws-region: AWS_REGION
+      - run:
+          name: Build application Docker image
+          command: |
+            user_id=${aws sts get-caller-identity | jq '.UserId' | sed -e 's/^"//' -e 's/"$//'}
+            ecr_repository=${aws cloudformation list-exports | jq '.Exports[] | select(.Name == "${AWS_STACK_NAME}-ecr-repository") | .Value' | sed -e 's/^"//' -e 's/"$//'}
+            docker build -t ${ecr_repository}/${API_IMAGE_TAG}:latest .
+            docker tag ${ecr_repository}/${API_IMAGE_TAG}:latest {user_id}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ecr_repository}/${API_IMAGE_TAG}:latest
+            docker push {user_id}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ecr_repository}/${API_IMAGE_TAG}:latest
+
   test:
     working_directory: ~/aus-ddr-api
     machine:
@@ -58,6 +82,14 @@ workflows:
   build_and_deploy:
     jobs:
       - test:
+          filters:
+            branches:
+              only: master
+      - deploy_to_ecr:
+          context:
+            - production
+          post-steps:
+            - jira/notify
           filters:
             branches:
               only: master

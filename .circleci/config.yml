@@ -38,6 +38,7 @@ jobs:
       - run:
           name: Build application Docker image
           command: |
+            sha1_tag=$($CIRCLE_SHA1 | cut -c -8)
             user_id=$(aws sts get-caller-identity | jq '.UserId' | sed -e 's/^"//' -e 's/"$//')
             ecr_repository=$( \
               aws cloudformation list-exports | \
@@ -45,9 +46,9 @@ jobs:
               sed -e 's/^"//' -e 's/"$//')
             aws --region ${AWS_REGION} ecr get-login-password | \
               docker login --username AWS --password-stdin ${user_id}.dkr.ecr.${AWS_REGION}.amazonaws.com
-            docker build -t ${ecr_repository}:${API_IMAGE_TAG} .
-            docker tag ${ecr_repository}:${API_IMAGE_TAG} ${user_id}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ecr_repository}:${API_IMAGE_TAG}
-            docker push ${user_id}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ecr_repository}:${API_IMAGE_TAG}
+            docker build -t ${ecr_repository}:${sha1_tag} .
+            docker tag ${ecr_repository}:${sha1_tag} ${user_id}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ecr_repository}:${sha1_tag}
+            docker push ${user_id}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ecr_repository}:${sha1_tag}
   test:
     working_directory: ~/aus-ddr-api
     machine:

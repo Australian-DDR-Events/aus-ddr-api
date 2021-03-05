@@ -63,17 +63,17 @@ namespace AusDdrApi.Controllers
         [HttpPost]
         [Authorize(Policy = "Admin")]
         [ProducesResponseType(StatusCodes.Status201Created)]
-        public async Task<ActionResult<SongResponse>> Post([FromForm] SongRequest songRequest, [FromForm] [Required] IFormFile? songJacket)
+        public async Task<ActionResult<SongResponse>> Post([FromForm] SongRequest songRequest)
         {
             var newSong = await _songService.Add(songRequest.ToEntity());
 
-            if (songJacket != null)
+            if (songRequest.SongJacket != null)
             {
                 var uploadTasks = new List<Task<string>>();
                 try
                 {
                     int[] imageSizes = {32, 64, 128, 256, 512};
-                    var ingredientImage = await Image.LoadAsync(songJacket!.OpenReadStream());
+                    var ingredientImage = await Image.LoadAsync(songRequest.SongJacket!.OpenReadStream());
                     foreach (var size in imageSizes)
                     {
                         var image = await Images.ImageToPngMemoryStream(ingredientImage, size, size);

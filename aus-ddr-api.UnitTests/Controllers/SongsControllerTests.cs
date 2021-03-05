@@ -130,7 +130,7 @@ namespace UnitTests.Controllers
                     Name = args.ArgAt<Song>(0).Name
                 }));
 
-            var actionResult = await _songsController.Post(songRequest, null);
+            var actionResult = await _songsController.Post(songRequest);
             
             var createdResult = Assert.IsType<CreatedResult>(actionResult.Result);
             Assert.Equal($"/songs/{songGuid}", createdResult.Location);

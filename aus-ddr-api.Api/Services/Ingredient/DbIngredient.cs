@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AusDdrApi.Persistence;
+using Microsoft.EntityFrameworkCore;
 using IngredientEntity = AusDdrApi.Entities.Ingredient;
 
 namespace AusDdrApi.Services.Ingredient
@@ -18,17 +19,17 @@ namespace AusDdrApi.Services.Ingredient
 
         public IEnumerable<IngredientEntity> GetAll()
         {
-            return _context.Ingredients.AsQueryable().ToArray();
+            return _context.Ingredients.Include(i => i.Song).AsQueryable().ToArray();
         }
 
         public IngredientEntity? Get(Guid ingredientId)
         {
-            return _context.Ingredients.AsQueryable().SingleOrDefault(i => i.Id == ingredientId);
+            return _context.Ingredients.Include(i => i.Song).AsQueryable().SingleOrDefault(i => i.Id == ingredientId);
         }
         
         public IEnumerable<IngredientEntity> Get(IEnumerable<Guid> ingredientIds)
         {
-            return _context.Ingredients.AsQueryable().Where(i => ingredientIds.Contains(i.Id)).ToList();
+            return _context.Ingredients.Include(i => i.Song).AsQueryable().Where(i => ingredientIds.Contains(i.Id)).ToList();
         }
 
         public async Task<IngredientEntity> Add(IngredientEntity ingredient)

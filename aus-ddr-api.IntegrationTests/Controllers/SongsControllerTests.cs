@@ -197,7 +197,7 @@ namespace aus_ddr_api.IntegrationTests.Controllers
                 Name = songRequest.Name
             };
 
-            var actionResult = await _songsController.Post(songRequest, null);
+            var actionResult = await _songsController.Post(songRequest);
             
             var createdResult = Assert.IsType<CreatedResult>(actionResult.Result);
             var id = Guid.Parse(createdResult.Location.Substring(createdResult.Location.LastIndexOf("/") + 1));

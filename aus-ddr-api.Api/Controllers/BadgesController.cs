@@ -78,7 +78,7 @@ namespace AusDdrApi.Controllers
 
         [HttpPost]
         [Authorize(Policy = "Admin")]
-        [Route("{badgeId}/{dancerId}")]
+        [Route("{badgeId}/dancers/{dancerId}")]
         public async Task<ActionResult> AssignBadge([FromRoute] Guid badgeId, [FromRoute] Guid dancerId)
         {
             if (_badgeService.AssignBadge(badgeId, dancerId)) return BadRequest();
@@ -88,7 +88,7 @@ namespace AusDdrApi.Controllers
 
         [HttpDelete]
         [Authorize(Policy = "Admin")]
-        [Route("{badgeId}/{dancerId}")]
+        [Route("{badgeId}/dancers/{dancerId}")]
         public async Task<ActionResult> RevokeBadge([FromRoute] Guid badgeId, [FromRoute] Guid dancerId)
         {
             if (_badgeService.RevokeBadge(badgeId, dancerId)) return BadRequest();

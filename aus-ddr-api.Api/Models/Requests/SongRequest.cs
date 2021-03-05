@@ -18,6 +18,7 @@ namespace AusDdrApi.Models.Requests
         public int Level { get; set; }
         [Required]
         public int MaxScore { get; set; }
+        public IFormFile? SongJacket { get; set; }
 
         public Song ToEntity() => new Song
         {

@@ -38,7 +38,7 @@ jobs:
       - run:
           name: Build application Docker image
           command: |
-            sha1_tag=$($CIRCLE_SHA1 | cut -c -8)
+            sha1_tag=$(echo $CIRCLE_SHA1 | cut -c -8)
             user_id=$(aws sts get-caller-identity | jq '.UserId' | sed -e 's/^"//' -e 's/"$//')
             ecr_repository=$( \
               aws cloudformation list-exports | \

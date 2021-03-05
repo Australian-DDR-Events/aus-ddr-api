@@ -39,7 +39,10 @@ jobs:
           name: Build application Docker image
           command: |
             user_id=$(aws sts get-caller-identity | jq '.UserId' | sed -e 's/^"//' -e 's/"$//')
-            ecr_repository=$(aws cloudformation list-exports | jq '.Exports[] | select(.Name == "${AWS_STACK_NAME}-ecr-repository") | .Value' | sed -e 's/^"//' -e 's/"$//')
+            ecr_repository=$( \
+              aws cloudformation list-exports | \
+              jq '.Exports[] | select(.Name == '\"$AWS_STACK_NAME-ecr-repository\"') | .Value'| \
+              sed -e 's/^"//' -e 's/"$//')
             docker build -t ${ecr_repository}/${API_IMAGE_TAG}:latest .
             docker tag ${ecr_repository}/${API_IMAGE_TAG}:latest {user_id}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ecr_repository}/${API_IMAGE_TAG}:latest
             docker push {user_id}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ecr_repository}/${API_IMAGE_TAG}:latest

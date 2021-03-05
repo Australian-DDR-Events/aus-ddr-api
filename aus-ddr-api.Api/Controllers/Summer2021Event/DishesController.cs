@@ -89,14 +89,6 @@ namespace AusDdrApi.Controllers.Summer2021Event
         }
 
         [HttpGet]
-        [Route("{dishId}/ingredients")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public ActionResult<IEnumerable<IngredientResponse>> GetIngredients(Guid dishId)
-        {
-            return Ok( _dishService.GetIngredientsForDish(dishId).AsEnumerable().Select(IngredientResponse.FromEntity));
-        }
-
-        [HttpGet]
         [Route("{dishId}/songs")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult<IEnumerable<IngredientResponse>> GetDishSongs(Guid dishId)
@@ -130,11 +122,10 @@ namespace AusDdrApi.Controllers.Summer2021Event
             var dish = _dishService.Get(dishId);
             if (dish == null) return NotFound();
 
-            var ingredients = _dishService.GetIngredientsForDish(dish.Id);
             var gradedIngredients = _gradedDancerIngredientService.GetIngredientsForDancer(
-                ingredients.Select(i => i.Id).ToList(),
+                dish.DishIngredients.Select(i => i.Id).ToList(),
                 existingDancer.Id);
-            if (ingredients.Count() != gradedIngredients.Count()) return BadRequest();
+            if (dish.DishIngredients.Count() != gradedIngredients.Count()) return BadRequest();
             
             var dishSongs = _dishService.GetSongsForDish(dish.Id);
             if (gradedDancerDishRequest.Scores.Count() != dishSongs.Count()) return BadRequest();
@@ -291,15 +282,8 @@ namespace AusDdrApi.Controllers.Summer2021Event
             {
                 Name = dishRequest.Name
             });
-            await _dishService.AddDishIngredients(
-                dishRequest.IngredientIds.Select(
-                    ingredientId => new DishIngredient()
-                    {
-                        DishId = dish.Id,
-                        IngredientId = ingredientId
-                    }
-                )
-            );
+            var ingredients = _ingredientService.Get(dishRequest.IngredientIds);
+            _dishService.AddDishIngredients(dish.Id, ingredients);
             await _dishService.AddDishSongs(
                 dishRequest.SongIds.Select(
                     (songId, index) => new DishSong()

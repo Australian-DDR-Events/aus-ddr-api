@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using AusDdrApi.Persistence;
 using Microsoft.EntityFrameworkCore;
 using DishSongEntity = AusDdrApi.Entities.DishSong;
-using DishIngredientEntity = AusDdrApi.Entities.DishIngredient;
 using DishEntity = AusDdrApi.Entities.Dish;
 using IngredientEntity = AusDdrApi.Entities.Ingredient;
 
@@ -22,24 +21,12 @@ namespace AusDdrApi.Services.Dish
 
         public IEnumerable<DishEntity> GetAll()
         {
-            return _context.Dishes.AsQueryable().ToArray();
+            return _context.Dishes.Include(d => d.DishIngredients).AsQueryable().ToArray();
         }
 
         public DishEntity? Get(Guid dishId)
         {
-            return _context.Dishes.AsQueryable().SingleOrDefault(d => d.Id == dishId);
-        }
-
-        public IEnumerable<IngredientEntity> GetIngredientsForDish(Guid dishId)
-        {
-            var ingredients = _context
-                .DishIngredients
-                .Include(d => d.Ingredient)
-                .AsQueryable()
-                .Where(d => d.DishId == dishId)
-                .Select(d => d.Ingredient!)
-                .ToList();
-            return ingredients;
+            return _context.Dishes.Include(d => d.DishIngredients).AsQueryable().SingleOrDefault(d => d.Id == dishId);
         }
 
         public IEnumerable<DishSongEntity> GetSongsForDish(Guid dishId)
@@ -57,11 +44,19 @@ namespace AusDdrApi.Services.Dish
             return dishEntity.Entity;
         }
 
-        public async Task AddDishIngredients(IEnumerable<DishIngredientEntity> dishIngredients)
+        public void AddDishIngredients(Guid dishId, IEnumerable<IngredientEntity> ingredients)
         {
-            await _context
-                .DishIngredients
-                .AddRangeAsync(dishIngredients);
+            var dish = _context
+                .Dishes
+                .Include(d => d.DishIngredients)
+                .FirstOrDefault(d => d.Id == dishId);
+            if (dish != null)
+            {
+                foreach (var ingredient in ingredients)
+                {
+                    dish.DishIngredients.Add(ingredient);
+                }
+            }
         }
 
         public async Task AddDishSongs(IEnumerable<DishSongEntity> dishSongs)

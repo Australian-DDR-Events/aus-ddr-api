@@ -2,15 +2,21 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using AusDdrApi.Entities;
+using Microsoft.AspNetCore.Http;
 
 namespace AusDdrApi.Models.Requests
 {
     public class SongRequest
     {
+        [Required]
         public string Name { get; set; } = string.Empty;
+        [Required]
         public string Artist { get; set; } = string.Empty;
+        [Required]
         public string Difficulty { get; set; } = string.Empty;
+        [Required]
         public int Level { get; set; }
+        [Required]
         public int MaxScore { get; set; }
 
         public Song ToEntity() => new Song

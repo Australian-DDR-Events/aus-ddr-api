@@ -90,6 +90,10 @@ workflows:
           filters:
             branches:
               only: master
+      - block_ecr:
+          type: approval
+          requires:
+            - test
       - deploy_to_ecr:
           context:
             - production
@@ -98,6 +102,8 @@ workflows:
           filters:
             branches:
               only: master
+          requires:
+            - block_ecr
       - build:
           name: deploy-staging
           context:

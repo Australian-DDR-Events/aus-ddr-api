@@ -46,7 +46,7 @@ namespace aus_ddr_api.IntegrationTests.Controllers
         [Fact]
         public void Get_WhenDatabaseIsEmpty_Returns_EmptyListOfSongResponses()
         {
-            var actionResult = _songsController.Get();
+            var actionResult = _songsController.Get(null);
             
             var okObjectResult = Assert.IsType<OkObjectResult>(actionResult.Result);
             var songs = Assert.IsAssignableFrom<IEnumerable<SongResponse>>(okObjectResult.Value);
@@ -70,13 +70,42 @@ namespace aus_ddr_api.IntegrationTests.Controllers
             _fixture._context.Songs.AddRange(song1, song2);
             _fixture._context.SaveChanges();
 
-            var actionResult = _songsController.Get();
+            var actionResult = _songsController.Get(null);
             
             var okObjectResult = Assert.IsType<OkObjectResult>(actionResult.Result);
             var songs = Assert.IsAssignableFrom<IEnumerable<SongResponse>>(okObjectResult.Value);
             Assert.Collection(songs,
                 Assert.NotNull, Assert.NotNull
                 );
+        }
+
+        [Fact]
+        public void Get_WhenSongIdsAreProvided_Returns_ListOfSongsIncludedInRequest()
+        { 
+            var song1 = new Song
+            {
+                Id = Guid.NewGuid(),
+                Level = 1
+            };
+            var song2 = new Song
+            {
+                Id = Guid.NewGuid(),
+                Level = 1
+            };
+
+            _fixture._context.Songs.Add(song1);
+            var songToGet = _fixture._context.Songs.Add(song2).Entity;
+            _fixture._context.SaveChanges();
+
+            var expectedSong = SongResponse.FromEntity(songToGet);
+
+            var actionResult = _songsController.Get(new Guid[]{songToGet.Id});
+            
+            var okObjectResult = Assert.IsType<OkObjectResult>(actionResult.Result);
+            var songs = Assert.IsAssignableFrom<IEnumerable<SongResponse>>(okObjectResult.Value);
+            Assert.Collection(songs,
+                song => Assert.Equal(song, expectedSong)
+            );
         }
 
         [Fact]
@@ -102,7 +131,7 @@ namespace aus_ddr_api.IntegrationTests.Controllers
             _fixture._context.Songs.Add(song);
             _fixture._context.SaveChanges();
             
-            var actionResult = _songsController.Get();
+            var actionResult = _songsController.Get(null);
             
             var okObjectResult = Assert.IsType<OkObjectResult>(actionResult.Result);
             var songs = Assert.IsAssignableFrom<IEnumerable<SongResponse>>(okObjectResult.Value);
@@ -157,7 +186,7 @@ namespace aus_ddr_api.IntegrationTests.Controllers
                 Artist = "artist",
                 Difficulty = "difficulty",
                 Level = 5,
-                Name = "name"
+                Name = "name",
             };
             
             var expectedSong = new Song
@@ -168,7 +197,7 @@ namespace aus_ddr_api.IntegrationTests.Controllers
                 Name = songRequest.Name
             };
 
-            var actionResult = await _songsController.Post(songRequest);
+            var actionResult = await _songsController.Post(songRequest, null);
             
             var createdResult = Assert.IsType<CreatedResult>(actionResult.Result);
             var id = Guid.Parse(createdResult.Location.Substring(createdResult.Location.LastIndexOf("/") + 1));

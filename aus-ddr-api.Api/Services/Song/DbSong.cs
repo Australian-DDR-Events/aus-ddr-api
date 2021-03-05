@@ -21,6 +21,11 @@ namespace AusDdrApi.Services.Song
             return _context.Songs.AsQueryable().ToList();
         }
 
+        public IEnumerable<SongEntity> Get(IEnumerable<Guid> songIds)
+        {
+            return _context.Songs.AsQueryable().Where(s => songIds.Contains(s.Id)).ToList();
+        }
+
         public SongEntity? Get(Guid songId)
         {
             return _context.Songs.AsQueryable().SingleOrDefault(s => s.Id == songId);

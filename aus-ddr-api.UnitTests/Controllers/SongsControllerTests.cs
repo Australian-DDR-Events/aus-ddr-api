@@ -60,7 +60,7 @@ namespace UnitTests.Controllers
 
             var expectedSongList = songList.Select(SongResponse.FromEntity).AsEnumerable();
 
-            var actionResult = _songsController.Get();
+            var actionResult = _songsController.Get(null);
 
             var okObjectResult = Assert.IsType<OkObjectResult>(actionResult.Result);
             Assert.IsAssignableFrom<IEnumerable<SongResponse>>(okObjectResult.Value);
@@ -109,6 +109,7 @@ namespace UnitTests.Controllers
                 Level = 5,
                 Name = "Song1"
             };
+            
             var songGuid = Guid.Parse("F531D138-44F2-4400-A21B-C3D9A3C8D485");
             var expectedSongResponse = new SongResponse
             {
@@ -129,7 +130,7 @@ namespace UnitTests.Controllers
                     Name = args.ArgAt<Song>(0).Name
                 }));
 
-            var actionResult = await _songsController.Post(songRequest);
+            var actionResult = await _songsController.Post(songRequest, null);
             
             var createdResult = Assert.IsType<CreatedResult>(actionResult.Result);
             Assert.Equal($"/songs/{songGuid}", createdResult.Location);

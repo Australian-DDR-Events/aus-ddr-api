@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using AusDdrApi.Helpers;
@@ -39,9 +40,12 @@ namespace AusDdrApi.Controllers
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public ActionResult<IEnumerable<SongResponse>> Get()
+        public ActionResult<IEnumerable<SongResponse>> Get(
+            [FromQuery(Name = "song_id")] Guid[]? songIds
+            )
         {
-            return Ok(_songService.GetAll().Select(SongResponse.FromEntity).AsEnumerable());
+            var songs = songIds?.Length > 0 ? _songService.Get(songIds) : _songService.GetAll();
+            return Ok(songs.Select(SongResponse.FromEntity).AsEnumerable());
         }
 
         [HttpGet]
@@ -51,10 +55,7 @@ namespace AusDdrApi.Controllers
         public ActionResult<SongResponse> GetSong(Guid songId)
         {
             var song = _songService.Get(songId);
-            if (song == null)
-            {
-                return NotFound();
-            }
+            if (song == null) return NotFound();
 
             return Ok(SongResponse.FromEntity(song));
         }
@@ -62,9 +63,41 @@ namespace AusDdrApi.Controllers
         [HttpPost]
         [Authorize(Policy = "Admin")]
         [ProducesResponseType(StatusCodes.Status201Created)]
-        public async Task<ActionResult<SongResponse>> Post(SongRequest song)
+        public async Task<ActionResult<SongResponse>> Post([FromForm] SongRequest songRequest, [FromForm] [Required] IFormFile? songJacket)
         {
-            var newSong = await _songService.Add(song.ToEntity());
+            var newSong = await _songService.Add(songRequest.ToEntity());
+
+            if (songJacket != null)
+            {
+                var uploadTasks = new List<Task<string>>();
+                try
+                {
+                    int[] imageSizes = {32, 64, 128, 256, 512};
+                    var ingredientImage = await Image.LoadAsync(songJacket!.OpenReadStream());
+                    foreach (var size in imageSizes)
+                    {
+                        var image = await Images.ImageToPngMemoryStream(ingredientImage, size, size);
+
+                        var destinationKey = $"songs/{newSong.Id}.{size}.png";
+                        uploadTasks.Add(_fileStorage.UploadFileFromStream(image, destinationKey));
+                    }
+                }
+                catch
+                {
+                    return BadRequest();
+                }
+                
+                var t = Task.WhenAll(uploadTasks);
+                try
+                {
+                    t.Wait();
+                }
+                catch
+                {
+                    return BadRequest();
+                }
+            }
+            
             await _coreService.SaveChanges();
             return Created($"/songs/{newSong.Id}", SongResponse.FromEntity(newSong));
         }

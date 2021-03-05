@@ -21,12 +21,20 @@ namespace AusDdrApi.Services.Dish
 
         public IEnumerable<DishEntity> GetAll()
         {
-            return _context.Dishes.Include(d => d.DishIngredients).AsQueryable().ToArray();
+            return _context
+                .Dishes
+                .Include(d => d.DishSongs)
+                .Include(d => d.DishIngredients)
+                .AsQueryable().ToArray();
         }
 
         public DishEntity? Get(Guid dishId)
         {
-            return _context.Dishes.Include(d => d.DishIngredients).AsQueryable().SingleOrDefault(d => d.Id == dishId);
+            return _context
+                .Dishes
+                .Include(d => d.DishSongs)
+                .Include(d => d.DishIngredients)
+                .AsQueryable().SingleOrDefault(d => d.Id == dishId);
         }
 
         public IEnumerable<DishSongEntity> GetSongsForDish(Guid dishId)

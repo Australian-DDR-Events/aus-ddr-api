@@ -1,5 +1,6 @@
 using System;
 using AusDdrApi.Entities;
+using Microsoft.EntityFrameworkCore.Query.Internal;
 
 namespace AusDdrApi.Models.Responses
 {
@@ -7,7 +8,7 @@ namespace AusDdrApi.Models.Responses
     {
         public Guid Id { get; set; }
         public string Name { get; set; } = string.Empty;
-        public Guid SongId { get; set; }
+        public SongResponse? Song { get; set; }
         public string Image32 { get; set; } = string.Empty;
         public string Image64 { get; set; } = string.Empty;
         public string Image128 { get; set; } = string.Empty;
@@ -17,7 +18,7 @@ namespace AusDdrApi.Models.Responses
         {
             Id = ingredient.Id,
             Name = ingredient.Name,
-            SongId = ingredient.SongId,
+            Song = ingredient.Song != null ? SongResponse.FromEntity(ingredient.Song) : null,
             Image32 = $"/summer2021/ingredients/{ingredient.Id}.32.png",
             Image64 = $"/summer2021/ingredients/{ingredient.Id}.64.png",
             Image128 = $"/summer2021/ingredients/{ingredient.Id}.128.png",

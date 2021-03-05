@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace AusDdrApi.Entities
 {
@@ -9,5 +10,7 @@ namespace AusDdrApi.Entities
         
         public Guid SongId { get; set; }
         public Song? Song { get; set; }
+        
+        public virtual ICollection<Ingredient> DishIngredients { get; set; } = new HashSet<Ingredient>();
     }
 }

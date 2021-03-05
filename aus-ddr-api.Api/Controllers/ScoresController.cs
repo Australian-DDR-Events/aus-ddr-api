@@ -103,7 +103,11 @@ namespace AusDdrApi.Controllers
             }
 
             var song = _songService.Get(request.SongId);
-            if (request.Score > song.MaxScore) return BadRequest();
+            if (song == null)
+            {
+                return NotFound();
+            }
+            if (request.Score > song!.MaxScore) return BadRequest();
 
             var score = await _scoreService.Add(new Score
             {

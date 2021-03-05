@@ -55,7 +55,7 @@ namespace AusDdrApi.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public ActionResult<DancerResponse> GetDancer(string id)
         {
-            Dancer dancer = Guid.TryParse(id, out var dancerId) ? _dancerService.Get(dancerId) : _dancerService.GetByAuthId(id);
+            var dancer = Guid.TryParse(id, out var dancerId) ? _dancerService.Get(dancerId) : _dancerService.GetByAuthId(id);
             if (dancer == null)
             {
                 return NotFound();

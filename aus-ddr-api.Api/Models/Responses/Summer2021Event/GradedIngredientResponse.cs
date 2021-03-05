@@ -8,6 +8,7 @@ namespace AusDdrApi.Models.Responses
         public Guid Id { get; set; }
         public string Grade { get; set; } = string.Empty;
         public int RequiredScore { get; set; }
+        public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public string Image32 { get; set; } = string.Empty;
         public string Image64 { get; set; } = string.Empty;
@@ -19,6 +20,7 @@ namespace AusDdrApi.Models.Responses
             Id = gradedIngredient.Id,
             Grade = gradedIngredient.Grade.ToString("g"),
             RequiredScore = gradedIngredient.RequiredScore,
+            Name = gradedIngredient.Ingredient?.Name ?? string.Empty,
             Description = gradedIngredient.Description,
             Image32 = $"/summer2021/gradedingredients/{gradedIngredient.Id}.32.png",
             Image64 = $"/summer2021/gradedingredients/{gradedIngredient.Id}.64.png",

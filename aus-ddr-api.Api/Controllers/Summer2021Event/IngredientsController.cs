@@ -139,7 +139,7 @@ namespace AusDdrApi.Controllers.Summer2021Event
             [FromForm] IngredientScoreRequest request)
         {
             var authId = HttpContext.GetUserId();
-            var existingDancer = _dancerService.GetByAuthId(authId);
+            var existingDancer = _dancerService.GetByAuthId(authId) ?? await _dancerService.Add(new Dancer{AuthenticationId = authId});
             if (existingDancer == null)
             {
                 return NotFound("dancer does not exist");

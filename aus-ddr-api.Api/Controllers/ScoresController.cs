@@ -96,7 +96,7 @@ namespace AusDdrApi.Controllers
         public async Task<ActionResult<ScoreResponse>> SubmitScore([FromForm] ScoreSubmissionRequest request)
         {
             var authId = HttpContext.GetUserId();
-            var dancer = _dancerService.GetByAuthId(authId);
+            var dancer = _dancerService.GetByAuthId(authId) ?? await _dancerService.Add(new Dancer{AuthenticationId = authId});
             if (dancer == null)
             {
                 return NotFound();

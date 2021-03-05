@@ -11,6 +11,6 @@ namespace AusDdrApi.Entities
         public int MaxScore { get; set; }
         
         public ICollection<DishSong> DishSongs { get; set; } = new List<DishSong>();
-        public virtual ICollection<Ingredient> DishIngredients { get; set; } = new HashSet<Ingredient>();
+        public virtual ICollection<Ingredient> Ingredients { get; set; } = new HashSet<Ingredient>();
     }
 }

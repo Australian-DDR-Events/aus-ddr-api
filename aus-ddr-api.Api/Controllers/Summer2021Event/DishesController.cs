@@ -123,9 +123,9 @@ namespace AusDdrApi.Controllers.Summer2021Event
             if (dish == null) return NotFound();
 
             var gradedIngredients = _gradedDancerIngredientService.GetIngredientsForDancer(
-                dish.DishIngredients.Select(i => i.Id).ToList(),
+                dish.Ingredients.Select(i => i.Id).ToList(),
                 existingDancer.Id);
-            if (dish.DishIngredients.Count() != gradedIngredients.Count()) return BadRequest();
+            if (dish.Ingredients.Count() != gradedIngredients.Count()) return BadRequest();
             
             var dishSongs = _dishService.GetSongsForDish(dish.Id);
             if (gradedDancerDishRequest.Scores.Count() != dishSongs.Count()) return BadRequest();

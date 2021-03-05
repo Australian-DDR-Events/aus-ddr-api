@@ -21,7 +21,7 @@ namespace AusDdrApi.Models.Responses
             Id = dish.Id,
             Name = dish.Name,
             Songs = dish.DishSongs.Select(DishSongResponse.FromEntity),
-            Ingredients = dish.DishIngredients.Select(IngredientResponse.FromEntity),
+            Ingredients = dish.Ingredients.Select(IngredientResponse.FromEntity),
             Image32 = $"/summer2021/dishes/{dish.Id}.32.png",
             Image64 = $"/summer2021/dishes/{dish.Id}.64.png",
             Image128 = $"/summer2021/dishes/{dish.Id}.128.png",

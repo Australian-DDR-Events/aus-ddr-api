@@ -11,6 +11,6 @@ namespace AusDdrApi.Entities
         public Guid SongId { get; set; }
         public Song? Song { get; set; }
         
-        public virtual ICollection<Ingredient> DishIngredients { get; set; } = new HashSet<Ingredient>();
+        public virtual ICollection<Dish> Dishes { get; set; } = new HashSet<Dish>();
     }
 }

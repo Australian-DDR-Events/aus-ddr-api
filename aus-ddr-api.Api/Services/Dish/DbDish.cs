@@ -24,8 +24,10 @@ namespace AusDdrApi.Services.Dish
             return _context
                 .Dishes
                 .Include(d => d.DishSongs)
-                .Include(d => d.DishIngredients)
-                .AsQueryable().ToArray();
+                .ThenInclude(s => s.Song)
+                .Include(d => d.Ingredients)
+                .AsSplitQuery()
+                .ToList();
         }
 
         public DishEntity? Get(Guid dishId)
@@ -33,7 +35,9 @@ namespace AusDdrApi.Services.Dish
             return _context
                 .Dishes
                 .Include(d => d.DishSongs)
-                .Include(d => d.DishIngredients)
+                .ThenInclude(s => s.Song)
+                .Include(d => d.Ingredients)
+                .AsSplitQuery()
                 .AsQueryable().SingleOrDefault(d => d.Id == dishId);
         }
 
@@ -56,13 +60,13 @@ namespace AusDdrApi.Services.Dish
         {
             var dish = _context
                 .Dishes
-                .Include(d => d.DishIngredients)
+                .Include(d => d.Ingredients)
                 .FirstOrDefault(d => d.Id == dishId);
             if (dish != null)
             {
                 foreach (var ingredient in ingredients)
                 {
-                    dish.DishIngredients.Add(ingredient);
+                    dish.Ingredients.Add(ingredient);
                 }
             }
         }

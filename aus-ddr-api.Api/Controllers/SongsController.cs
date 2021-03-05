@@ -60,6 +60,7 @@ namespace AusDdrApi.Controllers
         }
         
         [HttpPost]
+        [Authorize(Policy = "Admin")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         public async Task<ActionResult<SongResponse>> Post(SongRequest song)
         {
@@ -96,31 +97,8 @@ namespace AusDdrApi.Controllers
             {
                 return NotFound();
             }
+
             await _coreService.SaveChanges();
-            return Ok();
-        }
-        
-        [HttpPost]
-        [Route("{songId}/addimage")]
-        public async Task<ActionResult> PostSongImage([FromForm] IFormFile formImage, [FromRoute] string songId)
-        {
-            try
-            {
-                int[] imageSizes = {32, 64, 128, 256, 512};
-                var ingredientImage = await Image.LoadAsync(formImage.OpenReadStream());
-                foreach (var size in imageSizes)
-                {
-                    var image = await Images.ImageToPngMemoryStream(ingredientImage, size, size);
-
-                    var destinationKey = $"songs/{songId}.{size}.png";
-                    await _fileStorage.UploadFileFromStream(image, destinationKey);
-                }
-            }
-            catch
-            {
-                return BadRequest();
-            }
-
             return Ok();
         }
     }

@@ -65,6 +65,7 @@ namespace AusDdrApi.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public ActionResult<IEnumerable<ScoreResponse>> Get(
+            [FromQuery(Name = "score_id")] Guid[]? scoreIds,
             [FromQuery(Name = "dancer_id")] Guid[]? dancerIds,
             [FromQuery(Name = "song_id")] Guid[]? songIds,
             [FromQuery(Name = "top_scores_only")] bool topScoresOnly = true
@@ -101,6 +102,9 @@ namespace AusDdrApi.Controllers
                 return NotFound();
             }
 
+            var song = _songService.Get(request.SongId);
+            if (request.Score > song.MaxScore) return BadRequest();
+
             var score = await _scoreService.Add(new Score
             {
                 Value = request.Score,
@@ -127,8 +131,9 @@ namespace AusDdrApi.Controllers
         }
 
         [HttpDelete]
+        [Route("{scoreId}")]
         [Authorize(Policy = "Admin")]
-        public async Task<ActionResult> Delete(Guid scoreId)
+        public async Task<ActionResult> Delete([FromRoute] Guid scoreId)
         {
             if (!_scoreService.Delete(scoreId))
             {

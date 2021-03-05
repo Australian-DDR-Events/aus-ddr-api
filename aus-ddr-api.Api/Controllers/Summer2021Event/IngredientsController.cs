@@ -99,30 +99,6 @@ namespace AusDdrApi.Controllers.Summer2021Event
         }
 
         [HttpPost]
-        [Route("{gradedIngredientId}/addimage")]
-        public async Task<ActionResult> PostGradedIngredientImage([FromForm] IFormFile formImage, [FromRoute] string gradedIngredientId)
-        {
-            try
-            {
-                int[] imageSizes = {32, 64, 128, 256};
-                var ingredientImage = await Image.LoadAsync(formImage.OpenReadStream());
-                foreach (var size in imageSizes)
-                {
-                    var image = await Images.ImageToPngMemoryStream(ingredientImage, size, size);
-
-                    var destinationKey = $"summer2021/gradedingredients/{gradedIngredientId}.{size}.png";
-                    await _fileStorage.UploadFileFromStream(image, destinationKey);
-                }
-            }
-            catch
-            {
-                return BadRequest();
-            }
-
-            return Ok();
-        }
-
-        [HttpPost]
         [Authorize(Policy = "Admin")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

@@ -42,6 +42,7 @@ namespace AusDdrApi.Services.GradedDancerIngredient
                 .Include(g => g.GradedIngredient)
                 .ThenInclude(g => g!.Ingredient)
                 .AsSplitQuery()
+                .Where(g => g.DancerId == dancerId)
                 .AsEnumerable()
                 .GroupBy(ingredient => ingredient.Score!.SongId)
                 .Select(i => i

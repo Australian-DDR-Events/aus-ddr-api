@@ -45,6 +45,7 @@ namespace AusDdrApi.Services.Dish
         {
             return _context
                 .DishSongs
+                .Include(d => d.Song)
                 .AsQueryable()
                 .Where(d => d.DishId == dishId)
                 .ToList();

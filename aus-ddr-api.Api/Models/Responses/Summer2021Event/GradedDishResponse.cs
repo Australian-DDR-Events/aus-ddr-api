@@ -6,7 +6,7 @@ namespace AusDdrApi.Models.Responses
     public class GradedDishResponse
     {
         public Guid Id { get; set; }
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public string Grade { get; set; } = string.Empty;
         public string Image32 { get; set; } = string.Empty;

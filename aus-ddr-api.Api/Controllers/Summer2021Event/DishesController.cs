@@ -134,6 +134,12 @@ namespace AusDdrApi.Controllers.Summer2021Event
             
             var dishSongs = _dishService.GetSongsForDish(dish.Id);
             if (gradedDancerDishRequest.Scores.Count() != dishSongs.Count()) return BadRequest();
+            
+            foreach (var score in gradedDancerDishRequest.Scores)
+            {
+                var song = dishSongs.FirstOrDefault(s => s.Id == score.SongId);
+                if (song?.Song == null || song.Song.MaxScore < score.Score) return BadRequest();
+            }
 
             var scores = new List<Score>();
             var uploadTasks = new List<Task<string>>();

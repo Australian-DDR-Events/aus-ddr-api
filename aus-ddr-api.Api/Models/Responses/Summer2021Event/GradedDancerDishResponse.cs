@@ -11,7 +11,7 @@ namespace AusDdrApi.Models.Responses
         public GradedDishResponse? GradedDish { get; set; }
         public Guid DancerId { get; set; }
         public string ResultImage { get; set; } = string.Empty;
-        public IEnumerable<ScoreResponse> Scores { get; set; }
+        public IEnumerable<ScoreResponse> Scores { get; set; } = new List<ScoreResponse>();
 
         public static GradedDancerDishResponse FromEntity(GradedDancerDish dish, Guid dishId) => new GradedDancerDishResponse
         {

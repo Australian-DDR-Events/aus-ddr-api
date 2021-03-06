@@ -160,7 +160,8 @@ namespace AusDdrApi.Controllers.Summer2021Event
             }
 
             var ingredient = _ingredientService.Get(ingredientId);
-            if (ingredient == null) return BadRequest("ingredient does not exist");
+            if (ingredient?.Song == null) return BadRequest("ingredient does not exist");
+            if (request.Score > ingredient.Song!.MaxScore) return BadRequest();
 
             var gradedIngredient = _gradedIngredientService.GetForScore(ingredient.Id, request.Score);
             if (gradedIngredient?.Ingredient == null)

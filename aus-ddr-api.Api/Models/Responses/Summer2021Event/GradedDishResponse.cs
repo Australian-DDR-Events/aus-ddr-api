@@ -6,6 +6,7 @@ namespace AusDdrApi.Models.Responses
     public class GradedDishResponse
     {
         public Guid Id { get; set; }
+        public string Name { get; set; }
         public string Description { get; set; } = string.Empty;
         public string Grade { get; set; } = string.Empty;
         public string Image32 { get; set; } = string.Empty;
@@ -16,6 +17,7 @@ namespace AusDdrApi.Models.Responses
         public static GradedDishResponse FromEntity(GradedDish gradedDish) => new GradedDishResponse()
         {
             Id = gradedDish.Id,
+            Name = gradedDish.Dish?.Name ?? string.Empty,
             Description = gradedDish.Description,
             Grade = gradedDish.Grade.ToString("g"),
             Image32 = $"/summer2021/gradeddishes/{gradedDish.Id}.32.png",

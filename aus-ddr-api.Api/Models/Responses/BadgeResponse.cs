@@ -8,7 +8,7 @@ namespace AusDdrApi.Models.Responses
         public Guid Id { get; set; }
         public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
-        public Guid EventId { get; set; }
+        public EventResponse? Event { get; set; }
         public string Image32 { get; set; } = string.Empty;
         public string Image64 { get; set; } = string.Empty;
         public string Image128 { get; set; } = string.Empty;
@@ -19,7 +19,7 @@ namespace AusDdrApi.Models.Responses
             Id = badge.Id,
             Name = badge.Name,
             Description = badge.Description,
-            EventId = badge.EventId,
+            Event = badge.Event != null ? EventResponse.FromEntity(badge.Event) : null,
             Image32 = $"/badges/{badge.Id}.32.png",
             Image64 = $"/badges/{badge.Id}.64.png",
             Image128 = $"/badges/{badge.Id}.128.png",

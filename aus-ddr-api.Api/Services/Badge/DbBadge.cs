@@ -19,7 +19,11 @@ namespace AusDdrApi.Services.Badges
         
         public IEnumerable<Badge> GetAll()
         {
-            return _context.Badges.ToList();
+            return _context
+                .Badges
+                .Include(b => b.Event)
+                .AsSplitQuery()
+                .ToList();
         }
 
         public IEnumerable<Badge> GetAssigned(Guid dancerId)
@@ -27,19 +31,26 @@ namespace AusDdrApi.Services.Badges
             return _context
                 .Badges
                 .Include(b => b.Dancers)
-                .AsQueryable()
+                .Include(b => b.Event)
+                .AsSplitQuery()
                 .Where(b => b.Dancers.Any(d => d.Id == dancerId))
                 .ToList();
         }
 
         public Badge? Get(Guid badgeId)
         {
-            return _context.Badges.Find(badgeId);
+            return _context
+                .Badges
+                .Include(b => b.Event)
+                .FirstOrDefault(b => b.Id == badgeId);
         }
 
         public Badge? GetByName(string name)
         {
-            return _context.Badges.FirstOrDefault(b => b.Name == name);
+            return _context
+                .Badges
+                .Include(b => b.Event)
+                .FirstOrDefault(b => b.Name == name);
         }
 
         public async Task<Badge?> Add(Badge badge)

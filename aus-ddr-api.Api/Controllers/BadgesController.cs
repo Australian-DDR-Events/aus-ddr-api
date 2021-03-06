@@ -48,6 +48,15 @@ namespace AusDdrApi.Controllers
             return Ok(badges.Select(BadgeResponse.FromEntity));
         }
 
+        [HttpGet]
+        [Route("{badgeId}")]
+        public ActionResult<BadgeResponse> GetBadge(Guid badgeId)
+        {
+            var badge = _badgeService.Get(badgeId);
+            if (badge == null) return NotFound();
+            return Ok(BadgeResponse.FromEntity(badge));
+        }
+
         [HttpPost]
         [Authorize(Policy = "Admin")]
         public async Task<ActionResult<BadgeResponse>> Post([FromForm] BadgeRequest badgeRequest)

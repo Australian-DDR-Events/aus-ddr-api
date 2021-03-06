@@ -68,6 +68,19 @@ namespace AusDdrApi.Controllers.Summer2021Event
         }
 
         [HttpGet]
+        [Route("~/summer2021/dancers/{dancerId}/ingredients")]
+        public ActionResult<IEnumerable<GradedDancerIngredientResponse>> GetGradedIngredientsForDancer(
+            Guid dancerId, 
+            [FromQuery(Name = "top_only")] bool topOnly = true)
+        {
+            var gradedIngredients = topOnly ? 
+                _gradedDancerIngredientService.GetTopForDancer(dancerId) :
+                _gradedDancerIngredientService.GetAllForDancer(dancerId);
+            
+            return Ok(gradedIngredients.Select(GradedDancerIngredientResponse.FromEntity));
+        }
+
+        [HttpGet]
         [Route("{ingredientId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

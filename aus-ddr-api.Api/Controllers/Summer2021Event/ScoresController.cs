@@ -82,7 +82,7 @@ namespace AusDdrApi.Controllers.Summer2021Event
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [Route("dancers/{dancerId}/scores")]
+        [Route("~/summer2021/dancers/{dancerId}/scores")]
         public ActionResult<IEnumerable<GradedDancerIngredientResponse>> GetIngredientsForDancer(
             Guid dancerId)
         {

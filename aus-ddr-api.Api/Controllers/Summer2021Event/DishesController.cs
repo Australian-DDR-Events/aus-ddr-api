@@ -144,7 +144,7 @@ namespace AusDdrApi.Controllers.Summer2021Event
                 try
                 {
                     var scoreImage = await Image.LoadAsync(scoreRequest.ScoreImage!.OpenReadStream());
-                    var image = await Images.ImageToPngMemoryStream(scoreImage);
+                    var image = await Images.ImageToPngMemoryStreamFactor(scoreImage, 1000, 1000);
 
                     var destinationKey = $"songs/{score.SongId}/scores/{score.Id}.png";
                     uploadTasks.Add(_fileStorage.UploadFileFromStream(image, destinationKey));
@@ -173,7 +173,7 @@ namespace AusDdrApi.Controllers.Summer2021Event
             try
             {
                 var scoreImage = await Image.LoadAsync(gradedDancerDishRequest.FinalImage!.OpenReadStream());
-                var image = await Images.ImageToPngMemoryStream(scoreImage);
+                var image = await Images.ImageToPngMemoryStreamFactor(scoreImage, 1000, 1000);
 
                 var destinationKey = $"dishes/{dish.Id}/final/{gradedDancerDish.Id}.png";
                 uploadTasks.Add(_fileStorage.UploadFileFromStream(image, destinationKey));

@@ -171,7 +171,7 @@ namespace AusDdrApi.Controllers.Summer2021Event
             try
             {
                 var scoreImage = await Image.LoadAsync(request.ScoreImage!.OpenReadStream());
-                var image = await Images.ImageToPngMemoryStream(scoreImage);
+                var image = await Images.ImageToPngMemoryStreamFactor(scoreImage, 1000, 1000);
 
                 var destinationKey = $"songs/{score.SongId}/scores/{score.Id}.png";
                 await _fileStorage.UploadFileFromStream(image, destinationKey);

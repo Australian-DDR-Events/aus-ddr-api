@@ -96,6 +96,7 @@ namespace AusDdrApi
             
             services.AddSingleton<IFileStorage>(new S3FileStorage(client, awsConfiguration));
 
+            services.AddHttpContextAuthorizationServices();
             services.AddDbEntityServices();
         }
 

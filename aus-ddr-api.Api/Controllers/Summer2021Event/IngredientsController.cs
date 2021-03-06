@@ -9,6 +9,7 @@ using AusDdrApi.Helpers;
 using AusDdrApi.Models.Requests;
 using AusDdrApi.Models.Responses;
 using AusDdrApi.Persistence;
+using AusDdrApi.Services.Authorization;
 using AusDdrApi.Services.CoreData;
 using AusDdrApi.Services.Dancer;
 using AusDdrApi.Services.FileStorage;
@@ -37,6 +38,7 @@ namespace AusDdrApi.Controllers.Summer2021Event
         private readonly IIngredient _ingredientService;
         private readonly IScore _scoreService;
         private readonly IFileStorage _fileStorage;
+        private readonly IAuthorization _authorizationService;
 
         public IngredientsController(ILogger<IngredientsController> logger,
             ICoreData coreDataService,
@@ -45,7 +47,8 @@ namespace AusDdrApi.Controllers.Summer2021Event
             IGradedIngredient gradedIngredientService,
             IIngredient ingredientService,
             IScore scoreService,
-            IFileStorage fileStorage)
+            IFileStorage fileStorage,
+            IAuthorization authorizationService)
         {
             _logger = logger;
             _coreDataService = coreDataService;
@@ -55,6 +58,7 @@ namespace AusDdrApi.Controllers.Summer2021Event
             _ingredientService = ingredientService;
             _scoreService = scoreService;
             _fileStorage = fileStorage;
+            _authorizationService = authorizationService;
         }
 
         [HttpGet]
@@ -151,7 +155,8 @@ namespace AusDdrApi.Controllers.Summer2021Event
             [FromRoute] Guid ingredientId,
             [FromForm] IngredientScoreRequest request)
         {
-            var authId = HttpContext.GetUserId();
+            var authId = _authorizationService.GetUserId();
+            if (authId == null) return Unauthorized();
             var existingDancer = _dancerService.GetByAuthId(authId) ?? await _dancerService.Add(new Dancer{AuthenticationId = authId});
             if (existingDancer == null)
             {

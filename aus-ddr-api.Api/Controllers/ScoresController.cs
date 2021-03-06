@@ -7,6 +7,7 @@ using AusDdrApi.Entities;
 using AusDdrApi.Helpers;
 using AusDdrApi.Models.Requests;
 using AusDdrApi.Models.Responses;
+using AusDdrApi.Services.Authorization;
 using AusDdrApi.Services.CoreData;
 using AusDdrApi.Services.Dancer;
 using AusDdrApi.Services.FileStorage;
@@ -30,6 +31,7 @@ namespace AusDdrApi.Controllers
         private readonly ISong _songService;
         private readonly IDancer _dancerService;
         private readonly IFileStorage _fileStorage;
+        private readonly IAuthorization _authorizationService;
 
         public ScoresController(
             ILogger<ScoresController> logger,
@@ -37,7 +39,8 @@ namespace AusDdrApi.Controllers
             IScore scoreService,
             ISong songService,
             IDancer dancerService,
-            IFileStorage fileStorage)
+            IFileStorage fileStorage,
+            IAuthorization authorizationService)
         {
             _logger = logger;
             _coreService = coreService;
@@ -45,6 +48,7 @@ namespace AusDdrApi.Controllers
             _songService = songService;
             _dancerService = dancerService;
             _fileStorage = fileStorage;
+            _authorizationService = authorizationService;
         }
 
         [HttpGet]
@@ -95,7 +99,8 @@ namespace AusDdrApi.Controllers
         [Authorize]
         public async Task<ActionResult<ScoreResponse>> SubmitScore([FromForm] ScoreSubmissionRequest request)
         {
-            var authId = HttpContext.GetUserId();
+            var authId = _authorizationService.GetUserId();
+            if (authId == null) return Unauthorized();
             var dancer = _dancerService.GetByAuthId(authId) ?? await _dancerService.Add(new Dancer{AuthenticationId = authId});
             if (dancer == null)
             {

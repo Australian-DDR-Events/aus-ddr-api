@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using AusDdrApi.Controllers;
 using AusDdrApi.Entities;
+using AusDdrApi.Services.Authorization;
 using AusDdrApi.Services.CoreData;
 using AusDdrApi.Services.Dancer;
 using AusDdrApi.Services.FileStorage;
@@ -25,6 +26,7 @@ namespace aus_ddr_api.IntegrationTests.Controllers
         private readonly ISong _songService;
         private readonly IDancer _dancerService;
         private readonly IFileStorage _fileStorage;
+        private readonly IAuthorization _authorizationService;
 
         private readonly ScoresController _scoresController;
 
@@ -38,6 +40,7 @@ namespace aus_ddr_api.IntegrationTests.Controllers
             _songService = new DbSong(_fixture._context);
             _dancerService = new DbDancer(_fixture._context);
             _fileStorage = new LocalFileStorage(".");
+            _authorizationService = Substitute.For<IAuthorization>();
             
             _scoresController = new ScoresController(
                 _logger,
@@ -45,7 +48,8 @@ namespace aus_ddr_api.IntegrationTests.Controllers
                 _scoreService,
                 _songService,
                 _dancerService,
-                _fileStorage);
+                _fileStorage,
+                _authorizationService);
             
             Setup.DropAllRows(_fixture._context);
         }
@@ -61,7 +65,7 @@ namespace aus_ddr_api.IntegrationTests.Controllers
                 Difficulty = "Hard",
                 Level = 12
             };
-            _fixture._context.Songs.Add(song);
+            song = _fixture._context.Songs.Add(song).Entity;
             _fixture._context.SaveChanges();
 
         }

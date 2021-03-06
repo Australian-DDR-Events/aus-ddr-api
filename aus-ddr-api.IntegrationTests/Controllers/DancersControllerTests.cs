@@ -1,15 +1,20 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using AusDdrApi.Controllers;
 using AusDdrApi.Entities;
+using AusDdrApi.Models.Requests;
 using AusDdrApi.Models.Responses;
+using AusDdrApi.Services.Authorization;
 using AusDdrApi.Services.Badges;
 using AusDdrApi.Services.CoreData;
 using AusDdrApi.Services.Dancer;
 using AusDdrApi.Services.FileStorage;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using NSubstitute;
 using Xunit;
 
 namespace aus_ddr_api.IntegrationTests.Controllers
@@ -24,6 +29,7 @@ namespace aus_ddr_api.IntegrationTests.Controllers
         private readonly IDancer _dancerService;
         private readonly IBadge _badgeService;
         private readonly IFileStorage _fileStorage;
+        private readonly IAuthorization _authorizationService;
         
         private readonly DancersController _dancersController;
 
@@ -36,13 +42,15 @@ namespace aus_ddr_api.IntegrationTests.Controllers
             _dancerService = new DbDancer(_fixture._context);
             _badgeService = new DbBadge(_fixture._context);
             _fileStorage = new LocalFileStorage(".");
+            _authorizationService = Substitute.For<IAuthorization>();
             
             _dancersController = new DancersController(
                 _logger,
                 _coreService,
                 _dancerService,
                 _badgeService,
-                _fileStorage);
+                _fileStorage,
+                _authorizationService);
             
             Setup.DropAllRows(_fixture._context);
         }
@@ -80,10 +88,9 @@ namespace aus_ddr_api.IntegrationTests.Controllers
         {
             var dancer = new Dancer
             {
-                AuthenticationId = "auth_id_1",
-                Id = Guid.NewGuid()
+                AuthenticationId = "auth_id_1"
             };
-            _fixture._context.Dancers.Add(dancer);
+            dancer = _fixture._context.Dancers.Add(dancer).Entity;
             _fixture._context.SaveChanges();
 
             var expectedDancerResponse = new DancerResponse
@@ -97,6 +104,84 @@ namespace aus_ddr_api.IntegrationTests.Controllers
             var okObjectResult = Assert.IsType<OkObjectResult>(actionResult.Result);
             var dancerResponse = Assert.IsAssignableFrom<DancerResponse>(okObjectResult.Value);
             Assert.Equal(expectedDancerResponse, dancerResponse);
+        }
+
+        [Fact]
+        public void GetDancer_GivenUserIdExists_ReturnsActionResultWithDancerResponse()
+        {
+            var dancer = new Dancer
+            {
+                AuthenticationId = "auth_id_1"
+            };
+            dancer = _fixture._context.Dancers.Add(dancer).Entity;
+            _fixture._context.SaveChanges();
+
+            var expectedDancerResponse = new DancerResponse
+            {
+                AuthenticationId = dancer.AuthenticationId,
+                Id = dancer.Id
+            };
+
+            var actionResult = _dancersController.GetDancer(dancer.Id.ToString());
+            
+            var okObjectResult = Assert.IsType<OkObjectResult>(actionResult.Result);
+            var dancerResponse = Assert.IsAssignableFrom<DancerResponse>(okObjectResult.Value);
+            Assert.Equal(expectedDancerResponse, dancerResponse);
+        }
+
+        [Fact]
+        public void GetDancer_GivenUserDoesNotExist_ReturnsActionResultWithDancerResponse()
+        {
+            var dancer = new Dancer
+            {
+                AuthenticationId = "auth_id_1"
+            };
+            dancer = _fixture._context.Dancers.Add(dancer).Entity;
+            _fixture._context.SaveChanges();
+
+            var expectedDancerResponse = new DancerResponse
+            {
+                AuthenticationId = dancer.AuthenticationId,
+                Id = dancer.Id
+            };
+
+            var actionResult = _dancersController.GetDancer("invalid_id");
+            
+            Assert.IsType<NotFoundResult>(actionResult.Result);
+        }
+
+        [Fact]
+        public async Task Post_GivenUserDoesNotExist_Returns_CreatedActionResultWithNewUser()
+        {
+            _authorizationService.GetUserId().Returns("user_id");
+            var dancerRequest = new DancerRequest();
+
+            var expectedDancerResponse = new DancerResponse
+            {
+                AuthenticationId = "user_id",
+                DdrCode = "573",
+                State = "n/a"
+            };
+            
+            var actionResult = await _dancersController.Post(dancerRequest);
+            
+            var createdResult = Assert.IsType<CreatedResult>(actionResult.Result);
+            var id = Guid.Parse(createdResult.Location.Substring(createdResult.Location.LastIndexOf("/") + 1));
+            expectedDancerResponse.Id = id;
+            var dancerResponse = Assert.IsAssignableFrom<DancerResponse>(createdResult.Value);
+            Assert.Equal(expectedDancerResponse, dancerResponse);
+        }
+
+        [Fact]
+        public async Task Post_GivenUserIdExists_Returns_ConflictActionResult()
+        {
+            _authorizationService.GetUserId().Returns("user_id");
+            await _fixture._context.Dancers.AddAsync(new Dancer {AuthenticationId = "user_id"});
+            await _fixture._context.SaveChangesAsync();
+            
+            var actionResult = await _dancersController.Post(new DancerRequest());
+
+            Assert.IsType<ConflictResult>(actionResult.Result);
         }
     }
 }

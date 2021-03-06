@@ -2,11 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AusDdrApi.Authentication;
-using AusDdrApi.Entities;
 using AusDdrApi.Helpers;
 using AusDdrApi.Models.Requests;
 using AusDdrApi.Models.Responses;
+using AusDdrApi.Services.Authorization;
 using AusDdrApi.Services.Badges;
 using AusDdrApi.Services.CoreData;
 using AusDdrApi.Services.Dancer;
@@ -28,19 +27,22 @@ namespace AusDdrApi.Controllers
         private readonly IDancer _dancerService;
         private readonly IBadge _badgeService;
         private readonly IFileStorage _fileStorage;
+        private readonly IAuthorization _authorizationService;
 
         public DancersController(
             ILogger<DancersController> logger,
             ICoreData coreService,
             IDancer dancerService,
             IBadge badgeService,
-            IFileStorage fileStorage)
+            IFileStorage fileStorage,
+            IAuthorization authorizationService)
         {
             _logger = logger;
             _coreService = coreService;
             _dancerService = dancerService;
             _badgeService = badgeService;
             _fileStorage = fileStorage;
+            _authorizationService = authorizationService;
         }
 
         [HttpGet]
@@ -67,10 +69,12 @@ namespace AusDdrApi.Controllers
         [HttpPost]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         public async Task<ActionResult<DancerResponse>> Post(DancerRequest dancerRequest)
         {
-            var authId = HttpContext.GetUserId();
+            var authId = _authorizationService.GetUserId();
+            if (authId == null) return Unauthorized();
             var existingDancer = _dancerService.GetByAuthId(authId);
             if (existingDancer != null)
             {
@@ -82,7 +86,7 @@ namespace AusDdrApi.Controllers
             var baseBadge = _badgeService.GetByName("Base");
             if (baseBadge != null) _badgeService.AssignBadge(baseBadge.Id, newDancer.Id);
             await _coreService.SaveChanges();
-            return DancerResponse.FromEntity(newDancer);
+            return Created($"/dancers/{newDancer.Id}", DancerResponse.FromEntity(newDancer));
         }
 
         [HttpPost]
@@ -90,10 +94,12 @@ namespace AusDdrApi.Controllers
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> PostProfilePicture(IFormFile profilePicture)
         {
-            var authId = HttpContext.GetUserId();
+            var authId = _authorizationService.GetUserId();
+            if (authId == null) return Unauthorized();
             var existingDancer = _dancerService.GetByAuthId(authId);
             if (existingDancer == null)
             {
@@ -124,7 +130,8 @@ namespace AusDdrApi.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<DancerResponse>> Put(Guid dancerId, DancerRequest dancerRequest)
         {
-            var authId = HttpContext.GetUserId();
+            var authId = _authorizationService.GetUserId();
+            if (authId == null) return Unauthorized();
             var existingDancer = _dancerService.Get(dancerId);
             if (existingDancer == null)
             {

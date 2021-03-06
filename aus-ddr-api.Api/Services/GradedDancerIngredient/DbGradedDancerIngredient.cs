@@ -21,7 +21,11 @@ namespace AusDdrApi.Services.GradedDancerIngredient
         {
             return _context
                 .GradedDancerIngredients
-                .AsQueryable()
+                .Include(g => g.Score)
+                .ThenInclude(s => s!.Song)
+                .Include(g => g.GradedIngredient)
+                .ThenInclude(g => g!.Ingredient)
+                .AsSplitQuery()
                 .Where(g => g.DancerId == dancerId)
                 .ToList();
         }
@@ -33,7 +37,11 @@ namespace AusDdrApi.Services.GradedDancerIngredient
             // on the database.
             return _context
                 .GradedDancerIngredients
-                .Include(s => s.Score)
+                .Include(g => g.Score)
+                .ThenInclude(s => s!.Song)
+                .Include(g => g.GradedIngredient)
+                .ThenInclude(g => g!.Ingredient)
+                .AsSplitQuery()
                 .AsEnumerable()
                 .GroupBy(ingredient => ingredient.Score!.SongId)
                 .Select(i => i
@@ -46,7 +54,11 @@ namespace AusDdrApi.Services.GradedDancerIngredient
         {
             return _context
                 .GradedDancerIngredients
-                .AsQueryable()
+                .Include(g => g.Score)
+                .ThenInclude(s => s!.Song)
+                .Include(g => g.GradedIngredient)
+                .ThenInclude(g => g!.Ingredient)
+                .AsSplitQuery()
                 .Include(g => g.GradedIngredient)
                 .Where(g => g.GradedIngredient!.IngredientId == ingredientId)
                 .ToList();
@@ -56,7 +68,11 @@ namespace AusDdrApi.Services.GradedDancerIngredient
         {
             return _context
                 .GradedDancerIngredients
-                .AsQueryable()
+                .Include(g => g.Score)
+                .ThenInclude(s => s!.Song)
+                .Include(g => g.GradedIngredient)
+                .ThenInclude(g => g!.Ingredient)
+                .AsSplitQuery()
                 .SingleOrDefault(g => g.Id == gradedDancerIngredientId);
         }
 
@@ -64,9 +80,11 @@ namespace AusDdrApi.Services.GradedDancerIngredient
         {
             return _context
                 .GradedDancerIngredients
-                .Include(g => g.GradedIngredient)
                 .Include(g => g.Score)
-                .AsQueryable()
+                .ThenInclude(s => s!.Song)
+                .Include(g => g.GradedIngredient)
+                .ThenInclude(g => g!.Ingredient)
+                .AsSplitQuery()
                 .Where(g => g.DancerId == dancerId)
                 .Where(g => g.GradedIngredient!.IngredientId == ingredientId)
                 .OrderByDescending(g => g.Score!.Value)
@@ -78,9 +96,11 @@ namespace AusDdrApi.Services.GradedDancerIngredient
         {
             var gradedDancerIngredients = _context
                 .GradedDancerIngredients
-                .Include(g => g.GradedIngredient)
                 .Include(g => g.Score)
-                .AsQueryable();
+                .ThenInclude(s => s!.Song)
+                .Include(g => g.GradedIngredient)
+                .ThenInclude(g => g!.Ingredient)
+                .AsSplitQuery();
 
             // TODO: this performs grouping locally rather than on the database. This can
             // result in poor performance. This will need to be reworked to instead run 

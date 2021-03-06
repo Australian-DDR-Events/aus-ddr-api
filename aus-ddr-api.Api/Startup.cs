@@ -83,6 +83,7 @@ namespace AusDdrApi
                         builder.WithOrigins(
                                 "http://localhost:1234",
                                 "https://ausddrevents-e18b1--ausddrevents-staging-homst7uj.web.app",
+                                "https://ausddrevents-e18b1--ausddrevents-development-di3otvtf.web.app",
                                 "https://ausddrevents.com")
                             .WithHeaders(HeaderNames.Authorization);
                     });

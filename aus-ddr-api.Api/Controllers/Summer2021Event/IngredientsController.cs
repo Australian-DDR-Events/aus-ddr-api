@@ -123,10 +123,10 @@ namespace AusDdrApi.Controllers.Summer2021Event
             try
             {
                 int[] imageSizes = {32, 64, 128, 256};
-                var ingredientImage = await Image.LoadAsync(ingredientRequest.IngredientImage!.OpenReadStream());
+                using var ingredientImage = await Image.LoadAsync(ingredientRequest.IngredientImage!.OpenReadStream());
                 foreach (var size in imageSizes)
                 {
-                    var image = await Images.ImageToPngMemoryStream(ingredientImage, size, size);
+                    await using var image = await Images.ImageToPngMemoryStream(ingredientImage, size, size);
 
                     var destinationKey = $"summer2021/ingredients/{newIngredient.Id}.{size}.png";
                     await _fileStorage.UploadFileFromStream(image, destinationKey);
@@ -185,8 +185,8 @@ namespace AusDdrApi.Controllers.Summer2021Event
 
             try
             {
-                var scoreImage = await Image.LoadAsync(request.ScoreImage!.OpenReadStream());
-                var image = await Images.ImageToPngMemoryStreamFactor(scoreImage, 1000, 1000);
+                using var scoreImage = await Image.LoadAsync(request.ScoreImage!.OpenReadStream());
+                await using var image = await Images.ImageToPngMemoryStreamFactor(scoreImage, 1000, 1000);
 
                 var destinationKey = $"songs/{score.SongId}/scores/{score.Id}.png";
                 await _fileStorage.UploadFileFromStream(image, destinationKey);

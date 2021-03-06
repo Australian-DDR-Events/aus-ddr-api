@@ -73,10 +73,10 @@ namespace AusDdrApi.Controllers
                 try
                 {
                     int[] imageSizes = {32, 64, 128, 256, 512};
-                    var ingredientImage = await Image.LoadAsync(songRequest.SongJacket!.OpenReadStream());
+                    using var ingredientImage = await Image.LoadAsync(songRequest.SongJacket!.OpenReadStream());
                     foreach (var size in imageSizes)
                     {
-                        var image = await Images.ImageToPngMemoryStream(ingredientImage, size, size);
+                        await using var image = await Images.ImageToPngMemoryStream(ingredientImage, size, size);
 
                         var destinationKey = $"songs/{newSong.Id}.{size}.png";
                         uploadTasks.Add(_fileStorage.UploadFileFromStream(image, destinationKey));

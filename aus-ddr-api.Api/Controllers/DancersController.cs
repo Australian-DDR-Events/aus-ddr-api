@@ -108,8 +108,8 @@ namespace AusDdrApi.Controllers
 
             try
             {
-                var profileImage = await Image.LoadAsync(profilePicture.OpenReadStream());
-                var image = await Images.ImageToPngMemoryStream(profileImage, 256, 256);
+                using var profileImage = await Image.LoadAsync(profilePicture.OpenReadStream());
+                await using var image = await Images.ImageToPngMemoryStream(profileImage, 256, 256);
                 
                 var destinationKey = $"profile/picture/{authId}.png";
                 await _fileStorage.UploadFileFromStream(image, destinationKey);

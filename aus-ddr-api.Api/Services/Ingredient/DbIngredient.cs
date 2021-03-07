@@ -19,7 +19,7 @@ namespace AusDdrApi.Services.Ingredient
 
         public IEnumerable<IngredientEntity> GetAll()
         {
-            return _context.Ingredients.Include(i => i.Song).AsQueryable().ToArray();
+            return _context.Ingredients.Include(i => i.Song).AsQueryable().OrderBy(i => i.Song.Level).ToArray();
         }
 
         public IngredientEntity? Get(Guid ingredientId)

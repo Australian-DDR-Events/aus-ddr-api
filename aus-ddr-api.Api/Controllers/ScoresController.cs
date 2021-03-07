@@ -75,7 +75,7 @@ namespace AusDdrApi.Controllers
             [FromQuery(Name = "top_scores_only")] bool topScoresOnly = true
         )
         {
-            if (dancerIds?.Length == 0 && songIds?.Length == 0)
+            if (dancerIds?.Length == 0 && songIds?.Length == 0 && !topScoresOnly)
             {
                 return BadRequest();
             }

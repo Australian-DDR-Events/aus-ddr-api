@@ -18,8 +18,8 @@ namespace AusDdrApi.Models.Responses
         
         public Guid? DancerId { get; set; }
         public DancerResponse? Dancer { get; set; }
-        
-        public Guid SongId { get; set; }
+        public Guid? SongId { get; set; }
+        public SongResponse? Song { get; set; }
         
         public static ScoreResponse FromEntity(Score score) => new ScoreResponse
         {
@@ -28,7 +28,8 @@ namespace AusDdrApi.Models.Responses
             SubmissionTime = score.SubmissionTime,
             Dancer = score.Dancer != null ? DancerResponse.FromEntity(score.Dancer) : null,
             DancerId = score.Dancer == null ? score.DancerId : default(Guid?),
-            SongId = score.SongId,
+            Song = score.Song != null ? SongResponse.FromEntity(score.Song) : null,
+            SongId = score.Song == null ? score.SongId : default(Guid?),
             ImageUrl = $"/songs/{score.SongId}/scores/{score.Id}.png"
         };
     }

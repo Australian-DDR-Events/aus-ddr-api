@@ -22,7 +22,7 @@ namespace AusDdrApi.Services.Ingredient
             return _context.Ingredients
                 .Include(i => i.Song)
                 .AsQueryable()
-                .OrderBy(i => i.Song.Level)
+                .OrderBy(i => i.Song!.Level)
                 .ToArray();
         }
 

@@ -160,8 +160,9 @@ namespace AusDdrApi.Controllers.Summer2021Event
                     var destinationKey = $"songs/{score.SongId}/scores/{score.Id}.png";
                     uploadTasks.Add(_fileStorage.UploadFileFromStream(image, destinationKey));
                 }
-                catch
+                catch (Exception e)
                 {
+                    _logger.Log(LogLevel.Error, $"Failed to add score image to file store: {e.Message}");
                     return BadRequest();
                 }
             }
@@ -189,8 +190,9 @@ namespace AusDdrApi.Controllers.Summer2021Event
                 var destinationKey = $"dishes/{dish.Id}/final/{gradedDancerDish.Id}.png";
                 uploadTasks.Add(_fileStorage.UploadFileFromStream(image, destinationKey));
             }
-            catch
+            catch (Exception e)
             {
+                _logger.Log(LogLevel.Error, $"Failed to add score image to file store: {e.Message}");
                 return BadRequest();
             }
 
@@ -199,8 +201,9 @@ namespace AusDdrApi.Controllers.Summer2021Event
             {
                 t.Wait();
             }
-            catch
+            catch (Exception e)
             {
+                _logger.Log(LogLevel.Error, $"Failed to add score image to file store: {e.Message}");
                 return BadRequest();
             }
             

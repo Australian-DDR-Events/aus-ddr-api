@@ -191,8 +191,9 @@ namespace AusDdrApi.Controllers.Summer2021Event
                 var destinationKey = $"songs/{score.SongId}/scores/{score.Id}.png";
                 await _fileStorage.UploadFileFromStream(image, destinationKey);
             }
-            catch
+            catch (Exception e)
             {
+                _logger.Log(LogLevel.Error, $"Failed to add score image to file store: {e.Message}");
                 return BadRequest("image was invalid or malformed");
             }
 

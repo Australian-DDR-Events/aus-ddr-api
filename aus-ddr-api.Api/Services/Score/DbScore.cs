@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AusDdrApi.Persistence;
+using Microsoft.EntityFrameworkCore;
 using ScoreEntity = AusDdrApi.Entities.Score;
 
 namespace AusDdrApi.Services.Score
@@ -23,9 +24,10 @@ namespace AusDdrApi.Services.Score
 
         public IEnumerable<ScoreEntity> GetScores(Guid[]? dancerIds, Guid[]? songIds, bool topScoresOnly)
         {
-            var scores = _context
-                .Scores
-                .AsQueryable()
+            var scoresQuery = _context.Scores.AsQueryable();
+            if (dancerIds == null) scoresQuery = scoresQuery.Include(s => s.Dancer);
+            if (songIds == null) scoresQuery = scoresQuery.Include(s => s.Song);
+            var scores = scoresQuery
                 .Where(score => dancerIds == null || dancerIds.Length <= 0 || dancerIds.Contains(score.DancerId))
                 .Where(score => songIds == null || songIds.Length <= 0 || songIds.Contains(score.SongId))
                 .ToList();

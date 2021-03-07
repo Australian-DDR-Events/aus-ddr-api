@@ -16,7 +16,8 @@ namespace AusDdrApi.Models.Responses
         
         public string ImageUrl { get; set; } = string.Empty;
         
-        public Guid DancerId { get; set; }
+        public Guid? DancerId { get; set; }
+        public DancerResponse? Dancer { get; set; }
         
         public Guid SongId { get; set; }
         
@@ -25,7 +26,8 @@ namespace AusDdrApi.Models.Responses
             Id = score.Id,
             Value = score.Value,
             SubmissionTime = score.SubmissionTime,
-            DancerId = score.DancerId,
+            Dancer = score.Dancer != null ? DancerResponse.FromEntity(score.Dancer) : null,
+            DancerId = score.Dancer == null ? score.DancerId : default(Guid?),
             SongId = score.SongId,
             ImageUrl = $"/songs/{score.SongId}/scores/{score.Id}.png"
         };

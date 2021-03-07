@@ -66,6 +66,16 @@ namespace AusDdrApi.Controllers
         }
 
         [HttpGet]
+        [Route("top")]
+        public ActionResult<IEnumerable<ScoreResponse>> GetTop(
+            [FromQuery(Name = "song_id")] Guid[] songIds)
+        {
+            return Ok(_scoreService
+                .GetTopScores(songIds)
+                .Select(ScoreResponse.FromEntity));
+        }
+
+        [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public ActionResult<IEnumerable<ScoreResponse>> Get(

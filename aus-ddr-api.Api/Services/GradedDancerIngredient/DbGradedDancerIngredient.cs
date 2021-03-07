@@ -32,23 +32,15 @@ namespace AusDdrApi.Services.GradedDancerIngredient
 
         public IEnumerable<GradedDancerIngredientEntity> GetTopForDancer(Guid dancerId)
         {
-            // TODO: this performs grouping locally rather than on the database. This can
-            // result in poor performance. This will need to be reworked to instead run 
-            // on the database.
             return _context
                 .GradedDancerIngredients
-                .Include(g => g.Score)
-                .ThenInclude(s => s!.Song)
-                .Include(g => g.GradedIngredient)
-                .ThenInclude(g => g!.Ingredient)
-                .AsSplitQuery()
-                .Where(g => g.DancerId == dancerId)
+                .Where(z => z.DancerId == dancerId)
+                .Include(x => x.GradedIngredient!.Ingredient)
+                .Include(x => x.Score)
                 .AsEnumerable()
-                .GroupBy(ingredient => ingredient.Score!.SongId)
-                .Select(i => i
-                    .OrderByDescending(g => g.Score!.Value)
-                    .First())
-                .ToList();
+                .GroupBy(x => x.Score!.SongId)
+                .Select(x => x.Aggregate(
+                    (l, r) => l.Score!.Value > r.Score!.Value ? l : r));
         }
 
         public IEnumerable<GradedDancerIngredientEntity> GetAllForIngredient(Guid ingredientId)

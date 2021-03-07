@@ -137,7 +137,7 @@ namespace AusDdrApi.Controllers.Summer2021Event
             
             foreach (var score in gradedDancerDishRequest.Scores)
             {
-                var song = dishSongs.FirstOrDefault(s => s.Id == score.SongId);
+                var song = dishSongs.FirstOrDefault(s => s.SongId == score.SongId);
                 if (song?.Song == null || song.Song.MaxScore < score.Score) return BadRequest();
             }
 

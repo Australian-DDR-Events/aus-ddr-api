@@ -31,20 +31,16 @@ namespace AusDdrApi.Services.GradedDancerDish
 
         public IEnumerable<GradedDancerDishEntity> GetTopForDancer(Guid dancerId)
         {
-            // TODO: this performs grouping locally rather than on the database. This can
-            // result in poor performance. This will need to be reworked to instead run 
-            // on the database.
             return _context
                 .GradedDancerDishes
-                .Include(g => g.GradedDish)
-                .Include(g => g.Scores)
-                .AsSplitQuery()
+                .Where(z => z.DancerId == dancerId)
+                .Include(x => x.GradedDish.Dish)
+                .Include(x => x.Scores)
                 .AsEnumerable()
-                .GroupBy(g => g.GradedDish!.DishId)
-                .Select(i => i
-                    .OrderByDescending(g => g.Scores.Aggregate(0, (v, s) => v + s.Value))
-                    .First())
-                .ToList();
+                .GroupBy(x => x.GradedDish.DishId)
+                .Select(x => x.Aggregate(
+                    (l, r) => 
+                        l.Scores.Sum(s => s.Value) > l.Scores.Sum(s => s.Value) ? l : r));
         }
 
         public GradedDancerDishEntity? GetDishForDancer(Guid dishId, Guid dancerId)
@@ -56,7 +52,7 @@ namespace AusDdrApi.Services.GradedDancerDish
                 .AsSplitQuery()
                 .Where(g => g.DancerId == dancerId)
                 .Where(g => g.GradedDish!.DishId == dishId)
-                .OrderByDescending(g => g.Scores.Aggregate(0, (v, s) => v + s.Value))
+                .OrderByDescending(g => g.Scores.Sum(s => s.Value))
                 .FirstOrDefault();
         }
 

@@ -285,7 +285,8 @@ namespace AusDdrApi.Controllers.Summer2021Event
         private int calculateSeasonScore(Guid dancerId)
         {
             var dishes = _gradedDancerDishService.GetTopForDancer(dancerId);
-            var score = dishes.Aggregate(0, (v, s) => v + (int) s.GradedDish!.Grade + 1);
+            var score = dishes.Sum(d => (int) d.GradedDish!.Grade);
+            score += dishes.Count();
             return score;
         }
 

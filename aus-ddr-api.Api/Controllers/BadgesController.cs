@@ -70,7 +70,7 @@ namespace AusDdrApi.Controllers
                 using var ingredientImage = await Image.LoadAsync(badgeRequest.BadgeImage!.OpenReadStream());
                 foreach (var size in imageSizes)
                 {
-                    await using var image = await Images.ImageToPngMemoryStream(ingredientImage, size, size);
+                    var image = await Images.ImageToPngMemoryStream(ingredientImage, size, size);
 
                     var destinationKey = $"badges/{newBadge.Id}.{size}.png";
                     await _fileStorage.UploadFileFromStream(image, destinationKey);

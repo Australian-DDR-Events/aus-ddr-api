@@ -155,7 +155,7 @@ namespace AusDdrApi.Controllers.Summer2021Event
                 try
                 {
                     using var scoreImage = await Image.LoadAsync(scoreRequest.ScoreImage!.OpenReadStream());
-                    await using var image = await Images.ImageToPngMemoryStreamFactor(scoreImage, 1000, 1000);
+                    var image = await Images.ImageToPngMemoryStreamFactor(scoreImage, 1000, 1000);
 
                     var destinationKey = $"songs/{score.SongId}/scores/{score.Id}.png";
                     uploadTasks.Add(_fileStorage.UploadFileFromStream(image, destinationKey));
@@ -185,7 +185,7 @@ namespace AusDdrApi.Controllers.Summer2021Event
             try
             {
                 using var scoreImage = await Image.LoadAsync(gradedDancerDishRequest.FinalImage!.OpenReadStream());
-                await using var image = await Images.ImageToPngMemoryStreamFactor(scoreImage, 1000, 1000);
+                var image = await Images.ImageToPngMemoryStreamFactor(scoreImage, 1000, 1000);
 
                 var destinationKey = $"dishes/{dish.Id}/final/{gradedDancerDish.Id}.png";
                 uploadTasks.Add(_fileStorage.UploadFileFromStream(image, destinationKey));
@@ -325,7 +325,7 @@ namespace AusDdrApi.Controllers.Summer2021Event
                 using var dishImage = await Image.LoadAsync(dishRequest.DishImage!.OpenReadStream());
                 foreach (var size in imageSizes)
                 {
-                    await using var image = await Images.ImageToPngMemoryStream(dishImage, size, size);
+                    var image = await Images.ImageToPngMemoryStream(dishImage, size, size);
 
                     var destinationKey = $"summer2021/dishes/{dish.Id}.{size}.png";
                     await _fileStorage.UploadFileFromStream(image, destinationKey);

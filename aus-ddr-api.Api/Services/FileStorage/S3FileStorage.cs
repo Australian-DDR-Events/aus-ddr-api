@@ -30,6 +30,7 @@ namespace AusDdrApi.Services.FileStorage
 
             var fileTransferUtility = new TransferUtility(_s3Client);
             await fileTransferUtility.UploadAsync(uploadRequest);
+            await stream.DisposeAsync();
 
             return
                 $"https://{_awsConfiguration.AssetsBucketName}.s3-{_awsConfiguration.AssetsBucketLocation}.amazonaws.com/{destination}";

@@ -26,6 +26,15 @@ namespace AusDdrApi.Services.Badges
                 .ToList();
         }
 
+        public IEnumerable<Badge> GetForEvent(Guid eventId)
+        {
+            return _context
+                .Badges
+                .Include(b => b.Event)
+                .Where(b => b.EventId == eventId)
+                .ToList();
+        }
+
         public IEnumerable<Badge> GetAssigned(Guid dancerId)
         {
             return _context

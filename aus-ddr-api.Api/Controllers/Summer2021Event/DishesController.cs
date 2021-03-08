@@ -259,23 +259,27 @@ namespace AusDdrApi.Controllers.Summer2021Event
                 new Tuple<string, int>("Opal", 23),
             };
             var score = calculateSeasonScore(dancerId);
+            var eventId = Guid.Parse("94ed4523-5e6f-4534-89ba-574e813c5a33");
+            var eventBadges = _badgeService.GetForEvent(eventId);
 
             var badgeName = badgeThresholds
                 .OrderByDescending(b => b.Item2)
                 .First(b => b.Item2 <= score)
                 .Item1;
-            var badge = _badgeService.GetByName(badgeName);
+            var badge = eventBadges.FirstOrDefault(b => b.Name == badgeName);
             if (badge == null) return;
 
             var badges = _badgeService.GetAssigned(dancerId);
             foreach (var assignedBadge in badges)
             {
-                if (badgeThresholds.Exists(b => b.Item1 == assignedBadge.Name))
+                if (
+                    badgeThresholds.Exists(b => b.Item1 == assignedBadge.Name) && 
+                    assignedBadge.EventId == eventId
+                    )
                     _badgeService.RevokeBadge(assignedBadge.Id, dancerId);
             }
 
             _badgeService.AssignBadge(badge.Id, dancerId);
-
         }
 
         private int calculateSeasonScore(Guid dancerId)

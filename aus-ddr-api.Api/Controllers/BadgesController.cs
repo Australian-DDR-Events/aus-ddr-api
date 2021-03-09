@@ -90,7 +90,7 @@ namespace AusDdrApi.Controllers
         [Route("{badgeId}/dancers/{dancerId}")]
         public async Task<ActionResult> AssignBadge([FromRoute] Guid badgeId, [FromRoute] Guid dancerId)
         {
-            if (_badgeService.AssignBadge(badgeId, dancerId)) return BadRequest();
+            if (!_badgeService.AssignBadge(badgeId, dancerId)) return BadRequest();
             await _coreService.SaveChanges();
             return Ok();
         }
@@ -100,7 +100,7 @@ namespace AusDdrApi.Controllers
         [Route("{badgeId}/dancers/{dancerId}")]
         public async Task<ActionResult> RevokeBadge([FromRoute] Guid badgeId, [FromRoute] Guid dancerId)
         {
-            if (_badgeService.RevokeBadge(badgeId, dancerId)) return BadRequest();
+            if (!_badgeService.RevokeBadge(badgeId, dancerId)) return BadRequest();
             await _coreService.SaveChanges();
             return Ok();
         }

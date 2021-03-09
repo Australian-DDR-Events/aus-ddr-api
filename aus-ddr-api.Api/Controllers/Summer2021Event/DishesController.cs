@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 using AusDdrApi.Authentication;
@@ -167,7 +168,7 @@ namespace AusDdrApi.Controllers.Summer2021Event
                 }
             }
 
-            var grade = calculateGrade(gradedIngredients, scores, dish, dishSongs, gradedDancerDishRequest.PairBonus);
+            var grade = CalculateGrade(gradedIngredients, scores, dish, dishSongs, gradedDancerDishRequest.PairBonus);
 
             var gradedDish = _gradedDishService
                 .GetForDishIdAndGrade(dishId, grade);
@@ -179,7 +180,8 @@ namespace AusDdrApi.Controllers.Summer2021Event
                     GradedDishId = gradedDish.Id,
                     Scores = scores
                 });
-
+            
+            await _coreDataService.SaveChanges();
             if (gradedDancerDish == null) return BadRequest();
             
             try
@@ -207,13 +209,13 @@ namespace AusDdrApi.Controllers.Summer2021Event
                 return BadRequest();
             }
             
-            issueBadge(existingDancer.Id);
+            AllocateBadge(existingDancer.Id);
 
             await _coreDataService.SaveChanges();
             return Ok(GradedDancerDishResponse.FromEntity(gradedDancerDish, dish.Id));
         }
 
-        private Grade calculateGrade(
+        private Grade CalculateGrade(
             IEnumerable<GradedDancerIngredient> gradedIngredients,
             IList<Score> scores,
             Dish dish,
@@ -236,57 +238,58 @@ namespace AusDdrApi.Controllers.Summer2021Event
                 if (firstSong?.CookingOrder + 1 == secondSong?.CookingOrder) orderVariance++;
             }
 
-            var varianceMultiplier = 1 + (orderVariance / maxVariance) * 0.5;
+            var varianceMultiplier = 1 + orderVariance / maxVariance * 0.5;
 
             var top = (avgStars + 1) / 2 + ex * varianceMultiplier;
-            var baseGrade = Math.Floor((top / 1.1) * (pairBonus ? 1.1 : 1.0));
-            return (Grade) (Math.Max(Math.Min(baseGrade, 4), 0));
+            var baseGrade = Math.Floor(top / 1.1 * (pairBonus ? 1.1 : 1.0));
+            return (Grade) Math.Max(Math.Min(baseGrade, 4), 0);
         }
 
-        private void issueBadge(Guid dancerId)
+        private void AllocateBadge(Guid dancerId)
         {
-            var badgeThresholds = new List<Tuple<string, int>>
+            var badgeThresholds = new []
             {
-                new Tuple<string, int>("Base", 0),
-                new Tuple<string, int>("Red (I)", 3),
-                new Tuple<string, int>("Red (II)", 6),
-                new Tuple<string, int>("Blue (I)", 8),
-                new Tuple<string, int>("Blue (II)", 11),
-                new Tuple<string, int>("Green (I)", 13),
-                new Tuple<string, int>("Green (II)", 16),
-                new Tuple<string, int>("Gold (I)", 18),
-                new Tuple<string, int>("Gold (II)", 21),
-                new Tuple<string, int>("Opal", 23),
+                (BadgeName: "Base", StarsRequired: 0),
+                (BadgeName: "Red (I)", StarsRequired: 3),
+                (BadgeName: "Red (II)", StarsRequired: 6),
+                (BadgeName: "Blue (I)", StarsRequired: 8),
+                (BadgeName: "Blue (II)", StarsRequired: 11),
+                (BadgeName: "Green (I)", StarsRequired: 13),
+                (BadgeName: "Green (II)", StarsRequired: 16),
+                (BadgeName: "Gold (I)", StarsRequired: 18),
+                (BadgeName: "Gold (II)", StarsRequired: 21),
+                (BadgeName: "Opal", StarsRequired: 23),
             };
-            var score = calculateSeasonScore(dancerId);
+            var score = CalculateSeasonScore(dancerId);
             var eventId = Guid.Parse("94ed4523-5e6f-4534-89ba-574e813c5a33");
             var eventBadges = _badgeService.GetForEvent(eventId);
 
             var badgeName = badgeThresholds
-                .OrderByDescending(b => b.Item2)
-                .First(b => b.Item2 <= score)
-                .Item1;
-            var badge = eventBadges.FirstOrDefault(b => b.Name == badgeName);
-            if (badge == null) return;
+                .OrderByDescending(b => b.StarsRequired)
+                .First(b => b.StarsRequired <= score)
+                .BadgeName;
+            var newBadge = eventBadges.FirstOrDefault(b => b.Name == badgeName);
+            if (newBadge == null) return;
 
             var badges = _badgeService.GetAssigned(dancerId);
             foreach (var assignedBadge in badges)
             {
                 if (
-                    badgeThresholds.Exists(b => b.Item1 == assignedBadge.Name) && 
+                    badgeThresholds.Any(b => b.BadgeName == assignedBadge.Name) && 
                     assignedBadge.EventId == eventId
-                    )
+                )
                     _badgeService.RevokeBadge(assignedBadge.Id, dancerId);
             }
 
-            _badgeService.AssignBadge(badge.Id, dancerId);
+            _badgeService.AssignBadge(newBadge.Id, dancerId);
         }
 
-        private int calculateSeasonScore(Guid dancerId)
+        private int CalculateSeasonScore(Guid dancerId)
         {
-            var dishes = _gradedDancerDishService.GetTopForDancer(dancerId);
-            var score = dishes.Sum(d => (int) d.GradedDish!.Grade);
-            score += dishes.Count();
+            var dishes = _gradedDancerDishService.GetTopForDancer(dancerId).ToImmutableArray();
+            // E starts 0 in the enum but when calculate, E should be equal to 1
+            // The same applies to the other grades
+            var score = dishes.Sum(d => (int) d.GradedDish!.Grade + 1); 
             return score;
         }
 

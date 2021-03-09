@@ -181,7 +181,6 @@ namespace AusDdrApi.Controllers.Summer2021Event
                     Scores = scores
                 });
             
-            await _coreDataService.SaveChanges();
             if (gradedDancerDish == null) return BadRequest();
             
             try
@@ -208,6 +207,8 @@ namespace AusDdrApi.Controllers.Summer2021Event
                 _logger.Log(LogLevel.Error, $"Failed to add score image to file store: {e.Message}");
                 return BadRequest();
             }
+            
+            await _coreDataService.SaveChanges();
             
             AllocateBadge(existingDancer.Id);
 

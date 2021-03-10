@@ -52,7 +52,9 @@ namespace AusDdrApi.Services.Score
                         .OrderByDescending(s => s.Value)
                         .ThenByDescending(s => s.SubmissionTime)
                         .First()
-                    ).ToList();
+                    ).OrderByDescending(s => s.Value)
+                    .ThenByDescending(s => s.SubmissionTime)
+                    .ToList();
             }
 
             return scores;

@@ -50,6 +50,7 @@ namespace AusDdrApi.Services.Score
                     .GroupBy(s => new {s.SongId, s.DancerId})
                     .Select(g => g
                         .OrderByDescending(s => s.Value)
+                        .ThenByDescending(s => s.SubmissionTime)
                         .First()
                     ).ToList();
             }

@@ -34,10 +34,13 @@ namespace AusDdrApi.Services.GradedDancerDish
             return _context
                 .GradedDancerDishes
                 .Where(z => z.DancerId == dancerId)
-                .Include(x => x.GradedDish.Dish)
+                .Include(x => x.GradedDish)
+                .ThenInclude(d => d!.Dish)
                 .Include(x => x.Scores)
+                .ThenInclude(s => s!.Song)
+                .AsSplitQuery()
                 .AsEnumerable()
-                .GroupBy(x => x.GradedDish.DishId)
+                .GroupBy(x => x.GradedDish!.DishId)
                 .Select(x => x.Aggregate(
                     (l, r) => 
                         l.Scores.Sum(s => s.Value) > l.Scores.Sum(s => s.Value) ? l : r));

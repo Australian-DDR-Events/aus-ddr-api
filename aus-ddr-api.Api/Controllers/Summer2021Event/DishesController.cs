@@ -230,7 +230,7 @@ namespace AusDdrApi.Controllers.Summer2021Event
 
             await _coreDataService.SaveChanges();
             gradedDancerDish = _gradedDancerDishService.Get(gradedDancerDish.Id);
-            return Ok(GradedDancerDishResponse.FromEntity(gradedDancerDish));
+            return Ok(GradedDancerDishResponse.FromEntity(gradedDancerDish!));
         }
 
         private Grade CalculateGrade(

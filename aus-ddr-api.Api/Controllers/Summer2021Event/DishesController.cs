@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -78,6 +79,16 @@ namespace AusDdrApi.Controllers.Summer2021Event
         public ActionResult<IEnumerable<DishResponse>> Get()
         {
             return Ok(_dishService.GetAll().Select(DishResponse.FromEntity).AsEnumerable());
+        }
+
+        [HttpGet]
+        [Route("{~/dancers/{dancerId}/dishes")]
+        public ActionResult<IEnumerable<GradedDancerDishResponse>> GetGradedDishesForDancer([FromRoute] Guid dancerId)
+        {
+            return _gradedDancerDishService
+                .GetTopForDancer(dancerId)
+                .Select(GradedDancerDishResponse.FromEntity)
+                .ToList();
         }
 
         [HttpGet]
@@ -218,7 +229,8 @@ namespace AusDdrApi.Controllers.Summer2021Event
             AllocateBadge(existingDancer.Id);
 
             await _coreDataService.SaveChanges();
-            return Ok(GradedDancerDishResponse.FromEntity(gradedDancerDish, dish.Id));
+            gradedDancerDish = _gradedDancerDishService.Get(gradedDancerDish.Id);
+            return Ok(GradedDancerDishResponse.FromEntity(gradedDancerDish));
         }
 
         private Grade CalculateGrade(

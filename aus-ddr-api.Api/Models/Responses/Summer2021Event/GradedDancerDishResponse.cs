@@ -13,12 +13,12 @@ namespace AusDdrApi.Models.Responses
         public string ResultImage { get; set; } = string.Empty;
         public IEnumerable<ScoreResponse> Scores { get; set; } = new List<ScoreResponse>();
 
-        public static GradedDancerDishResponse FromEntity(GradedDancerDish dish, Guid dishId) => new GradedDancerDishResponse
+        public static GradedDancerDishResponse FromEntity(GradedDancerDish dish) => new GradedDancerDishResponse
         {
             Id = dish.Id,
             GradedDish = dish.GradedDish != null ? GradedDishResponse.FromEntity(dish.GradedDish) : null,
             DancerId = dish.DancerId,
-            ResultImage = $"dishes/{dishId}/final/{dish.Id}.png",
+            ResultImage = $"dishes/{dish.GradedDish!.DishId}/final/{dish.Id}.png",
             Scores = dish.Scores.Select(ScoreResponse.FromEntity)
         };
     }

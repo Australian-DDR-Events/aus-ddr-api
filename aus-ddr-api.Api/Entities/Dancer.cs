@@ -12,6 +12,8 @@ namespace AusDdrApi.Entities
         public string PrimaryMachineLocation { get; set; } = string.Empty;
         public string State { get; set; } = string.Empty;
         
+        public DateTime? ProfilePictureTimestamp { get; set; }
+        
         public virtual ICollection<Badge> Badges { get; set; } = new HashSet<Badge>();
                 
         public override bool Equals(object? comparator)
@@ -29,12 +31,13 @@ namespace AusDdrApi.Entities
                 DdrName == comparator.DdrName &&
                 DdrCode == comparator.DdrCode &&
                 PrimaryMachineLocation == comparator.PrimaryMachineLocation &&
-                State == comparator.State);
+                State == comparator.State &&
+                ProfilePictureTimestamp == comparator.ProfilePictureTimestamp);
         }
 
         public override int GetHashCode()
         {
-            return (Id, AuthenticationId, DdrName, DdrCode, PrimaryMachineLocation, State).GetHashCode();
+            return (Id, AuthenticationId, DdrName, DdrCode, PrimaryMachineLocation, State, ProfilePictureTimestamp).GetHashCode();
         }
     }
 }

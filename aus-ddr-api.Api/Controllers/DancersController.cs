@@ -105,13 +105,15 @@ namespace AusDdrApi.Controllers
             {
                 return NotFound();
             }
+            existingDancer.ProfilePictureTimestamp = DateTime.UtcNow;
+            _dancerService.Update(existingDancer);
 
             try
             {
                 using var profileImage = await Image.LoadAsync(profilePicture.OpenReadStream());
                 var image = await Images.ImageToPngMemoryStreamFactor(profileImage, 256, 256);
                 
-                var destinationKey = $"profile/picture/{authId}.png";
+                var destinationKey = $"profile/picture/{authId}.{(existingDancer.ProfilePictureTimestamp?.Ticks - 621355968000000000) / 10000000}.png";
                 await _fileStorage.UploadFileFromStream(image, destinationKey);
             }
             catch (Exception e)
@@ -119,6 +121,8 @@ namespace AusDdrApi.Controllers
                 Console.WriteLine(e.Message);
                 return BadRequest();
             }
+
+            await _coreService.SaveChanges();
 
             return Ok();
         }

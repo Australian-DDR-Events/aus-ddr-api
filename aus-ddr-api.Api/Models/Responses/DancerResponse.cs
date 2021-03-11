@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 using AusDdrApi.Entities;
 
 namespace AusDdrApi.Models.Responses
@@ -21,7 +22,13 @@ namespace AusDdrApi.Models.Responses
             DdrCode = dancer.DdrCode,
             PrimaryMachineLocation = dancer.PrimaryMachineLocation,
             State = dancer.State,
-            ProfilePictureUrl = $"/profile/picture/{dancer.AuthenticationId}.png"
+            ProfilePictureUrl =
+                new StringBuilder()
+                    .Append("/profile/picture/")
+                    .Append($"{dancer.AuthenticationId}")
+                    .Append(dancer.ProfilePictureTimestamp != null ? $".{(dancer.ProfilePictureTimestamp.Value.Ticks - 621355968000000000) / 10000000}" : "")
+                    .Append(".png")
+                    .ToString()
         };
         public override bool Equals(object? comparator)
         {

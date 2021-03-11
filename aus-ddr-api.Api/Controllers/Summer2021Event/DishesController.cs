@@ -82,7 +82,7 @@ namespace AusDdrApi.Controllers.Summer2021Event
         }
 
         [HttpGet]
-        [Route("{~/dancers/{dancerId}/dishes")]
+        [Route("~/dancers/{dancerId}/dishes")]
         public ActionResult<IEnumerable<GradedDancerDishResponse>> GetGradedDishesForDancer([FromRoute] Guid dancerId)
         {
             return _gradedDancerDishService

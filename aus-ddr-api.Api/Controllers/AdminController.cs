@@ -28,6 +28,7 @@ namespace AusDdrApi.Controllers
         }
 
         [HttpPost]
+        [Route("upload")]
         public async Task<ActionResult> UploadImage(
             [FromForm] IFormFile formImage,
             [FromForm] string fileName,

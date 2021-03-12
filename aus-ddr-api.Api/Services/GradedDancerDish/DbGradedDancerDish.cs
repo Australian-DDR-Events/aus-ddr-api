@@ -43,6 +43,8 @@ namespace AusDdrApi.Services.GradedDancerDish
                 .GroupBy(x => x.GradedDish!.DishId)
                 .Select(x => x.Aggregate(
                     (l, r) => 
+                        (int)l.GradedDish!.Grade > (int)r.GradedDish!.Grade ||
+                        (int)l.GradedDish!.Grade == (int)r.GradedDish!.Grade &&
                         l.Scores.Sum(s => s.Value) > l.Scores.Sum(s => s.Value) ? l : r));
         }
 

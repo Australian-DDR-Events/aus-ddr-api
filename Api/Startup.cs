@@ -6,6 +6,7 @@ using AusDdrApi.Authentication;
 using AusDdrApi.Context;
 using AusDdrApi.Extensions;
 using AusDdrApi.GraphQL;
+using AusDdrApi.GraphQL.Dancers;
 using AusDdrApi.GraphQL.DataLoader;
 using AusDdrApi.Helpers;
 using AusDdrApi.Middleware;
@@ -113,6 +114,10 @@ namespace AusDdrApi
                 // Queries
                 .AddQueryType(x => x.Name("Query"))
                 .AddTypeExtension<DancerQueries>()
+                
+                // Mutations
+                .AddMutationType(x => x.Name("Mutation"))
+                .AddTypeExtension<DancerMutations>()
 
                 // Types
                 .AddType(new UuidType('D'))

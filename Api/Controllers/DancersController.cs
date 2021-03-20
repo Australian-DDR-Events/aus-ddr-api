@@ -24,7 +24,7 @@ namespace AusDdrApi.Controllers
     {
         private readonly ILogger<DancersController> _logger;
         private readonly ICoreData _coreService;
-        private readonly IDancerService _dancerServiceService;
+        private readonly IDancerService _dancerService;
         private readonly IBadge _badgeService;
         private readonly IFileStorage _fileStorage;
         private readonly IAuthorization _authorizationService;
@@ -32,14 +32,14 @@ namespace AusDdrApi.Controllers
         public DancersController(
             ILogger<DancersController> logger,
             ICoreData coreService,
-            IDancerService dancerServiceService,
+            IDancerService dancerService,
             IBadge badgeService,
             IFileStorage fileStorage,
             IAuthorization authorizationService)
         {
             _logger = logger;
             _coreService = coreService;
-            _dancerServiceService = dancerServiceService;
+            _dancerService = dancerService;
             _badgeService = badgeService;
             _fileStorage = fileStorage;
             _authorizationService = authorizationService;
@@ -49,7 +49,7 @@ namespace AusDdrApi.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult<IEnumerable<DancerResponse>> Get()
         {
-            return Ok(_dancerServiceService.GetAll().Select(DancerResponse.FromEntity));
+            return Ok(_dancerService.GetAll().Select(DancerResponse.FromEntity));
         }
 
         [HttpGet("{id}")]
@@ -57,7 +57,7 @@ namespace AusDdrApi.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public ActionResult<DancerResponse> GetDancer(string id)
         {
-            var dancer = Guid.TryParse(id, out var dancerId) ? _dancerServiceService.Get(dancerId) : _dancerServiceService.GetByAuthId(id);
+            var dancer = Guid.TryParse(id, out var dancerId) ? _dancerService.Get(dancerId) : _dancerService.GetByAuthId(id);
             if (dancer == null)
             {
                 return NotFound();
@@ -75,14 +75,14 @@ namespace AusDdrApi.Controllers
         {
             var authId = _authorizationService.GetUserId();
             if (authId == null) return Unauthorized();
-            var existingDancer = _dancerServiceService.GetByAuthId(authId);
+            var existingDancer = _dancerService.GetByAuthId(authId);
             if (existingDancer != null)
             {
                 return Conflict();
             }
             var dancer = dancerRequest.ToEntity();
             dancer.AuthenticationId = authId;
-            var newDancer = await _dancerServiceService.Add(dancer);
+            var newDancer = await _dancerService.Add(dancer);
             var baseBadge = _badgeService.GetByName("Base");
             if (baseBadge != null) _badgeService.AssignBadge(baseBadge.Id, newDancer.Id);
             await _coreService.SaveChanges();
@@ -100,13 +100,13 @@ namespace AusDdrApi.Controllers
         {
             var authId = _authorizationService.GetUserId();
             if (authId == null) return Unauthorized();
-            var existingDancer = _dancerServiceService.GetByAuthId(authId);
+            var existingDancer = _dancerService.GetByAuthId(authId);
             if (existingDancer == null)
             {
                 return NotFound();
             }
             existingDancer.ProfilePictureTimestamp = DateTime.UtcNow;
-            _dancerServiceService.Update(existingDancer);
+            _dancerService.Update(existingDancer);
 
             try
             {
@@ -136,7 +136,7 @@ namespace AusDdrApi.Controllers
         {
             var authId = _authorizationService.GetUserId();
             if (authId == null) return Unauthorized();
-            var existingDancer = _dancerServiceService.Get(dancerId);
+            var existingDancer = _dancerService.Get(dancerId);
             if (existingDancer == null)
             {
                 return NotFound();
@@ -151,7 +151,7 @@ namespace AusDdrApi.Controllers
             existingDancer.DdrName = dancerRequest.DdrName;
             existingDancer.PrimaryMachineLocation = dancerRequest.PrimaryMachineLocation;
 
-            var newDancer = _dancerServiceService.Update(existingDancer);
+            var newDancer = _dancerService.Update(existingDancer);
             if (newDancer == null)
             {
                 return BadRequest();

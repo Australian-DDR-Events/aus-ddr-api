@@ -24,7 +24,7 @@ namespace aus_ddr_api.IntegrationTests.Controllers
         private readonly ICoreData _coreService;
         private readonly IScore _scoreService;
         private readonly ISong _songService;
-        private readonly IDancerService _dancerServiceService;
+        private readonly IDancerService _dancerService;
         private readonly IFileStorage _fileStorage;
         private readonly IAuthorization _authorizationService;
 
@@ -38,7 +38,7 @@ namespace aus_ddr_api.IntegrationTests.Controllers
             _coreService = new DbCoreData(_fixture._context);
             _scoreService = new DbScore(_fixture._context);
             _songService = new DbSong(_fixture._context);
-            _dancerServiceService = new DancerService(_fixture._context);
+            _dancerService = new DancerService(_fixture._context);
             _fileStorage = new LocalFileStorage(".");
             _authorizationService = Substitute.For<IAuthorization>();
             
@@ -47,7 +47,7 @@ namespace aus_ddr_api.IntegrationTests.Controllers
                 _coreService,
                 _scoreService,
                 _songService,
-                _dancerServiceService,
+                _dancerService,
                 _fileStorage,
                 _authorizationService);
             

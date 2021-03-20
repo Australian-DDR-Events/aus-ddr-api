@@ -28,7 +28,7 @@ namespace AusDdrApi.Controllers.Summer2021Event
     {
         private readonly ILogger<IngredientsController> _logger;
         private readonly ICoreData _coreDataService;
-        private readonly IDancer _dancerService;
+        private readonly IDancerService _dancerServiceService;
         private readonly IGradedDancerIngredient _gradedDancerIngredientService;
         private readonly IGradedIngredient _gradedIngredientService;
         private readonly IIngredient _ingredientService;
@@ -38,7 +38,7 @@ namespace AusDdrApi.Controllers.Summer2021Event
 
         public IngredientsController(ILogger<IngredientsController> logger,
             ICoreData coreDataService,
-            IDancer dancerService,
+            IDancerService dancerServiceService,
             IGradedDancerIngredient gradedDancerIngredientService,
             IGradedIngredient gradedIngredientService,
             IIngredient ingredientService,
@@ -48,7 +48,7 @@ namespace AusDdrApi.Controllers.Summer2021Event
         {
             _logger = logger;
             _coreDataService = coreDataService;
-            _dancerService = dancerService;
+            _dancerServiceService = dancerServiceService;
             _gradedDancerIngredientService = gradedDancerIngredientService;
             _gradedIngredientService = gradedIngredientService;
             _ingredientService = ingredientService;
@@ -153,7 +153,7 @@ namespace AusDdrApi.Controllers.Summer2021Event
         {
             var authId = _authorizationService.GetUserId();
             if (authId == null) return Unauthorized();
-            var existingDancer = _dancerService.GetByAuthId(authId) ?? await _dancerService.Add(new Dancer{AuthenticationId = authId});
+            var existingDancer = _dancerServiceService.GetByAuthId(authId) ?? await _dancerServiceService.Add(new Dancer{AuthenticationId = authId});
             if (existingDancer == null)
             {
                 return NotFound("dancer does not exist");

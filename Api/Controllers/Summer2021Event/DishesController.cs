@@ -35,7 +35,7 @@ namespace AusDdrApi.Controllers.Summer2021Event
     {
         private readonly ILogger<IngredientsController> _logger;
         private readonly ICoreData _coreDataService;
-        private readonly IDancer _dancerService;
+        private readonly IDancerService _dancerServiceService;
         private readonly IDish _dishService;
         private readonly IIngredient _ingredientService;
         private readonly IGradedDancerIngredient _gradedDancerIngredientService;
@@ -49,7 +49,7 @@ namespace AusDdrApi.Controllers.Summer2021Event
         public DishesController(
             ILogger<IngredientsController> logger,
             ICoreData coreDataService,
-            IDancer dancerService,
+            IDancerService dancerServiceService,
             IDish dishService,
             IIngredient ingredientService,
             IGradedDancerIngredient gradedDancerIngredientService,
@@ -62,7 +62,7 @@ namespace AusDdrApi.Controllers.Summer2021Event
         {
             _logger = logger;
             _coreDataService = coreDataService;
-            _dancerService = dancerService;
+            _dancerServiceService = dancerServiceService;
             _dishService = dishService;
             _ingredientService = ingredientService;
             _gradedDancerIngredientService = gradedDancerIngredientService;
@@ -133,7 +133,7 @@ namespace AusDdrApi.Controllers.Summer2021Event
         {
             var authId = _authorizationService.GetUserId();
             if (authId == null) return Unauthorized();
-            var existingDancer = _dancerService.GetByAuthId(authId) ?? await _dancerService.Add(new Dancer{AuthenticationId = authId});
+            var existingDancer = _dancerServiceService.GetByAuthId(authId) ?? await _dancerServiceService.Add(new Dancer{AuthenticationId = authId});
             if (existingDancer == null) return NotFound();
 
             var dish = _dishService.Get(dishId);

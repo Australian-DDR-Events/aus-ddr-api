@@ -30,7 +30,7 @@ namespace AusDdrApi.Controllers.Summer2021Event
     {
         private readonly ILogger<ScoresController> _logger;
         private readonly ICoreData _coreDataService;
-        private readonly IDancer _dancerService;
+        private readonly IDancerService _dancerServiceService;
         private readonly IScore _scoreService;
         private readonly IIngredient _ingredientService;
         private readonly IGradedIngredient _gradedIngredientService;
@@ -40,7 +40,7 @@ namespace AusDdrApi.Controllers.Summer2021Event
         public ScoresController(
             ILogger<ScoresController> logger,
             ICoreData coreDataService,
-            IDancer dancerService,
+            IDancerService dancerServiceService,
             IScore scoreService,
             IIngredient ingredientService,
             IGradedIngredient gradedIngredientService,
@@ -49,7 +49,7 @@ namespace AusDdrApi.Controllers.Summer2021Event
         {
             _logger = logger;
             _coreDataService = coreDataService;
-            _dancerService = dancerService;
+            _dancerServiceService = dancerServiceService;
             _scoreService = scoreService;
             _ingredientService = ingredientService;
             _gradedIngredientService = gradedIngredientService;
@@ -64,7 +64,7 @@ namespace AusDdrApi.Controllers.Summer2021Event
             [FromQuery(Name = "dancer_id")] Guid dancerId,
             [FromQuery(Name = "ingredient_id")] Guid ingredientId)
         {
-            var existingDancer = _dancerService.Get(dancerId);
+            var existingDancer = _dancerServiceService.Get(dancerId);
             if (existingDancer == null)
             {
                 return NotFound("dancer does not exist in this context");
@@ -86,7 +86,7 @@ namespace AusDdrApi.Controllers.Summer2021Event
         public ActionResult<IEnumerable<GradedDancerIngredientResponse>> GetIngredientsForDancer(
             Guid dancerId)
         {
-            var existingDancer = _dancerService.Get(dancerId);
+            var existingDancer = _dancerServiceService.Get(dancerId);
             if (existingDancer == null)
             {
                 return NotFound("dancer does not exist in this context");

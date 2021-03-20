@@ -19,18 +19,19 @@ namespace AusDdrApi.Extensions
         public static IServiceCollection AddDbEntityServices(
             this IServiceCollection services)
         {
-            services.AddTransient<ICoreData, DbCoreData>();
-            services.AddTransient<ISong, DbSong>();
-            services.AddTransient<IScore, DbScore>();
-            services.AddTransient<IDancer, DbDancer>();
-            services.AddTransient<IGradedDancerDish, DbGradedDancerDish>();
-            services.AddTransient<IGradedDancerIngredient, DbGradedDancerIngredient>();
-            services.AddTransient<IGradedIngredient, DbGradedIngredient>();
-            services.AddTransient<IIngredient, DbIngredient>();
-            services.AddTransient<IGradedDish, DbGradedDish>();
-            services.AddTransient<IDish, DbDish>();
-            services.AddTransient<IEvent, DbEvent>();
-            services.AddTransient<IBadge, DbBadge>();
+            services
+                .AddTransient<ICoreData, DbCoreData>()
+                .AddTransient<ISong, DbSong>()
+                .AddTransient<IScore, DbScore>()
+                .AddTransient<IDancerService, DancerService>()
+                .AddTransient<IGradedDancerDish, DbGradedDancerDish>()
+                .AddTransient<IGradedDancerIngredient, DbGradedDancerIngredient>()
+                .AddTransient<IGradedIngredient, DbGradedIngredient>()
+                .AddTransient<IIngredient, DbIngredient>()
+                .AddTransient<IGradedDish, DbGradedDish>()
+                .AddTransient<IDish, DbDish>()
+                .AddTransient<IEvent, DbEvent>()
+                .AddTransient<IBadge, DbBadge>();
             
             return services;
         }

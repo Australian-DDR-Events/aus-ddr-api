@@ -29,7 +29,7 @@ namespace AusDdrApi.Controllers
         private readonly ICoreData _coreService;
         private readonly IScore _scoreService;
         private readonly ISong _songService;
-        private readonly IDancer _dancerService;
+        private readonly IDancerService _dancerServiceService;
         private readonly IFileStorage _fileStorage;
         private readonly IAuthorization _authorizationService;
 
@@ -38,7 +38,7 @@ namespace AusDdrApi.Controllers
             ICoreData coreService,
             IScore scoreService,
             ISong songService,
-            IDancer dancerService,
+            IDancerService dancerServiceService,
             IFileStorage fileStorage,
             IAuthorization authorizationService)
         {
@@ -46,7 +46,7 @@ namespace AusDdrApi.Controllers
             _coreService = coreService;
             _scoreService = scoreService;
             _songService = songService;
-            _dancerService = dancerService;
+            _dancerServiceService = dancerServiceService;
             _fileStorage = fileStorage;
             _authorizationService = authorizationService;
         }
@@ -111,7 +111,7 @@ namespace AusDdrApi.Controllers
         {
             var authId = _authorizationService.GetUserId();
             if (authId == null) return Unauthorized();
-            var dancer = _dancerService.GetByAuthId(authId) ?? await _dancerService.Add(new Dancer{AuthenticationId = authId});
+            var dancer = _dancerServiceService.GetByAuthId(authId) ?? await _dancerServiceService.Add(new Dancer{AuthenticationId = authId});
             if (dancer == null)
             {
                 return NotFound();

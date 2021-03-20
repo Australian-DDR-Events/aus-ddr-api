@@ -23,20 +23,20 @@ namespace AusDdrApi.Controllers
     {
         private readonly ILogger<BadgesController> _logger;
         private readonly ICoreData _coreService;
-        private readonly IDancer _dancerService;
+        private readonly IDancerService _dancerServiceService;
         private readonly IFileStorage _fileStorage;
         private readonly IBadge _badgeService;
 
         public BadgesController(
             ILogger<BadgesController> logger,
             ICoreData coreService,
-            IDancer dancerService,
+            IDancerService dancerServiceService,
             IFileStorage fileStorage,
             IBadge badgeService)
         {
             _logger = logger;
             _coreService = coreService;
-            _dancerService = dancerService;
+            _dancerServiceService = dancerServiceService;
             _fileStorage = fileStorage;
             _badgeService = badgeService;
         }

@@ -5,9 +5,13 @@ using Amazon.S3;
 using AusDdrApi.Authentication;
 using AusDdrApi.Context;
 using AusDdrApi.Extensions;
+using AusDdrApi.GraphQL;
+using AusDdrApi.GraphQL.DataLoader;
+using AusDdrApi.Helpers;
 using AusDdrApi.Middleware;
 using AusDdrApi.Persistence;
 using AusDdrApi.Services.FileStorage;
+using HotChocolate.Types;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -31,8 +35,12 @@ namespace AusDdrApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<DatabaseContext>(options =>
-                options.UseNpgsql(Configuration.GetConnectionString("DatabaseContext")));
+            // services.AddDbContext<DatabaseContext>(options =>
+            //     options.UseNpgsql(Configuration.GetConnectionString("DatabaseContext")));
+            
+            services.AddPooledDbContextFactory<DatabaseContext>(
+                options => options.UseNpgsql(Configuration.GetConnectionString("DatabaseContext")));
+
             services.AddControllers()
                 .AddJsonOptions(options =>
                 {
@@ -40,7 +48,7 @@ namespace AusDdrApi
                 });
             services.AddJwtAuthentication(Configuration);
             services.AddRouting(options => options.LowercaseUrls = true);
-            services.AddSwaggerGen(c =>
+            /* services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "AusDdrApi", Version = "v1" });
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -73,7 +81,7 @@ namespace AusDdrApi
                         new List<string>()
                     }
                 });
-            });
+            }); */
 
             services.AddCors(options =>
             {
@@ -97,7 +105,27 @@ namespace AusDdrApi
             services.AddSingleton<IFileStorage>(new S3FileStorage(client, awsConfiguration));
 
             services.AddHttpContextAuthorizationServices();
-            services.AddDbEntityServices();
+            // services.AddDbEntityServices();
+
+            services
+                .AddGraphQLServer()
+
+                // Queries
+                .AddQueryType(x => x.Name("Query"))
+                .AddTypeExtension<DancerQueries>()
+
+                // Types
+                .AddType(new UuidType('D'))
+                .AddType<DancerType>()
+
+                // Extensions
+                .AddProjections()
+                .AddFiltering()
+                .AddSorting()
+                .EnableRelaySupport()
+
+                // Data loaders
+                .AddDataLoader<DancerByIdDataLoader>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -110,9 +138,8 @@ namespace AusDdrApi
 
             app.UseOptions();
             
-            app.UseSwagger();
-
-            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "AusDdrApi v1"));
+            // app.UseSwagger();
+            // app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "AusDdrApi v1"));
 
             app.UseRouting();
 
@@ -126,7 +153,8 @@ namespace AusDdrApi
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllers();
+                // endpoints.MapControllers();
+                endpoints.MapGraphQL();
             });
 
             using var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope();

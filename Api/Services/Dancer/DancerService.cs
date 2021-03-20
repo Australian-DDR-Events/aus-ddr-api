@@ -7,18 +7,18 @@ using AusDdrApi.Persistence;
 
 namespace AusDdrApi.Services.Dancer
 {
-    public class DbDancer : IDancer
+    public class DancerService : IDancerService
     {
         private readonly DatabaseContext _context;
 
-        public DbDancer(DatabaseContext context)
+        public DancerService(DatabaseContext context)
         {
             _context = context;
         }
 
-        public IEnumerable<AusDdrApi.Entities.Dancer> GetAll()
+        public IQueryable<AusDdrApi.Entities.Dancer> GetAll()
         {
-            return _context.Dancers.ToList();
+            return _context.Dancers;
         }
 
         public DancerEntity? Get(Guid dancerId)

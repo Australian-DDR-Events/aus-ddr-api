@@ -26,7 +26,7 @@ namespace aus_ddr_api.IntegrationTests.Controllers
         
         private readonly ILogger<DancersController> _logger;
         private readonly ICoreData _coreService;
-        private readonly IDancer _dancerService;
+        private readonly IDancerService _dancerServiceService;
         private readonly IBadge _badgeService;
         private readonly IFileStorage _fileStorage;
         private readonly IAuthorization _authorizationService;
@@ -39,7 +39,7 @@ namespace aus_ddr_api.IntegrationTests.Controllers
 
             _logger = new Logger<DancersController>(new NullLoggerFactory());
             _coreService = new DbCoreData(_fixture._context);
-            _dancerService = new DbDancer(_fixture._context);
+            _dancerServiceService = new DancerService(_fixture._context);
             _badgeService = new DbBadge(_fixture._context);
             _fileStorage = new LocalFileStorage(".");
             _authorizationService = Substitute.For<IAuthorization>();
@@ -47,7 +47,7 @@ namespace aus_ddr_api.IntegrationTests.Controllers
             _dancersController = new DancersController(
                 _logger,
                 _coreService,
-                _dancerService,
+                _dancerServiceService,
                 _badgeService,
                 _fileStorage,
                 _authorizationService);

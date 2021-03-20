@@ -1,13 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using DancerEntity = AusDdrApi.Entities.Dancer;
 
 namespace AusDdrApi.Services.Dancer
 {
-    public interface IDancer
+    public interface IDancerService
     {
-        public IEnumerable<DancerEntity> GetAll();
+        public IQueryable<DancerEntity> GetAll();
         public DancerEntity? Get(Guid dancerId);
         public DancerEntity? GetByAuthId(string authId);
 

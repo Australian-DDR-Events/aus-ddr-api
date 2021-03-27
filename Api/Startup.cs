@@ -128,6 +128,7 @@ namespace AusDdrApi
                 .AddFiltering()
                 .AddSorting()
                 .EnableRelaySupport()
+                .AddAuthorization()
 
                 // Data loaders
                 .AddDataLoader<DancerByIdDataLoader>();
@@ -146,11 +147,11 @@ namespace AusDdrApi
             // app.UseSwagger();
             // app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "AusDdrApi v1"));
 
+            app.UseAuthentication();
+            
             app.UseRouting();
 
             app.UseCors("CorsPolicy");
-
-            app.UseAuthentication();
             
             app.UseAuthorization();
 

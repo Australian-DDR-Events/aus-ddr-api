@@ -6,7 +6,6 @@ using AusDdrApi.Entities;
 using AusDdrApi.Extensions;
 using AusDdrApi.GraphQL.DataLoader;
 using AusDdrApi.Persistence;
-using AusDdrApi.Services.Dancer;
 using HotChocolate;
 using HotChocolate.Data;
 using HotChocolate.Types;
@@ -29,7 +28,7 @@ namespace AusDdrApi.GraphQL
             DancerByIdDataLoader dancerByIdDataLoader,
             CancellationToken cancellationToken) => dancerByIdDataLoader.LoadAsync(id, cancellationToken);
 
-        public async Task<IEnumerable<Dancer>> GetDancerByIdsAsync(
+        public async Task<IEnumerable<Dancer>> GetDancersByIdAsync(
             [ID(nameof(Dancer))] Guid[] ids,
             DancerByIdDataLoader dancerByIdDataLoader,
             CancellationToken cancellationToken) => await dancerByIdDataLoader.LoadAsync(ids, cancellationToken);

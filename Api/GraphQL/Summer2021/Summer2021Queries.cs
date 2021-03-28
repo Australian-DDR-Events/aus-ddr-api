@@ -1,10 +1,15 @@
+using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using AusDdrApi.Entities;
 using AusDdrApi.Extensions;
+using AusDdrApi.GraphQL.DataLoader;
 using AusDdrApi.Persistence;
 using HotChocolate;
 using HotChocolate.Data;
 using HotChocolate.Types;
+using HotChocolate.Types.Relay;
 
 namespace AusDdrApi.GraphQL.Summer2021
 {
@@ -24,6 +29,11 @@ namespace AusDdrApi.GraphQL.Summer2021
         [UseFiltering]
         [UseSorting]
         public IEnumerable<Dish> GetDishes([ScopedService] DatabaseContext context) => context.Dishes;
-        
+
+        public Task<IEnumerable<GradedDancerIngredient>> GetIngredientsByDancerId(
+            [ID(nameof(Dancer))] Guid id,
+            IngredientByDancerIdDataLoader ingredientByDancerIdDataLoader,
+            CancellationToken cancellationToken) => ingredientByDancerIdDataLoader.LoadAsync(id, cancellationToken);
+
     }
 }

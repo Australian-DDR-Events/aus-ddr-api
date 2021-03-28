@@ -35,9 +35,6 @@ namespace AusDdrApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            // services.AddDbContext<DatabaseContext>(options =>
-            //     options.UseNpgsql(Configuration.GetConnectionString("DatabaseContext")));
-            
             services.AddPooledDbContextFactory<DatabaseContext>(
                 options => options.UseNpgsql(Configuration.GetConnectionString("DatabaseContext")));
 
@@ -48,41 +45,6 @@ namespace AusDdrApi
                 });
             services.AddJwtAuthentication(Configuration);
             services.AddRouting(options => options.LowercaseUrls = true);
-            /* services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "AusDdrApi", Version = "v1" });
-                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-                {
-                    Description = @"JWT Authorization header using the Bearer scheme. 
-                      Enter 'Bearer' [space] and then your token in the text input below.
-                      
-                      Example: 'Bearer 12345abcdef'",
-                    Name = "Authorization",
-                    In = ParameterLocation.Header,
-                    Type = SecuritySchemeType.ApiKey,
-                    Scheme = "Bearer"
-                });
-
-                c.AddSecurityRequirement(new OpenApiSecurityRequirement
-                {
-                    {
-                        new OpenApiSecurityScheme
-                        {
-                            Reference = new OpenApiReference
-                            {
-                                Type = ReferenceType.SecurityScheme,
-                                Id = "Bearer"
-                            },
-                            Scheme = "oauth2",
-                            Name = "Bearer",
-                            In = ParameterLocation.Header,
-
-                        },
-                        new List<string>()
-                    }
-                });
-            }); */
-
             services.AddCors(options =>
             {
                 options.AddPolicy(name: "CorsPolicy",
@@ -144,9 +106,6 @@ namespace AusDdrApi
             }
 
             app.UseOptions();
-            
-            // app.UseSwagger();
-            // app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "AusDdrApi v1"));
 
             app.UseAuthentication();
             
@@ -160,7 +119,6 @@ namespace AusDdrApi
 
             app.UseEndpoints(endpoints =>
             {
-                // endpoints.MapControllers();
                 endpoints.MapGraphQL();
             });
 

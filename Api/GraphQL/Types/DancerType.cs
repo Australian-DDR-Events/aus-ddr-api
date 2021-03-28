@@ -1,15 +1,9 @@
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using AusDdrApi.Entities;
 using AusDdrApi.GraphQL.DataLoader;
-using AusDdrApi.Persistence;
-using HotChocolate;
 using HotChocolate.Resolvers;
 using HotChocolate.Types;
-using Microsoft.EntityFrameworkCore;
 
-namespace AusDdrApi.Helpers
+namespace AusDdrApi.GraphQL.Types
 {
     public class DancerType : ObjectType<Dancer>
     {

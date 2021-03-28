@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Amazon;
 using Amazon.Runtime;
 using Amazon.S3;
@@ -8,7 +7,8 @@ using AusDdrApi.Extensions;
 using AusDdrApi.GraphQL;
 using AusDdrApi.GraphQL.Dancers;
 using AusDdrApi.GraphQL.DataLoader;
-using AusDdrApi.Helpers;
+using AusDdrApi.GraphQL.Summer2021;
+using AusDdrApi.GraphQL.Types;
 using AusDdrApi.Middleware;
 using AusDdrApi.Persistence;
 using AusDdrApi.Services.FileStorage;
@@ -20,7 +20,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Net.Http.Headers;
-using Microsoft.OpenApi.Models;
 
 namespace AusDdrApi
 {
@@ -114,6 +113,7 @@ namespace AusDdrApi
                 // Queries
                 .AddQueryType(x => x.Name("Query"))
                 .AddTypeExtension<DancerQueries>()
+                .AddTypeExtension<Summer2021Queries>()
                 
                 // Mutations
                 .AddMutationType(x => x.Name("Mutation"))
@@ -131,7 +131,8 @@ namespace AusDdrApi
                 .AddAuthorization()
 
                 // Data loaders
-                .AddDataLoader<DancerByIdDataLoader>();
+                .AddDataLoader<DancerByIdDataLoader>()
+                .AddDataLoader<IngredientByDancerIdDataLoader>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

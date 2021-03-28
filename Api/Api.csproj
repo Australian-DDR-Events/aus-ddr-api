@@ -24,8 +24,4 @@
         <PackageReference Include="SixLabors.ImageSharp" Version="1.0.2" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
     </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="GraphQL\Types" />
-    </ItemGroup>
 </Project>

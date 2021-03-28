@@ -4,6 +4,5 @@ namespace AusDdrApi.GraphQL.Dancers
         string DdrName, 
         string DdrCode, 
         string PrimaryMachineLocation, 
-        string State, 
-        string AuthenticationId);
+        string State);
 }

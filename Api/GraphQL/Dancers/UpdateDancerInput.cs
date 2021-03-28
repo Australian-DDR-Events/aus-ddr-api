@@ -8,7 +8,7 @@ namespace AusDdrApi.GraphQL.Dancers
         [ID(nameof(Dancer))] Guid DancerId,
         string DdrName, 
         string DdrCode, 
-        string PrimaryMachineLocation, 
+        string PrimaryMachineLocation,
         string State);
     
 }

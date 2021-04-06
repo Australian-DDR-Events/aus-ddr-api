@@ -7,21 +7,21 @@ namespace AusDdrApi.Persistence
     public class DatabaseContext: DbContext
     {
         public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options) { }
-        public DbSet<Dancer> Dancers { get; set; }
-        public DbSet<Score> Scores { get; set; }
-        public DbSet<Song> Songs { get; set; }
-        public DbSet<Event> Events { get; set; }
-        public DbSet<Badge> Badges { get; set; }
-        public DbSet<Ingredient> Ingredients { get; set; }
-        public DbSet<GradedIngredient> GradedIngredients { get; set; }
-        public DbSet<Dish> Dishes { get; set; }
-        public DbSet<DishSong> DishSongs { get; set; }
-        public DbSet<GradedDancerIngredient> GradedDancerIngredients { get; set; }
+        public DbSet<Dancer> Dancers { get; set; } = default!;
+        public DbSet<Score> Scores { get; set; } = default!;
+        public DbSet<Song> Songs { get; set; } = default!;
+        public DbSet<Event> Events { get; set; } = default!;
+        public DbSet<Badge> Badges { get; set; } = default!;
+        public DbSet<Ingredient> Ingredients { get; set; } = default!;
+        public DbSet<GradedIngredient> GradedIngredients { get; set; } = default!;
+        public DbSet<Dish> Dishes { get; set; } = default!;
+        public DbSet<DishSong> DishSongs { get; set; } = default!;
+        public DbSet<GradedDancerIngredient> GradedDancerIngredients { get; set; } = default!;
         
-        public DbSet<GradedDish> GradedDishes { get; set; }
-        public DbSet<GradedDancerDish> GradedDancerDishes { get; set; }
+        public DbSet<GradedDish> GradedDishes { get; set; } = default!;
+        public DbSet<GradedDancerDish> GradedDancerDishes { get; set; } = default!;
         
-        public DbSet<BadgeThreshold> BadgeThresholds { get; set; }
+        public DbSet<BadgeThreshold> BadgeThresholds { get; set; } = default!;
         
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

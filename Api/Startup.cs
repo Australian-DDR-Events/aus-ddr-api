@@ -7,8 +7,10 @@ using AusDdrApi.Extensions;
 using AusDdrApi.GraphQL;
 using AusDdrApi.GraphQL.Dancers;
 using AusDdrApi.GraphQL.DataLoader;
+using AusDdrApi.GraphQL.DataLoader.Summer2021;
 using AusDdrApi.GraphQL.Summer2021;
 using AusDdrApi.GraphQL.Types;
+using AusDdrApi.GraphQL.Types.Summer2021;
 using AusDdrApi.Middleware;
 using AusDdrApi.Persistence;
 using AusDdrApi.Services.FileStorage;
@@ -84,6 +86,8 @@ namespace AusDdrApi
                 // Types
                 .AddType(new UuidType('D'))
                 .AddType<DancerType>()
+                .AddType<GradedIngredientType>()
+                .AddType<GradedDancerIngredientType>()
 
                 // Extensions
                 .AddProjections()
@@ -94,6 +98,10 @@ namespace AusDdrApi
 
                 // Data loaders
                 .AddDataLoader<DancerByIdDataLoader>()
+                .AddDataLoader<BadgeByIdDataLoader>()
+                .AddDataLoader<ScoreByIdDataLoader>()
+                .AddDataLoader<IngredientByIdDataLoader>()
+                .AddDataLoader<GradedIngredientByIdDataLoader>()
                 .AddDataLoader<IngredientByDancerIdDataLoader>();
         }
 

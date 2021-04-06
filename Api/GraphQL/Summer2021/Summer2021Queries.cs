@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AusDdrApi.Entities;
 using AusDdrApi.Extensions;
 using AusDdrApi.GraphQL.DataLoader;
+using AusDdrApi.GraphQL.DataLoader.Summer2021;
 using AusDdrApi.Persistence;
 using HotChocolate;
 using HotChocolate.Data;
@@ -30,7 +31,7 @@ namespace AusDdrApi.GraphQL.Summer2021
         [UseSorting]
         public IEnumerable<Dish> GetDishes([ScopedService] DatabaseContext context) => context.Dishes;
 
-        public Task<IEnumerable<GradedDancerIngredient>> GetIngredientsByDancerId(
+        public Task<IEnumerable<GradedDancerIngredient>?> GetIngredientsByDancerId(
             [ID(nameof(Dancer))] Guid id,
             IngredientByDancerIdDataLoader ingredientByDancerIdDataLoader,
             CancellationToken cancellationToken) => ingredientByDancerIdDataLoader.LoadAsync(id, cancellationToken);

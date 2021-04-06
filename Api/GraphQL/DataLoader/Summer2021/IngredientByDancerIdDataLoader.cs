@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,7 +9,7 @@ using GreenDonut;
 using HotChocolate.DataLoader;
 using Microsoft.EntityFrameworkCore;
 
-namespace AusDdrApi.GraphQL.DataLoader
+namespace AusDdrApi.GraphQL.DataLoader.Summer2021
 {
     public class IngredientByDancerIdDataLoader : BatchDataLoader<Guid, IEnumerable<GradedDancerIngredient>>
     {
@@ -25,16 +24,17 @@ namespace AusDdrApi.GraphQL.DataLoader
         protected override async Task<IReadOnlyDictionary<Guid, IEnumerable<GradedDancerIngredient>>> LoadBatchAsync(
             IReadOnlyList<Guid> keys, CancellationToken cancellationToken)
         {
-            await using DatabaseContext dbContext =
-                _dbContextFactory.CreateDbContext();
+            await using DatabaseContext dbContext = _dbContextFactory.CreateDbContext();
 
-            return await dbContext.GradedDancerIngredients
+            var gradedIngredientsForDancer = dbContext.GradedDancerIngredients
                 .AsQueryable()
-                .Where(d => keys.Contains(d.DancerId))
+                .Where(d => keys.Contains(d.DancerId));
+            
+            return gradedIngredientsForDancer
+                .AsEnumerable()
                 .GroupBy(d => d.DancerId)
-                .ToDictionaryAsync(d => d.Key, 
-                    d => d.AsEnumerable(), 
-                    cancellationToken);
+                .ToDictionary(d => d.Key, 
+                    d => d.AsEnumerable());
         }
     }
 }

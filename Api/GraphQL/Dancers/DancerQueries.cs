@@ -23,14 +23,15 @@ namespace AusDdrApi.GraphQL
         [UseSorting]
         public IEnumerable<Dancer> GetDancers([ScopedService] DatabaseContext context) => context.Dancers;
 
-        public Task<Dancer> GetDancerByIdAsync(
+        public Task<Dancer?> GetDancerByIdAsync(
             [ID(nameof(Dancer))] Guid id,
             DancerByIdDataLoader dancerByIdDataLoader,
-            CancellationToken cancellationToken) => dancerByIdDataLoader.LoadAsync(id, cancellationToken);
+            CancellationToken cancellationToken) => dancerByIdDataLoader.LoadAsync(id, cancellationToken)!;
 
         public async Task<IEnumerable<Dancer>> GetDancersByIdAsync(
             [ID(nameof(Dancer))] Guid[] ids,
             DancerByIdDataLoader dancerByIdDataLoader,
-            CancellationToken cancellationToken) => await dancerByIdDataLoader.LoadAsync(ids, cancellationToken);
+            CancellationToken cancellationToken) => await dancerByIdDataLoader.LoadAsync(ids, cancellationToken) 
+                                                    ?? Array.Empty<Dancer>();
     }
 }

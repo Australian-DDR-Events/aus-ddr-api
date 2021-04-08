@@ -86,6 +86,7 @@ namespace AusDdrApi
                 // Types
                 .AddType(new UuidType('D'))
                 .AddType<DancerType>()
+                .AddType<BadgeType>()
                 .AddType<GradedIngredientType>()
                 .AddType<GradedDancerIngredientType>()
 

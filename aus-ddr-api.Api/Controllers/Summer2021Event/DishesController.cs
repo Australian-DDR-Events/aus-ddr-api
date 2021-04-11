@@ -119,7 +119,7 @@ namespace AusDdrApi.Controllers.Summer2021Event
         public ActionResult<IEnumerable<GradedDishResponse>> GetGrades(Guid dishId)
         {
             var dish = _dishService.Get(dishId);
-            if (dish == null) return NotFound();
+            if (dish == null) return NotFound($"dish {dishId.ToString()} does not exist");
 
             var dishGrades = _gradedDishService.GetAllForDish(dish.Id);
             return Ok(dishGrades.Select(GradedDishResponse.FromEntity));
@@ -134,10 +134,10 @@ namespace AusDdrApi.Controllers.Summer2021Event
             var authId = _authorizationService.GetUserId();
             if (authId == null) return Unauthorized();
             var existingDancer = _dancerService.GetByAuthId(authId) ?? await _dancerService.Add(new Dancer{AuthenticationId = authId});
-            if (existingDancer == null) return NotFound();
+            if (existingDancer == null) return NotFound($"dancer {authId} does not exist");
 
             var dish = _dishService.Get(dishId);
-            if (dish == null) return NotFound();
+            if (dish == null) return NotFound($"dish {dishId.ToString()} does not exist");
 
             var gradedIngredients = _gradedDancerIngredientService.GetIngredientsForDancer(
                 dish.Ingredients.Select(i => i.Id).ToList(),
@@ -188,7 +188,7 @@ namespace AusDdrApi.Controllers.Summer2021Event
 
             var gradedDish = _gradedDishService
                 .GetForDishIdAndGrade(dishId, grade);
-            if (gradedDish == null) return NotFound();
+            if (gradedDish == null) return NotFound($"dish {dishId.ToString()} grade {grade} does not exist");
             var gradedDancerDish = await _gradedDancerDishService
                 .Add(new GradedDancerDish
                 {

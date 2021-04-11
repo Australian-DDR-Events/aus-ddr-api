@@ -4,7 +4,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using AusDdrApi.Entities;
 using AusDdrApi.Extensions;
-using AusDdrApi.GraphQL.DataLoader;
 using AusDdrApi.GraphQL.DataLoader.Summer2021;
 using AusDdrApi.Persistence;
 using HotChocolate;

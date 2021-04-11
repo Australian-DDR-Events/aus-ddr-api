@@ -1,10 +1,8 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
-using AusDdrApi.Authentication;
 using AusDdrApi.Entities;
 using AusDdrApi.Helpers;
 using AusDdrApi.Models.Requests;
@@ -18,7 +16,6 @@ using AusDdrApi.Services.FileStorage;
 using AusDdrApi.Services.GradedDancerDish;
 using AusDdrApi.Services.GradedDancerIngredient;
 using AusDdrApi.Services.GradedDish;
-using AusDdrApi.Services.GradedIngredient;
 using AusDdrApi.Services.Ingredient;
 using AusDdrApi.Services.Score;
 using Microsoft.AspNetCore.Authorization;
@@ -142,7 +139,7 @@ namespace AusDdrApi.Controllers.Summer2021Event
             var gradedIngredients = _gradedDancerIngredientService.GetIngredientsForDancer(
                 dish.Ingredients.Select(i => i.Id).ToList(),
                 existingDancer.Id);
-            if (dish.Ingredients.Count() != gradedIngredients.Count()) return BadRequest();
+            if (dish.Ingredients.Count != gradedIngredients.Count()) return BadRequest();
             
             var dishSongs = _dishService.GetSongsForDish(dish.Id);
             

@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using AusDdrApi.Entities;
 using AusDdrApi.Persistence;
-using Microsoft.EntityFrameworkCore;
 using GradedDishEntity = AusDdrApi.Entities.GradedDish;
 
 namespace AusDdrApi.Services.GradedDish

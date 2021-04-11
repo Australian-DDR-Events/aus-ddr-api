@@ -1,6 +1,5 @@
 using System;
 using AusDdrApi.Entities;
-using Microsoft.EntityFrameworkCore.Query.Internal;
 
 namespace AusDdrApi.Models.Responses
 {

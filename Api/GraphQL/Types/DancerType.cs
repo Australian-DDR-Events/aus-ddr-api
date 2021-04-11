@@ -6,7 +6,6 @@ using AusDdrApi.Entities;
 using AusDdrApi.Extensions;
 using AusDdrApi.GraphQL.DataLoader;
 using AusDdrApi.Persistence;
-using GreenDonut;
 using HotChocolate;
 using HotChocolate.Resolvers;
 using HotChocolate.Types;

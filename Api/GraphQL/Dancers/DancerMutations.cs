@@ -1,4 +1,3 @@
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 using AusDdrApi.Entities;
@@ -20,7 +19,7 @@ namespace AusDdrApi.GraphQL.Dancers
         public async Task<AddDancerPayload> AddDancerAsync(
             AddDancerInput input,
             [ScopedService] DatabaseContext context,
-            [Service]IAuthorization authorization,
+            [Service] IAuthorization authorization,
             CancellationToken cancellationToken)
         {
             var authId = authorization.GetUserId();

@@ -1,13 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using AusDdrApi.Authentication;
-using AusDdrApi.Entities;
-using AusDdrApi.Helpers;
-using AusDdrApi.Models.Requests;
 using AusDdrApi.Models.Responses;
-using AusDdrApi.Persistence;
 using AusDdrApi.Services.CoreData;
 using AusDdrApi.Services.Dancer;
 using AusDdrApi.Services.FileStorage;
@@ -15,12 +9,9 @@ using AusDdrApi.Services.GradedDancerIngredient;
 using AusDdrApi.Services.GradedIngredient;
 using AusDdrApi.Services.Ingredient;
 using AusDdrApi.Services.Score;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using SixLabors.ImageSharp;
 
 namespace AusDdrApi.Controllers.Summer2021Event
 {

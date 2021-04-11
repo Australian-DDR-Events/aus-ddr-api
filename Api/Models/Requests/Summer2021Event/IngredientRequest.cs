@@ -1,7 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using AusDdrApi.Entities;
-using AusDdrApi.Models.Responses;
 using Microsoft.AspNetCore.Http;
 
 namespace AusDdrApi.Models.Requests

@@ -8,6 +8,7 @@ using AusDdrApi.GraphQL;
 using AusDdrApi.GraphQL.Dancers;
 using AusDdrApi.GraphQL.DataLoader;
 using AusDdrApi.GraphQL.DataLoader.Summer2021;
+using AusDdrApi.GraphQL.Songs;
 using AusDdrApi.GraphQL.Summer2021;
 using AusDdrApi.GraphQL.Types;
 using AusDdrApi.GraphQL.Types.Summer2021;
@@ -77,15 +78,19 @@ namespace AusDdrApi
                 // Queries
                 .AddQueryType(x => x.Name("Query"))
                 .AddTypeExtension<DancerQueries>()
+                .AddTypeExtension<SongQueries>()
                 .AddTypeExtension<Summer2021Queries>()
                 
                 // Mutations
                 .AddMutationType(x => x.Name("Mutation"))
+                .AddTypeExtension<SongMutations>()
                 .AddTypeExtension<DancerMutations>()
 
                 // Types
                 .AddType(new UuidType('D'))
+                .AddType<UploadType>()
                 .AddType<DancerType>()
+                .AddType<SongType>()
                 .AddType<BadgeType>()
                 .AddType<GradedIngredientType>()
                 .AddType<GradedDancerIngredientType>()
@@ -101,6 +106,7 @@ namespace AusDdrApi
                 .AddDataLoader<DancerByIdDataLoader>()
                 .AddDataLoader<BadgeByIdDataLoader>()
                 .AddDataLoader<ScoreByIdDataLoader>()
+                .AddDataLoader<SongByIdDataLoader>()
                 .AddDataLoader<IngredientByIdDataLoader>()
                 .AddDataLoader<GradedIngredientByIdDataLoader>()
                 .AddDataLoader<IngredientByDancerIdDataLoader>();

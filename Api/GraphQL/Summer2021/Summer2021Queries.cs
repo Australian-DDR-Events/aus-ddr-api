@@ -30,7 +30,7 @@ namespace AusDdrApi.GraphQL.Summer2021
         [UseSorting]
         public IEnumerable<Dish> GetDishes([ScopedService] DatabaseContext context) => context.Dishes;
 
-        public Task<IEnumerable<GradedDancerIngredient>?> GetIngredientsByDancerId(
+        public Task<IEnumerable<GradedDancerIngredient>> GetIngredientsByDancerId(
             [ID(nameof(Dancer))] Guid id,
             IngredientByDancerIdDataLoader ingredientByDancerIdDataLoader,
             CancellationToken cancellationToken) => ingredientByDancerIdDataLoader.LoadAsync(id, cancellationToken);

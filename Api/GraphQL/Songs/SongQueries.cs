@@ -11,7 +11,7 @@ using HotChocolate.Data;
 using HotChocolate.Types;
 using HotChocolate.Types.Relay;
 
-namespace AusDdrApi.GraphQL
+namespace AusDdrApi.GraphQL.Songs
 {
     [ExtendObjectType("Query")]
     public class SongQueries

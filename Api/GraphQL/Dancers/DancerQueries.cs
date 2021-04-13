@@ -11,7 +11,7 @@ using HotChocolate.Data;
 using HotChocolate.Types;
 using HotChocolate.Types.Relay;
 
-namespace AusDdrApi.GraphQL
+namespace AusDdrApi.GraphQL.Dancers
 {
     [ExtendObjectType("Query")]
     public class DancerQueries

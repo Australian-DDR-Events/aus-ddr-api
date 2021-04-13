@@ -107,6 +107,7 @@ namespace AusDdrApi
 
                 // Data loaders
                 .AddDataLoader<DancerByIdDataLoader>()
+                .AddDataLoader<DancerByAuthIdDataLoader>()
                 .AddDataLoader<BadgeByIdDataLoader>()
                 .AddDataLoader<SongByIdDataLoader>()
                 .AddDataLoader<ScoreByIdDataLoader>()

@@ -1,13 +1,17 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using AusDdrApi.Entities;
 using AusDdrApi.Extensions;
 using AusDdrApi.GraphQL.Common;
+using AusDdrApi.Helpers;
 using AusDdrApi.Persistence;
 using AusDdrApi.Services.Authorization;
+using AusDdrApi.Services.FileStorage;
 using HotChocolate;
 using HotChocolate.AspNetCore.Authorization;
 using HotChocolate.Types;
+using SixLabors.ImageSharp;
 
 namespace AusDdrApi.GraphQL.Dancers
 {
@@ -45,6 +49,7 @@ namespace AusDdrApi.GraphQL.Dancers
             UpdateDancerInput input,
             [ScopedService] DatabaseContext context,
             [Service]IAuthorization authorization,
+            [Service] IFileStorage fileStorage,
             CancellationToken cancellationToken)
         {
             var authId = authorization.GetUserId();
@@ -72,6 +77,28 @@ namespace AusDdrApi.GraphQL.Dancers
             dancer.DdrName = input.DdrName;
             dancer.State = input.State;
             dancer.PrimaryMachineLocation = input.PrimaryMachineLocation;
+
+            if (input.ProfilePicture != null)
+            {
+                dancer.ProfilePictureTimestamp = DateTime.UtcNow;
+                try
+                {
+                    using var profileImage = await Image.LoadAsync(input.ProfilePicture.OpenReadStream());
+                    var image = await Images.ImageToPngMemoryStreamFactor(profileImage, 256, 256);
+                
+                    var destinationKey = $"profile/picture/{dancer.Id}.{(dancer.ProfilePictureTimestamp?.Ticks - 621355968000000000) / 10000000}.png";
+                    await fileStorage.UploadFileFromStream(image, destinationKey);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                    return new UpdateDancerPayload(
+                    new []
+                    {
+                        new UserError("Failed to upload profile picture.", CommonErrorCodes.IMAGE_UPLOAD_FAILED)
+                    });
+                }
+            }
 
             await context.SaveChangesAsync(cancellationToken);
 

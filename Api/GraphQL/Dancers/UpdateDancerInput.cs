@@ -1,5 +1,6 @@
 using System;
 using AusDdrApi.Entities;
+using HotChocolate.Types;
 using HotChocolate.Types.Relay;
 
 namespace AusDdrApi.GraphQL.Dancers
@@ -9,5 +10,6 @@ namespace AusDdrApi.GraphQL.Dancers
         string DdrName, 
         string DdrCode, 
         string PrimaryMachineLocation,
-        string State);
+        string State,
+        IFile? ProfilePicture);
 }

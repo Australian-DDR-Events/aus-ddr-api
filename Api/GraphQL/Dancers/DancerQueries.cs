@@ -27,6 +27,11 @@ namespace AusDdrApi.GraphQL.Dancers
             [ID(nameof(Dancer))] Guid id,
             DancerByIdDataLoader dancerByIdDataLoader,
             CancellationToken cancellationToken) => dancerByIdDataLoader.LoadAsync(id, cancellationToken)!;
+        
+        public Task<Dancer?> GetDancerByAuthIdAsync(
+            string authId,
+            DancerByAuthIdDataLoader dancerByIdAuthDataLoader,
+            CancellationToken cancellationToken) => dancerByIdAuthDataLoader.LoadAsync(authId, cancellationToken)!;
 
         public async Task<IEnumerable<Dancer>> GetDancersByIdAsync(
             [ID(nameof(Dancer))] Guid[] ids,

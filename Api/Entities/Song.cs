@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace AusDdrApi.Entities
 {
@@ -10,6 +11,8 @@ namespace AusDdrApi.Entities
         public string Difficulty { get; set; } = string.Empty;
         public int Level { get; set; }
         public int MaxScore { get; set; }
+        
+        public virtual ICollection<Course> Courses { get; set; } = new HashSet<Course>();
         
         public override bool Equals(object? comparator)
         {

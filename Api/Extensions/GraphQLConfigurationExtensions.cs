@@ -1,0 +1,65 @@
+using AusDdrApi.GraphQL.Dancers;
+using AusDdrApi.GraphQL.DataLoader;
+using AusDdrApi.GraphQL.DataLoader.Summer2021;
+using AusDdrApi.GraphQL.Scores;
+using AusDdrApi.GraphQL.Songs;
+using AusDdrApi.GraphQL.Summer2021;
+using AusDdrApi.GraphQL.Types;
+using AusDdrApi.GraphQL.Types.Summer2021;
+using HotChocolate.Types;
+using Microsoft.Extensions.DependencyInjection;
+// ReSharper disable InconsistentNaming
+
+namespace AusDdrApi.Extensions
+{
+    public static class GraphQLConfigurationExtensions
+    {
+        public static IServiceCollection AddGraphQLConfiguration(this IServiceCollection services)
+        {
+            services
+                .AddGraphQLServer()
+
+                // Queries
+                .AddQueryType(x => x.Name("Query"))
+                .AddTypeExtension<DancerQueries>()
+                .AddTypeExtension<SongQueries>()
+                .AddTypeExtension<ScoreQueries>()
+                .AddTypeExtension<Summer2021Queries>()
+                
+                // Mutations
+                .AddMutationType(x => x.Name("Mutation"))
+                .AddTypeExtension<SongMutations>()
+                .AddTypeExtension<DancerMutations>()
+                .AddTypeExtension<Summer2021Mutations>()
+
+                // Types
+                .AddType(new UuidType('D'))
+                .AddType<UploadType>()
+                .AddType<DancerType>()
+                .AddType<SongType>()
+                .AddType<ScoreType>()
+                .AddType<BadgeType>()
+                .AddType<GradedIngredientType>()
+                .AddType<GradedDancerIngredientType>()
+
+                // Extensions
+                .AddProjections()
+                .AddFiltering()
+                .AddSorting()
+                .EnableRelaySupport()
+                .AddAuthorization()
+
+                // Data loaders
+                .AddDataLoader<DancerByIdDataLoader>()
+                .AddDataLoader<DancerByAuthIdDataLoader>()
+                .AddDataLoader<BadgeByIdDataLoader>()
+                .AddDataLoader<SongByIdDataLoader>()
+                .AddDataLoader<ScoreByIdDataLoader>()
+                .AddDataLoader<IngredientByIdDataLoader>()
+                .AddDataLoader<GradedIngredientByIdDataLoader>()
+                .AddDataLoader<IngredientByDancerIdDataLoader>();
+            
+            return services;
+        }
+    }
+}

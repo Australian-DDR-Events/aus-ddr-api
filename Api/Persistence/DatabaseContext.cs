@@ -10,6 +10,7 @@ namespace AusDdrApi.Persistence
         public DbSet<Dancer> Dancers { get; set; } = default!;
         public DbSet<Score> Scores { get; set; } = default!;
         public DbSet<Song> Songs { get; set; } = default!;
+        public DbSet<Course> Courses { get; set; } = default!;
         public DbSet<Event> Events { get; set; } = default!;
         public DbSet<Badge> Badges { get; set; } = default!;
         public DbSet<Ingredient> Ingredients { get; set; } = default!;

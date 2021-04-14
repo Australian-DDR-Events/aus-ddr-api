@@ -29,7 +29,7 @@ namespace AusDdrApi.GraphQL.Songs
             CancellationToken cancellationToken) => songByIdDataLoader.LoadAsync(id, cancellationToken)!;
 
         public async Task<IEnumerable<Song>> GetSongsByIdAsync(
-            [ID(nameof(Dancer))] Guid[] ids,
+            [ID(nameof(Song))] Guid[] ids,
             SongByIdDataLoader songByIdDataLoader,
             CancellationToken cancellationToken) => await songByIdDataLoader.LoadAsync(ids, cancellationToken) 
                                                     ?? Array.Empty<Song>();

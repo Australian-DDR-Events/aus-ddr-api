@@ -1,6 +1,6 @@
 using HotChocolate.Types;
 
-namespace AusDdrApi.GraphQL
+namespace AusDdrApi.GraphQL.Songs
 {
     public record AddSongInput(
         string Name, 

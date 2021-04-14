@@ -25,6 +25,19 @@ namespace AusDdrApi.GraphQL.Types
 
         private class SongResolvers
         {
+            public async Task<IEnumerable<Course>> GetCoursesAsync(
+                Song song,
+                [ScopedService] DatabaseContext dbContext,
+                CourseByIdDataLoader courseById,
+                CancellationToken cancellationToken)
+            {
+                var courseIds = await dbContext.Songs
+                    .Where(s => s.Id == song.Id)
+                    .Include(s => s.Courses)
+                    .SelectMany(s => s.Courses.Select(c => c.Id))
+                    .ToArrayAsync(cancellationToken);
+                return await courseById.LoadAsync(courseIds, cancellationToken);
+            }
         }
     }
 }

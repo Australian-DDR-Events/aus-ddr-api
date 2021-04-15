@@ -1,21 +1,15 @@
-using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AusDdrApi.Entities;
 using AusDdrApi.Extensions;
 using AusDdrApi.GraphQL.Common;
-using AusDdrApi.GraphQL.Dancers;
 using AusDdrApi.GraphQL.DataLoader;
-using AusDdrApi.Helpers;
 using AusDdrApi.Persistence;
-using AusDdrApi.Services.Authorization;
-using AusDdrApi.Services.FileStorage;
-using GreenDonut;
 using HotChocolate;
 using HotChocolate.AspNetCore.Authorization;
 using HotChocolate.Types;
-using SixLabors.ImageSharp;
 
 namespace AusDdrApi.GraphQL.Courses
 {
@@ -23,19 +17,21 @@ namespace AusDdrApi.GraphQL.Courses
     public class CourseMutations
     {
         [UseDatabaseContext]
-        [Authorize(Policy = "Admin")]
         public async Task<AddCoursePayload> AddCourseAsync(
             AddCourseInput input,
             [ScopedService] DatabaseContext context,
             [ScopedService] SongByIdDataLoader songByIdDataLoader,
             CancellationToken cancellationToken)
         {
-            var songs = await songByIdDataLoader.LoadAsync(input.Songs);
+            var songs = context
+                .Songs
+                .Where(s => input.Songs.Contains(s.Id))
+                .ToImmutableList();
             var course = new Course
             {
                 Name = input.Name,
                 Description = input.Description,
-                Songs = songs.ToImmutableList()
+                Songs = songs
             };
 
             var courseEntity = await context.Courses.AddAsync(course, cancellationToken);

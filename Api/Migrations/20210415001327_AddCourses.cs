@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace AusDdrApi.Migrations
 {
-    public partial class AddCourseEntity : Migration
+    public partial class AddCourses : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -12,13 +12,13 @@ namespace AusDdrApi.Migrations
                 table: "Scores",
                 type: "timestamp without time zone",
                 nullable: false,
-                defaultValue: new DateTime(2021, 4, 13, 22, 34, 27, 208, DateTimeKind.Utc).AddTicks(8590),
+                defaultValue: new DateTime(2021, 4, 15, 0, 13, 26, 720, DateTimeKind.Utc).AddTicks(8750),
                 oldClrType: typeof(DateTime),
                 oldType: "timestamp without time zone",
                 oldDefaultValue: new DateTime(2021, 3, 11, 12, 7, 32, 339, DateTimeKind.Utc).AddTicks(9750));
 
             migrationBuilder.CreateTable(
-                name: "Course",
+                name: "Courses",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -27,7 +27,7 @@ namespace AusDdrApi.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Course", x => x.Id);
+                    table.PrimaryKey("PK_Courses", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -41,9 +41,9 @@ namespace AusDdrApi.Migrations
                 {
                     table.PrimaryKey("PK_CourseSong", x => new { x.CoursesId, x.SongsId });
                     table.ForeignKey(
-                        name: "FK_CourseSong_Course_CoursesId",
+                        name: "FK_CourseSong_Courses_CoursesId",
                         column: x => x.CoursesId,
-                        principalTable: "Course",
+                        principalTable: "Courses",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -66,7 +66,7 @@ namespace AusDdrApi.Migrations
                 name: "CourseSong");
 
             migrationBuilder.DropTable(
-                name: "Course");
+                name: "Courses");
 
             migrationBuilder.AlterColumn<DateTime>(
                 name: "SubmissionTime",
@@ -76,7 +76,7 @@ namespace AusDdrApi.Migrations
                 defaultValue: new DateTime(2021, 3, 11, 12, 7, 32, 339, DateTimeKind.Utc).AddTicks(9750),
                 oldClrType: typeof(DateTime),
                 oldType: "timestamp without time zone",
-                oldDefaultValue: new DateTime(2021, 4, 13, 22, 34, 27, 208, DateTimeKind.Utc).AddTicks(8590));
+                oldDefaultValue: new DateTime(2021, 4, 15, 0, 13, 26, 720, DateTimeKind.Utc).AddTicks(8750));
         }
     }
 }

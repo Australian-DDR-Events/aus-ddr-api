@@ -78,7 +78,7 @@ namespace AusDdrApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Course");
+                    b.ToTable("Courses");
                 });
 
             modelBuilder.Entity("AusDdrApi.Entities.Dancer", b =>
@@ -325,7 +325,7 @@ namespace AusDdrApi.Migrations
                     b.Property<DateTime>("SubmissionTime")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp without time zone")
-                        .HasDefaultValue(new DateTime(2021, 4, 13, 22, 34, 27, 208, DateTimeKind.Utc).AddTicks(8590));
+                        .HasDefaultValue(new DateTime(2021, 4, 15, 0, 13, 26, 720, DateTimeKind.Utc).AddTicks(8750));
 
                     b.Property<int>("Value")
                         .HasColumnType("integer");

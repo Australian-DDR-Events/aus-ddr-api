@@ -13,7 +13,8 @@ namespace AusDdrApi.Entities
         public int MaxScore { get; set; }
         
         public virtual ICollection<Course> Courses { get; set; } = new HashSet<Course>();
-        
+        public ICollection<Score> Scores { get; set; } = new List<Score>();
+
         public override bool Equals(object? comparator)
         {
             var comparatorAsSong = comparator as Song;

@@ -26,6 +26,11 @@ namespace AusDdrApi.GraphQL.Types
                 .Field(d => d.Badges)
                 .ResolveWith<DancerResolvers>(t => t.GetBadgesAsync(default!, default!, default!, default!))
                 .UseDbContext<DatabaseContext>();
+            
+            descriptor
+                .Field(d => d.Scores)
+                .ResolveWith<DancerResolvers>(t => t.GetScoresAsync(default!, default!, default!, default!))
+                .UseDbContext<DatabaseContext>();
         }
 
         private class DancerResolvers
@@ -43,6 +48,20 @@ namespace AusDdrApi.GraphQL.Types
                     .ToArrayAsync(cancellationToken);
 
                 return await badgeById.LoadAsync(badgeIds, cancellationToken);
+            }
+            public async Task<IEnumerable<Score>> GetScoresAsync(
+                Dancer dancer,
+                [ScopedService] DatabaseContext dbContext,
+                ScoreByIdDataLoader scoreById,
+                CancellationToken cancellationToken)
+            {
+                var scoreIds = await dbContext.Dancers
+                    .Where(d => d.Id == dancer.Id)
+                    .Include(d => d.Scores)
+                    .SelectMany(d => d.Scores.Select(t => t.Id))
+                    .ToArrayAsync(cancellationToken);
+
+                return await scoreById.LoadAsync(scoreIds, cancellationToken);
             }
         }
     }

@@ -15,6 +15,7 @@ namespace AusDdrApi.Entities
         public DateTime? ProfilePictureTimestamp { get; set; }
         
         public virtual ICollection<Badge> Badges { get; set; } = new HashSet<Badge>();
+        public ICollection<Score> Scores { get; set; } = new List<Score>();
                 
         public override bool Equals(object? comparator)
         {

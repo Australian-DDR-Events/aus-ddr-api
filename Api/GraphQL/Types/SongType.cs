@@ -21,6 +21,16 @@ namespace AusDdrApi.GraphQL.Types
                 .ImplementsNode()
                 .IdField(song => song.Id)
                 .ResolveNode((ctx, id) => ctx.DataLoader<SongByIdDataLoader>().LoadAsync(id, ctx.RequestAborted));
+            
+            descriptor
+                .Field(s => s.Scores)
+                .ResolveWith<SongResolvers>(t => t.GetScoresAsync(default!, default!, default!, default!))
+                .UseDbContext<DatabaseContext>();
+            
+            descriptor
+                .Field(s => s.Courses)
+                .ResolveWith<SongResolvers>(t => t.GetCoursesAsync(default!, default!, default!, default!))
+                .UseDbContext<DatabaseContext>();
         }
 
         private class SongResolvers
@@ -37,6 +47,20 @@ namespace AusDdrApi.GraphQL.Types
                     .SelectMany(s => s.Courses.Select(c => c.Id))
                     .ToArrayAsync(cancellationToken);
                 return await courseById.LoadAsync(courseIds, cancellationToken);
+            }
+            
+            public async Task<IEnumerable<Score>> GetScoresAsync(
+                Song song,
+                [ScopedService] DatabaseContext dbContext,
+                ScoreByIdDataLoader scoreById,
+                CancellationToken cancellationToken)
+            {
+                var scoreIds = await dbContext.Songs
+                    .Where(s => s.Id == song.Id)
+                    .Include(s => s.Scores)
+                    .SelectMany(s => s.Scores.Select(c => c.Id))
+                    .ToArrayAsync(cancellationToken);
+                return await scoreById.LoadAsync(scoreIds, cancellationToken);
             }
         }
     }

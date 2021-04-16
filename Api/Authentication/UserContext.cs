@@ -13,14 +13,12 @@ namespace AusDdrApi.Authentication
         public static Task UseUserContext(HttpContext context, Func<Task> next)
         {
             var authHeader = context.Request.Headers["Authorization"].FirstOrDefault();
-            if (authHeader != null)
-            {
-                var token = authHeader.Split(" ")[1];
-                var tokenHandler = new JwtSecurityTokenHandler();
-                var jsonToken = tokenHandler.ReadToken(token) as JwtSecurityToken;
-                context.Items[UserIdClaimType] = jsonToken?.Claims.FirstOrDefault(claim => claim.Type == UserIdClaimType)?.Value;
-                context.Items[AdminClaimType] = jsonToken?.Claims.FirstOrDefault(claim => claim.Type == AdminClaimType)?.Value;
-            }
+            if (authHeader == null || !authHeader.Contains(" ")) return next();
+            var token = authHeader.Split(" ")[1];
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var jsonToken = tokenHandler.ReadToken(token) as JwtSecurityToken;
+            context.Items[UserIdClaimType] = jsonToken?.Claims.FirstOrDefault(claim => claim.Type == UserIdClaimType)?.Value;
+            context.Items[AdminClaimType] = jsonToken?.Claims.FirstOrDefault(claim => claim.Type == AdminClaimType)?.Value;
             return next();
         }
     }

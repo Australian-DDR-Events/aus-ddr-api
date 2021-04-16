@@ -14,6 +14,8 @@ namespace AusDdrApi.Authentication
         {
             var authHeader = context.Request.Headers["Authorization"].FirstOrDefault();
             if (authHeader == null || !authHeader.Contains(" ")) return next();
+            var splitHeader = authHeader.Split(" ");
+            if (splitHeader[0].ToLower() != "bearer") return next();
             var token = authHeader.Split(" ")[1];
             var tokenHandler = new JwtSecurityTokenHandler();
             var jsonToken = tokenHandler.ReadToken(token) as JwtSecurityToken;

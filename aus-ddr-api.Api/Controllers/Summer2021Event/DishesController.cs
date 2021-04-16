@@ -126,6 +126,7 @@ namespace AusDdrApi.Controllers.Summer2021Event
         }
 
         [HttpPost]
+        [Authorize(Policy = "Admin")]
         [Route("{dishId}/submission")]
         public async Task<ActionResult<GradedDancerDishResponse>> PostDishSubmission(
             [FromRoute] Guid dishId,

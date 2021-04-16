@@ -15,11 +15,14 @@ namespace AusDdrApi.GraphQL.Types
                 .ImplementsNode()
                 .IdField(score => score.Id)
                 .ResolveNode((ctx, id) => ctx.DataLoader<ScoreByIdDataLoader>().LoadAsync(id, ctx.RequestAborted));
-            
+
+            descriptor
+                .Field(t => t.SongId)
+                .ID(nameof(Song));
+
             descriptor
                 .Field(t => t.Dancer)
-                .ResolveWith<ScoreResolvers>(t => 
-                    t.GetDancerAsync(default!, default!, default));
+                .ResolveWith<ScoreResolvers>(t => t.GetDancerAsync(default!, default!, default));
             descriptor
                 .Field(t => t.DancerId)
                 .ID(nameof(Dancer));

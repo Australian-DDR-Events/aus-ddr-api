@@ -21,7 +21,7 @@ namespace AusDdrApi.GraphQL.Types
                 .ImplementsNode()
                 .IdField(song => song.Id)
                 .ResolveNode((ctx, id) => ctx.DataLoader<SongByIdDataLoader>().LoadAsync(id, ctx.RequestAborted));
-            
+
             descriptor
                 .Field(s => s.Scores)
                 .ResolveWith<SongResolvers>(t => t.GetScoresAsync(default!, default!, default!, default!))

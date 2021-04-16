@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
-using HotChocolate;
 using HotChocolate.Data;
-using HotChocolate.Types;
 
 namespace AusDdrApi.Entities
 {

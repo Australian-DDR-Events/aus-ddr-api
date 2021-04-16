@@ -1,11 +1,7 @@
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AusDdrApi.Entities;
 using AusDdrApi.GraphQL.DataLoader;
-using AusDdrApi.Persistence;
-using HotChocolate;
 using HotChocolate.Resolvers;
 using HotChocolate.Types;
 
@@ -19,10 +15,25 @@ namespace AusDdrApi.GraphQL.Types
                 .ImplementsNode()
                 .IdField(score => score.Id)
                 .ResolveNode((ctx, id) => ctx.DataLoader<ScoreByIdDataLoader>().LoadAsync(id, ctx.RequestAborted));
+            
+            descriptor
+                .Field(t => t.Dancer)
+                .ResolveWith<ScoreResolvers>(t => 
+                    t.GetDancerAsync(default!, default!, default));
+            descriptor
+                .Field(t => t.DancerId)
+                .ID(nameof(Dancer));
         }
 
         private class ScoreResolvers
         {
+            public Task<Dancer> GetDancerAsync(
+                Score score,
+                DancerByIdDataLoader dancerById,
+                CancellationToken cancellationToken)
+            {
+                return dancerById.LoadAsync(score.DancerId, cancellationToken);
+            }
         }
     }
 }

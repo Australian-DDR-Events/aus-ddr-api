@@ -142,7 +142,7 @@ namespace AusDdrApi.Controllers.Summer2021Event
         }
         
         [HttpPost]
-        [Authorize]
+        [Authorize(Policy = "Admin")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

@@ -32,6 +32,8 @@ namespace AusDdrApi.Entities
         /// graphql, not mapped by entity framework.
         /// </summary>
         [NotMapped]
+        [UseFiltering]
+        [UseSorting]
         public IEnumerable<Score> DancerTopScores { get; set; } = new List<Score>();
 
         [NotMapped] public Score? TopScore { get; set; } = null;

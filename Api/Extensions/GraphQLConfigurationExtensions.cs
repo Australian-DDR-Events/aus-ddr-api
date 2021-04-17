@@ -1,3 +1,4 @@
+using AusDdrApi.GraphQL.Badges;
 using AusDdrApi.GraphQL.Courses;
 using AusDdrApi.GraphQL.Dancers;
 using AusDdrApi.GraphQL.DataLoader;
@@ -27,6 +28,7 @@ namespace AusDdrApi.Extensions
                 .AddTypeExtension<CourseQueries>()
                 .AddTypeExtension<ScoreQueries>()
                 .AddTypeExtension<Summer2021Queries>()
+                .AddTypeExtension<BadgeQueries>()
                 
                 // Mutations
                 .AddMutationType(x => x.Name("Mutation"))

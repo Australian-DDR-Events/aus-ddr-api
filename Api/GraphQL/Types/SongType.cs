@@ -26,6 +26,11 @@ namespace AusDdrApi.GraphQL.Types
                 .Field(s => s.Scores)
                 .ResolveWith<SongResolvers>(t => t.GetScoresAsync(default!, default!, default!, default!))
                 .UseDbContext<DatabaseContext>();
+
+            descriptor
+                .Field(s => s.DancerTopScores)
+                .ResolveWith<SongResolvers>(t => t.GetDancerTopScoresAsync(default!, default!, default!, default!))
+                .UseDbContext<DatabaseContext>();
             
             descriptor
                 .Field(s => s.Courses)
@@ -60,6 +65,28 @@ namespace AusDdrApi.GraphQL.Types
                     .Include(s => s.Scores)
                     .SelectMany(s => s.Scores.Select(c => c.Id))
                     .ToArrayAsync(cancellationToken);
+                return await scoreById.LoadAsync(scoreIds, cancellationToken);
+            }
+            
+            public async Task<IEnumerable<Score>> GetDancerTopScoresAsync(
+                Song song,
+                [ScopedService] DatabaseContext dbContext,
+                ScoreByIdDataLoader scoreById,
+                CancellationToken cancellationToken)
+            {
+                var scoreIds = dbContext.Scores
+                    .Where(s => s.SongId == song.Id)
+                    .ToList()
+                    .GroupBy(s => new {s.DancerId})
+                    .Select(g => g
+                        .OrderByDescending(s => s.Value)
+                        .ThenByDescending(s => s.SubmissionTime)
+                        .First()
+                    ).OrderByDescending(s => s.Value)
+                    .ThenByDescending(s => s.SubmissionTime)
+                    .Select(s => s.Id)
+                    .ToArray();
+                
                 return await scoreById.LoadAsync(scoreIds, cancellationToken);
             }
         }

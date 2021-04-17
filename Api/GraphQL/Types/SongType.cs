@@ -28,10 +28,16 @@ namespace AusDdrApi.GraphQL.Types
                 .UseDbContext<DatabaseContext>();
 
             descriptor
+                .Field(s => s.TopScore)
+                .ResolveWith<SongResolvers>(t => t.GetTopScoreAsync(default!, default!, default!, default!))
+                .UseDbContext<DatabaseContext>();
+
+
+            descriptor
                 .Field(s => s.DancerTopScores)
                 .ResolveWith<SongResolvers>(t => t.GetDancerTopScoresAsync(default!, default!, default!, default!))
                 .UseDbContext<DatabaseContext>();
-            
+
             descriptor
                 .Field(s => s.Courses)
                 .ResolveWith<SongResolvers>(t => t.GetCoursesAsync(default!, default!, default!, default!))
@@ -68,6 +74,20 @@ namespace AusDdrApi.GraphQL.Types
                 return await scoreById.LoadAsync(scoreIds, cancellationToken);
             }
             
+            public async Task<Score?> GetTopScoreAsync(
+                Song song,
+                [ScopedService] DatabaseContext dbContext,
+                ScoreByIdDataLoader scoreById,
+                CancellationToken cancellationToken)
+            {
+                var score = dbContext.Scores
+                    .Where(s => s.SongId == song.Id)
+                    .OrderByDescending(s => s.Value)
+                    .ThenByDescending(s => s.SubmissionTime)
+                    .First();
+                return score == null ? null : await scoreById.LoadAsync(score.Id, cancellationToken);
+            }
+            
             public async Task<IEnumerable<Score>> GetDancerTopScoresAsync(
                 Song song,
                 [ScopedService] DatabaseContext dbContext,
@@ -82,8 +102,7 @@ namespace AusDdrApi.GraphQL.Types
                         .OrderByDescending(s => s.Value)
                         .ThenByDescending(s => s.SubmissionTime)
                         .First()
-                    ).OrderByDescending(s => s.Value)
-                    .ThenByDescending(s => s.SubmissionTime)
+                    )
                     .Select(s => s.Id)
                     .ToArray();
                 

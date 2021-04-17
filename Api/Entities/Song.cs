@@ -25,14 +25,16 @@ namespace AusDdrApi.Entities
         public string Image256 => $"/songs/{Id}.256.png";
         [NotMapped]
         public string Image512 => $"/songs/{Id}.512.png";
-        
+
         /// <summary>
         /// Contains the top score for each dancer that has
         /// submitted a score for this song. Resolved by
         /// graphql, not mapped by entity framework.
         /// </summary>
         [NotMapped]
-        public IEnumerable<Score> DancerTopScores { get; set; }
+        public IEnumerable<Score> DancerTopScores { get; set; } = new List<Score>();
+
+        [NotMapped] public Score? TopScore { get; set; } = null;
         
         [UseFiltering]
         [UseSorting]

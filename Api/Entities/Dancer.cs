@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Text;
 
 namespace AusDdrApi.Entities
 {
@@ -16,6 +18,17 @@ namespace AusDdrApi.Entities
         
         public virtual ICollection<Badge> Badges { get; set; } = new HashSet<Badge>();
         public ICollection<Score> Scores { get; set; } = new List<Score>();
+
+        [NotMapped]
+        public string ProfilePictureUrl =>
+            new StringBuilder()
+                .Append("/profile/picture/")
+                .Append($"{AuthenticationId}")
+                .Append(ProfilePictureTimestamp != null
+                    ? $".{(ProfilePictureTimestamp.Value.Ticks - 621355968000000000) / 10000000}"
+                    : "")
+                .Append(".png")
+                .ToString();
                 
         public override bool Equals(object? comparator)
         {

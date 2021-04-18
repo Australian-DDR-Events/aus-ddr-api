@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AusDdrApi.Entities
 {
@@ -11,6 +12,17 @@ namespace AusDdrApi.Entities
         
         public Guid EventId { get; set; }
         public Event? Event { get; set; }
+        
+        [NotMapped]
+        public string Image32 => $"/badges/{Id}.32.png";
+        [NotMapped]
+        public string Image64 => $"/badges/{Id}.64.png";
+        [NotMapped]
+        public string Image128 => $"/badges/{Id}.128.png";
+        [NotMapped]
+        public string Image256 => $"/badges/{Id}.256.png";
+        [NotMapped]
+        public string Image512 => $"/badges/{Id}.512.png";
 
         public virtual ICollection<Dancer> Dancers { get; set; } = new HashSet<Dancer>();
     }

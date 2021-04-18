@@ -152,14 +152,14 @@ namespace AusDdrApi.Migrations
                     b.Property<Guid>("DishId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("SongId")
+                    b.Property<Guid>("SongDifficultyId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
                     b.HasIndex("DishId");
 
-                    b.HasIndex("SongId");
+                    b.HasIndex("SongDifficultyId");
 
                     b.ToTable("DishSongs");
                 });
@@ -297,12 +297,12 @@ namespace AusDdrApi.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid>("SongId")
+                    b.Property<Guid>("SongDifficultyId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("SongId");
+                    b.HasIndex("SongDifficultyId");
 
                     b.ToTable("Ingredients");
                 });
@@ -319,13 +319,13 @@ namespace AusDdrApi.Migrations
                     b.Property<Guid?>("GradedDancerDishId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("SongId")
+                    b.Property<Guid>("SongDifficultyId")
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("SubmissionTime")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp without time zone")
-                        .HasDefaultValue(new DateTime(2021, 4, 15, 0, 13, 26, 720, DateTimeKind.Utc).AddTicks(8750));
+                        .HasDefaultValue(new DateTime(2021, 4, 18, 2, 49, 37, 946, DateTimeKind.Utc).AddTicks(8460));
 
                     b.Property<int>("Value")
                         .HasColumnType("integer");
@@ -336,7 +336,7 @@ namespace AusDdrApi.Migrations
 
                     b.HasIndex("GradedDancerDishId");
 
-                    b.HasIndex("SongId");
+                    b.HasIndex("SongDifficultyId");
 
                     b.ToTable("Scores");
                 });
@@ -351,6 +351,21 @@ namespace AusDdrApi.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Songs");
+                });
+
+            modelBuilder.Entity("AusDdrApi.Entities.SongDifficulty", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Difficulty")
                         .IsRequired()
                         .HasColumnType("text");
@@ -361,13 +376,18 @@ namespace AusDdrApi.Migrations
                     b.Property<int>("MaxScore")
                         .HasColumnType("integer");
 
-                    b.Property<string>("Name")
+                    b.Property<string>("PlayMode")
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<Guid>("SongId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
 
-                    b.ToTable("Songs");
+                    b.HasIndex("SongId");
+
+                    b.ToTable("SongDifficulties");
                 });
 
             modelBuilder.Entity("BadgeDancer", b =>
@@ -385,19 +405,19 @@ namespace AusDdrApi.Migrations
                     b.ToTable("BadgeDancer");
                 });
 
-            modelBuilder.Entity("CourseSong", b =>
+            modelBuilder.Entity("CourseSongDifficulty", b =>
                 {
                     b.Property<Guid>("CoursesId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("SongsId")
+                    b.Property<Guid>("SongDifficultiesId")
                         .HasColumnType("uuid");
 
-                    b.HasKey("CoursesId", "SongsId");
+                    b.HasKey("CoursesId", "SongDifficultiesId");
 
-                    b.HasIndex("SongsId");
+                    b.HasIndex("SongDifficultiesId");
 
-                    b.ToTable("CourseSong");
+                    b.ToTable("CourseSongDifficulty");
                 });
 
             modelBuilder.Entity("DishIngredient", b =>
@@ -445,15 +465,15 @@ namespace AusDdrApi.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("AusDdrApi.Entities.Song", "Song")
+                    b.HasOne("AusDdrApi.Entities.SongDifficulty", "SongDifficulty")
                         .WithMany()
-                        .HasForeignKey("SongId")
+                        .HasForeignKey("SongDifficultyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Dish");
 
-                    b.Navigation("Song");
+                    b.Navigation("SongDifficulty");
                 });
 
             modelBuilder.Entity("AusDdrApi.Entities.GradedDancerDish", b =>
@@ -526,19 +546,19 @@ namespace AusDdrApi.Migrations
 
             modelBuilder.Entity("AusDdrApi.Entities.Ingredient", b =>
                 {
-                    b.HasOne("AusDdrApi.Entities.Song", "Song")
+                    b.HasOne("AusDdrApi.Entities.SongDifficulty", "SongDifficulty")
                         .WithMany()
-                        .HasForeignKey("SongId")
+                        .HasForeignKey("SongDifficultyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Song");
+                    b.Navigation("SongDifficulty");
                 });
 
             modelBuilder.Entity("AusDdrApi.Entities.Score", b =>
                 {
                     b.HasOne("AusDdrApi.Entities.Dancer", "Dancer")
-                        .WithMany()
+                        .WithMany("Scores")
                         .HasForeignKey("DancerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -547,13 +567,24 @@ namespace AusDdrApi.Migrations
                         .WithMany("Scores")
                         .HasForeignKey("GradedDancerDishId");
 
-                    b.HasOne("AusDdrApi.Entities.Song", "Song")
-                        .WithMany()
-                        .HasForeignKey("SongId")
+                    b.HasOne("AusDdrApi.Entities.SongDifficulty", "SongDifficulty")
+                        .WithMany("Scores")
+                        .HasForeignKey("SongDifficultyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Dancer");
+
+                    b.Navigation("SongDifficulty");
+                });
+
+            modelBuilder.Entity("AusDdrApi.Entities.SongDifficulty", b =>
+                {
+                    b.HasOne("AusDdrApi.Entities.Song", "Song")
+                        .WithMany("SongDifficulties")
+                        .HasForeignKey("SongId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Song");
                 });
@@ -573,7 +604,7 @@ namespace AusDdrApi.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("CourseSong", b =>
+            modelBuilder.Entity("CourseSongDifficulty", b =>
                 {
                     b.HasOne("AusDdrApi.Entities.Course", null)
                         .WithMany()
@@ -581,9 +612,9 @@ namespace AusDdrApi.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("AusDdrApi.Entities.Song", null)
+                    b.HasOne("AusDdrApi.Entities.SongDifficulty", null)
                         .WithMany()
-                        .HasForeignKey("SongsId")
+                        .HasForeignKey("SongDifficultiesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -603,12 +634,27 @@ namespace AusDdrApi.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("AusDdrApi.Entities.Dancer", b =>
+                {
+                    b.Navigation("Scores");
+                });
+
             modelBuilder.Entity("AusDdrApi.Entities.Dish", b =>
                 {
                     b.Navigation("DishSongs");
                 });
 
             modelBuilder.Entity("AusDdrApi.Entities.GradedDancerDish", b =>
+                {
+                    b.Navigation("Scores");
+                });
+
+            modelBuilder.Entity("AusDdrApi.Entities.Song", b =>
+                {
+                    b.Navigation("SongDifficulties");
+                });
+
+            modelBuilder.Entity("AusDdrApi.Entities.SongDifficulty", b =>
                 {
                     b.Navigation("Scores");
                 });

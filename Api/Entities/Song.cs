@@ -11,9 +11,6 @@ namespace AusDdrApi.Entities
         public Guid Id { get; set; }
         public string Name { get; set; } = string.Empty;
         public string Artist { get; set; } = string.Empty;
-        public string Difficulty { get; set; } = string.Empty;
-        public int Level { get; set; }
-        public int MaxScore { get; set; }
         
         [NotMapped]
         public string Image32 => $"/songs/{Id}.32.png";
@@ -26,25 +23,7 @@ namespace AusDdrApi.Entities
         [NotMapped]
         public string Image512 => $"/songs/{Id}.512.png";
 
-        /// <summary>
-        /// Contains the top score for each dancer that has
-        /// submitted a score for this song. Resolved by
-        /// graphql, not mapped by entity framework.
-        /// </summary>
-        [NotMapped]
-        [UseFiltering]
-        [UseSorting]
-        public IEnumerable<Score> DancerTopScores { get; set; } = new List<Score>();
-
-        [NotMapped] public Score? TopScore { get; set; } = null;
-        
-        [UseFiltering]
-        [UseSorting]
-        public virtual ICollection<Course> Courses { get; set; } = new HashSet<Course>();
-        
-        [UseFiltering]
-        [UseSorting]
-        public ICollection<Score> Scores { get; set; } = new List<Score>();
+        public ICollection<SongDifficulty> SongDifficulties { get; set; } = new List<SongDifficulty>();
 
         public override bool Equals(object? comparator)
         {
@@ -58,15 +37,12 @@ namespace AusDdrApi.Entities
             return (
                 Id == comparator.Id &&
                 Name == comparator.Name &&
-                Artist == comparator.Artist &&
-                Difficulty == comparator.Difficulty &&
-                Level == comparator.Level &&
-                MaxScore == comparator.MaxScore);
+                Artist == comparator.Artist);
         }
 
         public override int GetHashCode()
         {
-            return (Id, Name, Artist, Difficulty, Level, MaxScore).GetHashCode();
+            return (Id, Name, Artist).GetHashCode();
         }
     }
 }

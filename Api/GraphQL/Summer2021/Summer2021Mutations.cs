@@ -61,7 +61,7 @@ namespace AusDdrApi.GraphQL.Summer2021
                         new UserError("Ingredient not found", Summer2021ErrorCodes.INGREDIENT_NOT_FOUND)
                     });
             }
-            if (ingredient.Song == null)
+            if (ingredient.SongDifficulty == null)
             {
                 return new GradedIngredientPayload(
                     new []
@@ -69,7 +69,7 @@ namespace AusDdrApi.GraphQL.Summer2021
                         new UserError("Song not found", Summer2021ErrorCodes.SONG_NOT_FOUND)
                     });
             }
-            if (input.Score > ingredient.Song!.MaxScore)
+            if (input.Score > ingredient.SongDifficulty!.MaxScore)
             {
                 return new GradedIngredientPayload(
                     new []
@@ -98,7 +98,7 @@ namespace AusDdrApi.GraphQL.Summer2021
 
             var score = await context.Scores.AddAsync(new Score
             {
-                SongId = ingredient.SongId,
+                SongDifficultyId = ingredient.SongDifficultyId,
                 DancerId = existingDancer.Id,
                 Value = input.Score
             }, cancellationToken);
@@ -115,7 +115,7 @@ namespace AusDdrApi.GraphQL.Summer2021
                 using var scoreImage = await Image.LoadAsync(input.ScoreEvidenceImage!.OpenReadStream());
                 var image = await Images.ImageToPngMemoryStreamFactor(scoreImage, 1000, 1000);
 
-                var destinationKey = $"songs/{score.Entity.SongId}/scores/{score.Entity.Id}.png";
+                var destinationKey = $"songs/{score.Entity.SongDifficultyId}/scores/{score.Entity.Id}.png";
                 await fileStorage.UploadFileFromStream(image, destinationKey);
             }
             catch (Exception e)

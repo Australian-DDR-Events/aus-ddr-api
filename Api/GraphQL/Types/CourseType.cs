@@ -33,8 +33,8 @@ namespace AusDdrApi.GraphQL.Types
             {
                 var songIds = await dbContext.Courses
                     .Where(c => c.Id == course.Id)
-                    .Include(c => c.Songs)
-                    .SelectMany(c => c.Songs.Select(s => s.Id))
+                    .Include(c => c.SongDifficulties)
+                    .SelectMany(c => c.SongDifficulties.Select(s => s.Id))
                     .ToArrayAsync(cancellationToken);
                 return await songById.LoadAsync(songIds, cancellationToken);
             }

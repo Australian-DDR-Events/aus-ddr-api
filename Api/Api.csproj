@@ -27,5 +27,6 @@
 
     <ItemGroup>
       <Folder Include="GraphQL\Badges" />
+      <Folder Include="Migrations" />
     </ItemGroup>
 </Project>

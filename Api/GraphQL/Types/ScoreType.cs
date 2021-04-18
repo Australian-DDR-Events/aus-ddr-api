@@ -17,7 +17,7 @@ namespace AusDdrApi.GraphQL.Types
                 .ResolveNode((ctx, id) => ctx.DataLoader<ScoreByIdDataLoader>().LoadAsync(id, ctx.RequestAborted));
 
             descriptor
-                .Field(t => t.SongId)
+                .Field(t => t.SongDifficultyId)
                 .ID(nameof(Song));
 
             descriptor
@@ -35,6 +35,7 @@ namespace AusDdrApi.GraphQL.Types
                 DancerByIdDataLoader dancerById,
                 CancellationToken cancellationToken)
             {
+                if (score == null) return null;
                 return dancerById.LoadAsync(score.DancerId, cancellationToken);
             }
         }

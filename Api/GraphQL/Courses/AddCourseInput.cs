@@ -7,5 +7,5 @@ namespace AusDdrApi.GraphQL.Courses
     public record AddCourseInput(
         string Name, 
         string Description,
-        [ID(nameof(Song))] Guid[] Songs);
+        [ID(nameof(SongDifficulty))] Guid[] SongDifficulties);
 }

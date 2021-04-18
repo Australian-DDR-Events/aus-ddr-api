@@ -33,10 +33,7 @@ namespace AusDdrApi.GraphQL.Songs
             var song = new Song
             {
                 Name = input.Name,
-                Artist = input.Artist,
-                Difficulty = input.Difficulty,
-                Level = input.Level,
-                MaxScore = input.MaxScore
+                Artist = input.Artist
             };
 
             var songEntity = await context.Songs.AddAsync(song, cancellationToken);

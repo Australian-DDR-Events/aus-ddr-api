@@ -23,15 +23,15 @@ namespace AusDdrApi.GraphQL.Courses
             [ScopedService] SongByIdDataLoader songByIdDataLoader,
             CancellationToken cancellationToken)
         {
-            var songs = context
-                .Songs
-                .Where(s => input.Songs.Contains(s.Id))
+            var songDifficulties = context
+                .SongDifficulties
+                .Where(s => input.SongDifficulties.Contains(s.Id))
                 .ToImmutableList();
             var course = new Course
             {
                 Name = input.Name,
                 Description = input.Description,
-                Songs = songs
+                SongDifficulties = songDifficulties
             };
 
             var courseEntity = await context.Courses.AddAsync(course, cancellationToken);

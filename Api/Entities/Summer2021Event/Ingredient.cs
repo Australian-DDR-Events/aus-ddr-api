@@ -8,8 +8,8 @@ namespace AusDdrApi.Entities
         public Guid Id { get; set; }
         public string Name { get; set; } = string.Empty;
         
-        public Guid SongId { get; set; }
-        public Song? Song { get; set; }
+        public Guid SongDifficultyId { get; set; }
+        public SongDifficulty? SongDifficulty { get; set; }
         
         public virtual ICollection<Dish> Dishes { get; set; } = new HashSet<Dish>();
     }

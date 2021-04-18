@@ -11,7 +11,7 @@ namespace AusDdrApi.Entities
         public Guid DishId { get; set; }
         public Dish? Dish { get; set; }
         
-        public Guid SongId { get; set; }
-        public Song? Song { get; set; }
+        public Guid SongDifficultyId { get; set; }
+        public SongDifficulty? SongDifficulty { get; set; }
     }
 }

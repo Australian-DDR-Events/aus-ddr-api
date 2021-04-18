@@ -21,9 +21,9 @@ namespace AusDdrApi.Entities
         public Guid DancerId { get; set; }
         public Dancer? Dancer { get; set; }
         
-        public Guid SongId { get; set; }
-        public Song? Song { get; set; }
+        public Guid SongDifficultyId { get; set; }
+        public SongDifficulty? SongDifficulty { get; set; }
 
-        [NotMapped] public string ImageUrl => $"/songs/{SongId}/scores/{Id}.png";
+        [NotMapped] public string ImageUrl => $"/songs/{SongDifficultyId}/scores/{Id}.png";
     }
 }

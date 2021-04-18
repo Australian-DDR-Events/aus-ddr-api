@@ -10,6 +10,7 @@ namespace AusDdrApi.Persistence
         public DbSet<Dancer> Dancers { get; set; } = default!;
         public DbSet<Score> Scores { get; set; } = default!;
         public DbSet<Song> Songs { get; set; } = default!;
+        public DbSet<SongDifficulty> SongDifficulties { get; set; } = default!;
         public DbSet<Course> Courses { get; set; } = default!;
         public DbSet<Event> Events { get; set; } = default!;
         public DbSet<Badge> Badges { get; set; } = default!;
@@ -33,6 +34,20 @@ namespace AusDdrApi.Persistence
             modelBuilder.Entity<Score>()
                 .Property(s => s.SubmissionTime)
                 .HasDefaultValue(DateTime.UtcNow);
+            
+            modelBuilder
+                .Entity<SongDifficulty>()
+                .Property(i => i.PlayMode)
+                .HasConversion(
+                    ig => ig.ToString(),
+                    ig => (PlayMode) Enum.Parse(typeof(PlayMode), ig));
+            
+            modelBuilder
+                .Entity<SongDifficulty>()
+                .Property(i => i.Difficulty)
+                .HasConversion(
+                    ig => ig.ToString(),
+                    ig => (Difficulty) Enum.Parse(typeof(Difficulty), ig));
             
             modelBuilder
                 .Entity<GradedIngredient>()

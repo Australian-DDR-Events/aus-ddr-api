@@ -27,6 +27,14 @@ namespace AusDdrApi.GraphQL.Dancers
             CancellationToken cancellationToken)
         {
             var authId = authorization.GetUserId();
+            if (authId == null)
+            {
+                return new AddDancerPayload(
+                new []
+                {
+                    new UserError("Cannot find auth id.", CommonErrorCodes.ACT_AGAINST_INVALID_SUBJECT)
+                });
+            }
 
             var dancer = new Dancer
             {

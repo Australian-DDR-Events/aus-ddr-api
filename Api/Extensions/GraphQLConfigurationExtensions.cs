@@ -35,6 +35,7 @@ namespace AusDdrApi.Extensions
                 // Mutations
                 .AddMutationType(x => x.Name("Mutation"))
                 .AddTypeExtension<SongMutations>()
+                .AddTypeExtension<BadgeMutations>()
                 .AddTypeExtension<CourseMutations>()
                 .AddTypeExtension<DancerMutations>()
                 .AddTypeExtension<Summer2021Mutations>()

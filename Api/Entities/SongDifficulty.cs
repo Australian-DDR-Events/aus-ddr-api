@@ -15,7 +15,7 @@ namespace AusDdrApi.Entities
         public int MaxScore { get; set; }
         
         public Guid SongId { get; set; }
-        public Song Song { get; set; }
+        public Song Song { get; set; } = new Song();
         
         [UseFiltering]
         [UseSorting]

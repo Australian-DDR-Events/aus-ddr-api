@@ -35,8 +35,7 @@ namespace AusDdrApi.GraphQL.Types
                 DancerByIdDataLoader dancerById,
                 CancellationToken cancellationToken)
             {
-                if (score == null) return null;
-                return dancerById.LoadAsync(score.DancerId, cancellationToken);
+                return score == null ? null : dancerById.LoadAsync(score.DancerId, cancellationToken);
             }
         }
     }

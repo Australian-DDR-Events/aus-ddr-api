@@ -4,17 +4,17 @@ using System.Threading.Tasks;
 using AusDdrApi.Entities;
 using AusDdrApi.Extensions;
 using AusDdrApi.GraphQL.Common;
-using AusDdrApi.GraphQL.Songs;
 using AusDdrApi.Helpers;
 using AusDdrApi.Persistence;
-using AusDdrApi.Services.Authorization;
 using AusDdrApi.Services.FileStorage;
 using HotChocolate;
 using HotChocolate.AspNetCore.Authorization;
+using HotChocolate.Types;
 using SixLabors.ImageSharp;
 
 namespace AusDdrApi.GraphQL.Badges
 {
+    [ExtendObjectType("Mutation")]
     public class BadgeMutations
     {
         [UseDatabaseContext]
@@ -22,7 +22,6 @@ namespace AusDdrApi.GraphQL.Badges
         public async Task<AddBadgePayload> AddBadgeAsync(
             AddBadgeInput input,
             [ScopedService] DatabaseContext context,
-            [Service] IAuthorization authorization,
             [Service] IFileStorage fileStorage,
             CancellationToken cancellationToken)
         {
@@ -85,6 +84,38 @@ namespace AusDdrApi.GraphQL.Badges
             await context.SaveChangesAsync(cancellationToken);
 
             return new AddBadgePayload(badgeEntity.Entity);
+        }
+
+        [UseDatabaseContext]
+        [Authorize(Policy = "Admin")]
+        public async Task<AddBadgeAllocationPayload> AddBadgeAllocationAsync(
+            AddBadgeAllocationInput input,
+            [ScopedService] DatabaseContext context,
+            CancellationToken cancellationToken)
+        {
+            var dancer = await context.Dancers.FindAsync(new object[]{
+                input.DancerId
+            }, cancellationToken);
+            if (dancer == null) return new AddBadgeAllocationPayload(
+                new []
+                {
+                    new UserError("Dancer does not exist.", CommonErrorCodes.ACT_AGAINST_INVALID_SUBJECT)
+                }
+            );
+            var badge = await context.Badges.FindAsync(new object[]
+            {
+                input.BadgeId
+            }, cancellationToken);
+            if (dancer == null) return new AddBadgeAllocationPayload(
+                new []
+                {
+                    new UserError("Badge does not exist.", CommonErrorCodes.ACT_AGAINST_INVALID_SUBJECT)
+                }
+            );
+            dancer.Badges.Add(badge);
+            await context.SaveChangesAsync(cancellationToken);
+
+            return new AddBadgeAllocationPayload();
         }
     }
 }

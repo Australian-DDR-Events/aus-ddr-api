@@ -106,7 +106,7 @@ namespace AusDdrApi.GraphQL.Badges
             {
                 input.BadgeId
             }, cancellationToken);
-            if (dancer == null) return new AddBadgeAllocationPayload(
+            if (badge == null) return new AddBadgeAllocationPayload(
                 new []
                 {
                     new UserError("Badge does not exist.", CommonErrorCodes.ACT_AGAINST_INVALID_SUBJECT)
@@ -116,6 +116,38 @@ namespace AusDdrApi.GraphQL.Badges
             await context.SaveChangesAsync(cancellationToken);
 
             return new AddBadgeAllocationPayload();
+        }
+
+        [UseDatabaseContext]
+        [Authorize(Policy = "Admin")]
+        public async Task<RevokeBadgeAllocationPayload> RevokeBadgeAllocationAsync(
+            RevokeBadgeAllocationInput input,
+            [ScopedService] DatabaseContext context,
+            CancellationToken cancellationToken)
+        {
+            var dancer = await context.Dancers.FindAsync(new object[]{
+                input.DancerId
+            }, cancellationToken);
+            if (dancer == null) return new RevokeBadgeAllocationPayload(
+                new []
+                {
+                    new UserError("Dancer does not exist.", CommonErrorCodes.ACT_AGAINST_INVALID_SUBJECT)
+                }
+            );
+            var badge = await context.Badges.FindAsync(new object[]
+            {
+                input.BadgeId
+            }, cancellationToken);
+            if (badge == null) return new RevokeBadgeAllocationPayload(
+                new []
+                {
+                    new UserError("Badge does not exist.", CommonErrorCodes.ACT_AGAINST_INVALID_SUBJECT)
+                }
+            );
+            dancer.Badges.Remove(badge);
+            await context.SaveChangesAsync(cancellationToken);
+
+            return new RevokeBadgeAllocationPayload();
         }
     }
 }

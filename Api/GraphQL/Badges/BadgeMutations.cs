@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AusDdrApi.Entities;
@@ -10,6 +11,7 @@ using AusDdrApi.Services.FileStorage;
 using HotChocolate;
 using HotChocolate.AspNetCore.Authorization;
 using HotChocolate.Types;
+using Microsoft.EntityFrameworkCore;
 using SixLabors.ImageSharp;
 
 namespace AusDdrApi.GraphQL.Badges
@@ -125,19 +127,14 @@ namespace AusDdrApi.GraphQL.Badges
             [ScopedService] DatabaseContext context,
             CancellationToken cancellationToken)
         {
-            var dancer = await context.Dancers.FindAsync(new object[]{
-                input.DancerId
-            }, cancellationToken);
+            var dancer = await context.Dancers.Include(d => d.Badges).SingleOrDefaultAsync(d => d.Id == input.DancerId, cancellationToken);
             if (dancer == null) return new RevokeBadgeAllocationPayload(
                 new []
                 {
                     new UserError("Dancer does not exist.", CommonErrorCodes.ACT_AGAINST_INVALID_SUBJECT)
                 }
             );
-            var badge = await context.Badges.FindAsync(new object[]
-            {
-                input.BadgeId
-            }, cancellationToken);
+            var badge = dancer.Badges.FirstOrDefault(b => b.Id == input.BadgeId);
             if (badge == null) return new RevokeBadgeAllocationPayload(
                 new []
                 {

@@ -38,7 +38,6 @@ namespace AusDdrApi.Extensions
                 .AddTypeExtension<BadgeMutations>()
                 .AddTypeExtension<CourseMutations>()
                 .AddTypeExtension<DancerMutations>()
-                .AddTypeExtension<Summer2021Mutations>()
 
                 // Types
                 .AddType(new UuidType('D'))

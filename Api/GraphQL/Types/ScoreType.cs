@@ -17,8 +17,11 @@ namespace AusDdrApi.GraphQL.Types
                 .ResolveNode((ctx, id) => ctx.DataLoader<ScoreByIdDataLoader>().LoadAsync(id, ctx.RequestAborted));
 
             descriptor
+                .Field(t => t.SongDifficulty)
+                .ResolveWith<ScoreResolvers>(t => t.GetSongDifficultyAsync(default!, default!, default));
+            descriptor
                 .Field(t => t.SongDifficultyId)
-                .ID(nameof(Song));
+                .ID(nameof(SongDifficulty));
 
             descriptor
                 .Field(t => t.Dancer)
@@ -36,6 +39,14 @@ namespace AusDdrApi.GraphQL.Types
                 CancellationToken cancellationToken)
             {
                 return score == null ? null : dancerById.LoadAsync(score.DancerId, cancellationToken);
+            }
+            
+            public Task<SongDifficulty> GetSongDifficultyAsync(
+                Score score,
+                SongDifficultyByIdDataLoader songDifficultyById,
+                CancellationToken cancellationToken)
+            {
+                return score == null ? null : songDifficultyById.LoadAsync(score.SongDifficultyId, cancellationToken);
             }
         }
     }

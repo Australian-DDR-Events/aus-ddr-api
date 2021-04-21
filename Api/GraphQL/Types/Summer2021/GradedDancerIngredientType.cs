@@ -20,6 +20,14 @@ namespace AusDdrApi.GraphQL.Types.Summer2021
                 .ID(nameof(Score));
             
             descriptor
+                .Field(t => t.Dancer)
+                .ResolveWith<GradedDancerIngredientResolvers>(t => 
+                    t.GetDancerAsync(default!, default!, default));
+            descriptor
+                .Field(t => t.DancerId)
+                .ID(nameof(Dancer));
+            
+            descriptor
                 .Field(t => t.GradedIngredient)
                 .ResolveWith<GradedDancerIngredientResolvers>(t => 
                     t.GetGradedIngredientAsync(default!, default!, default));
@@ -36,6 +44,14 @@ namespace AusDdrApi.GraphQL.Types.Summer2021
                 CancellationToken cancellationToken)
             {
                 return scoreById.LoadAsync(gradedDancerIngredient.ScoreId, cancellationToken);
+            }
+            
+            public Task<Dancer> GetDancerAsync(
+                GradedDancerIngredient gradedDancerIngredient,
+                DancerByIdDataLoader dancerById,
+                CancellationToken cancellationToken)
+            {
+                return dancerById.LoadAsync(gradedDancerIngredient.DancerId, cancellationToken);
             }
             
             public Task<GradedIngredient> GetGradedIngredientAsync(

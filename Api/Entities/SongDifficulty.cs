@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
+using AusDdrApi.GraphQL.Types;
+using HotChocolate;
 using HotChocolate.Data;
+using HotChocolate.Types;
 
 namespace AusDdrApi.Entities
 {
@@ -15,27 +18,28 @@ namespace AusDdrApi.Entities
         public int MaxScore { get; set; }
         
         public Guid SongId { get; set; }
-        public Song Song { get; set; } = new Song();
-        
-        [UseFiltering]
-        [UseSorting]
-        public ICollection<Score> Scores { get; set; } = new List<Score>();
+        public Song Song { get; set; } = default!;
+
+        [GraphQLType(typeof(NonNullType<ListType<NonNullType<ScoreType>>>))]
+        [UseFiltering] [UseSorting] public ICollection<Score> Scores { get; set; } = new List<Score>();
 
         /// <summary>
         /// Contains the top score for each dancer that has
         /// submitted a score for this song. Resolved by
         /// graphql, not mapped by entity framework.
         /// </summary>
+        [GraphQLType(typeof(NonNullType<ListType<NonNullType<ScoreType>>>))]
         [NotMapped]
         [UseFiltering]
         [UseSorting]
-        public IEnumerable<Score> DancerTopScores { get; set; } = new List<Score>();
+        public IEnumerable<Score> DancerTopScores { get; set; } = default!;
 
         [NotMapped] public Score? TopScore { get; set; } = null;
-        
+
+        [GraphQLType(typeof(NonNullType<ListType<NonNullType<CourseType>>>))]
         [UseFiltering]
         [UseSorting]
-        public virtual ICollection<Course> Courses { get; set; } = new HashSet<Course>();
+        public virtual ICollection<Course> Courses { get; set; } = default!;
     }
     
     public enum PlayMode {

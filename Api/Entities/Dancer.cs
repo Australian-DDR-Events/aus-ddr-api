@@ -2,6 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
+using AusDdrApi.GraphQL.Types;
+using HotChocolate;
+using HotChocolate.Types;
 
 namespace AusDdrApi.Entities
 {
@@ -16,7 +19,10 @@ namespace AusDdrApi.Entities
         
         public DateTime? ProfilePictureTimestamp { get; set; }
         
+        [GraphQLType(typeof(NonNullType<ListType<NonNullType<BadgeType>>>))]
         public virtual ICollection<Badge> Badges { get; set; } = new HashSet<Badge>();
+        
+        [GraphQLType(typeof(NonNullType<ListType<NonNullType<ScoreType>>>))]
         public ICollection<Score> Scores { get; set; } = new List<Score>();
 
         [NotMapped]

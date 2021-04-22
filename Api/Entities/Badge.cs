@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
+using AusDdrApi.GraphQL.Types;
+using HotChocolate;
+using HotChocolate.Types;
 
 namespace AusDdrApi.Entities
 {
@@ -24,6 +27,7 @@ namespace AusDdrApi.Entities
         [NotMapped]
         public string Image512 => $"/badges/{Id}.512.png";
 
+        [GraphQLType(typeof(NonNullType<ListType<NonNullType<DancerType>>>))]
         public virtual ICollection<Dancer> Dancers { get; set; } = new HashSet<Dancer>();
     }
 }

@@ -1,5 +1,8 @@
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
+using AusDdrApi.GraphQL.Types;
+using HotChocolate;
+using HotChocolate.Types;
 
 namespace AusDdrApi.Entities
 {
@@ -19,10 +22,12 @@ namespace AusDdrApi.Entities
         public DateTime SubmissionTime { get; set; }
 
         public Guid DancerId { get; set; }
-        public Dancer? Dancer { get; set; }
+        public Dancer Dancer { get; set; } = default!;
         
         public Guid SongDifficultyId { get; set; }
-        public SongDifficulty? SongDifficulty { get; set; }
+        
+        [GraphQLType(typeof(NonNullType<ListType<NonNullType<SongDifficultyType>>>))]
+        public SongDifficulty SongDifficulty { get; set; } = default!;
 
         [NotMapped] public string ImageUrl => $"/songs/{SongDifficultyId}/scores/{Id}.png";
     }

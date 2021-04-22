@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
+using AusDdrApi.GraphQL.Types;
+using HotChocolate;
 using HotChocolate.Data;
+using HotChocolate.Types;
 
 namespace AusDdrApi.Entities
 {
@@ -22,8 +25,9 @@ namespace AusDdrApi.Entities
         public string Image256 => $"/songs/{Id}.256.png";
         [NotMapped]
         public string Image512 => $"/songs/{Id}.512.png";
-
-        public ICollection<SongDifficulty> SongDifficulties { get; set; } = new List<SongDifficulty>();
+        
+        [GraphQLType(typeof(NonNullType<ListType<NonNullType<SongDifficultyType>>>))]
+        public ICollection<SongDifficulty> SongDifficulties { get; set; } = default!;
 
         public override bool Equals(object? comparator)
         {

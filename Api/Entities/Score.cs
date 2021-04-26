@@ -22,6 +22,8 @@ namespace AusDdrApi.Entities
         public DateTime SubmissionTime { get; set; }
 
         public Guid DancerId { get; set; }
+        
+        [GraphQLType(typeof(NonNullType<DancerType>))]
         public Dancer Dancer { get; set; } = default!;
         
         public Guid SongDifficultyId { get; set; }

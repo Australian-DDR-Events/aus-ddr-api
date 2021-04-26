@@ -17,6 +17,7 @@ namespace AusDdrApi.Entities
         public int Level { get; set; }
         public int MaxScore { get; set; }
         
+        [IsProjected(true)]
         public Guid SongId { get; set; }
         public Song Song { get; set; } = default!;
 

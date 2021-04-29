@@ -28,7 +28,7 @@ namespace AusDdrApi.Entities
         
         public Guid SongDifficultyId { get; set; }
         
-        [GraphQLType(typeof(NonNullType<ListType<NonNullType<SongDifficultyType>>>))]
+        [GraphQLType(typeof(NonNullType<SongDifficultyType>))]
         public SongDifficulty SongDifficulty { get; set; } = default!;
 
         [NotMapped] public string ImageUrl => $"/songs/{SongDifficultyId}/scores/{Id}.png";

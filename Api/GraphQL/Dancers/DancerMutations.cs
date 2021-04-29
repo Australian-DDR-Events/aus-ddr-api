@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AusDdrApi.Entities;
@@ -23,6 +24,7 @@ namespace AusDdrApi.GraphQL.Dancers
         public async Task<AddDancerPayload> AddDancerAsync(
             AddDancerInput input,
             [ScopedService] DatabaseContext context,
+            [Service] IFileStorage fileStorage,
             [Service] IAuthorization authorization,
             CancellationToken cancellationToken)
         {
@@ -35,6 +37,15 @@ namespace AusDdrApi.GraphQL.Dancers
                     new UserError("Cannot find auth id.", CommonErrorCodes.ACT_AGAINST_INVALID_SUBJECT)
                 });
             }
+            
+            if (context.Dancers.Any(d => d.AuthenticationId == authId))
+            {
+                return new AddDancerPayload(
+                    new []
+                    {
+                        new UserError("Auth id already has associated dancer.", CommonErrorCodes.ACT_AGAINST_INVALID_SUBJECT)
+                    });
+            }
 
             var dancer = new Dancer
             {
@@ -44,6 +55,28 @@ namespace AusDdrApi.GraphQL.Dancers
                 PrimaryMachineLocation = input.PrimaryMachineLocation,
                 AuthenticationId = authId
             };
+            
+            if (input.ProfilePicture != null)
+            {
+                dancer.ProfilePictureTimestamp = DateTime.UtcNow;
+                try
+                {
+                    using var profileImage = await Image.LoadAsync(input.ProfilePicture.OpenReadStream());
+                    var image = await Images.ImageToPngMemoryStreamFactor(profileImage, 256, 256);
+                
+                    var destinationKey = $"profile/picture/{dancer.Id}.{(dancer.ProfilePictureTimestamp?.Ticks - 621355968000000000) / 10000000}.png";
+                    await fileStorage.UploadFileFromStream(image, destinationKey);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                    return new AddDancerPayload(
+                        new []
+                        {
+                            new UserError("Failed to upload profile picture.", CommonErrorCodes.IMAGE_UPLOAD_FAILED)
+                        });
+                }
+            }
 
             await context.Dancers.AddAsync(dancer, cancellationToken);
             await context.SaveChangesAsync(cancellationToken);

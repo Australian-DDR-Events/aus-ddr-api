@@ -11,15 +11,18 @@ namespace AusDdrApi.Entities
         public Guid Id { get; set; }
         
         public Guid GradedIngredientId { get; set; }
+
         [GraphQLType(typeof(NonNullType<GradedIngredientType>))]
-        public GradedIngredient GradedIngredient { get; set; }
+        public GradedIngredient GradedIngredient { get; set; } = default!;
         
         public Guid DancerId { get; set; }
+
         [GraphQLType(typeof(NonNullType<DancerType>))]
-        public Dancer Dancer { get; set; }
+        public Dancer Dancer { get; set; } = default!;
         
         public Guid ScoreId { get; set; }
+
         [GraphQLType(typeof(NonNullType<ScoreType>))]
-        public Score Score { get; set; }
+        public Score Score { get; set; } = default!;
     }
 }

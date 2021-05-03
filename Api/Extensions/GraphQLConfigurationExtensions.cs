@@ -49,6 +49,8 @@ namespace AusDdrApi.Extensions
                 .AddType<BadgeType>()
                 .AddType<GradedIngredientType>()
                 .AddType<GradedDancerIngredientType>()
+                .AddType<GradedDishType>()
+                .AddType<GradedDancerDishType>()
 
                 // Extensions
                 .AddProjections()
@@ -67,7 +69,9 @@ namespace AusDdrApi.Extensions
                 .AddDataLoader<ScoreByIdDataLoader>()
                 .AddDataLoader<IngredientByIdDataLoader>()
                 .AddDataLoader<GradedIngredientByIdDataLoader>()
-                .AddDataLoader<IngredientByDancerIdDataLoader>();
+                .AddDataLoader<IngredientByDancerIdDataLoader>()
+                .AddDataLoader<GradedDishByIdDataLoader>()
+                .AddDataLoader<DishByDancerIdDataLoader>();
             
             return services;
         }

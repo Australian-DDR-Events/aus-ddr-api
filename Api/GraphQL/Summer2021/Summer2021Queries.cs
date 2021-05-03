@@ -35,5 +35,10 @@ namespace AusDdrApi.GraphQL.Summer2021
             IngredientByDancerIdDataLoader ingredientByDancerIdDataLoader,
             CancellationToken cancellationToken) => ingredientByDancerIdDataLoader.LoadAsync(id, cancellationToken);
 
+        public Task<IEnumerable<GradedDancerDish>> GetDishesByDancerId(
+            [ID(nameof(Dancer))] Guid id,
+            DishByDancerIdDataLoader dishByDancerIdDataLoader,
+            CancellationToken cancellationToken) => dishByDancerIdDataLoader.LoadAsync(id, cancellationToken);
+
     }
 }

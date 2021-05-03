@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AusDdrApi.Entities;
+using AusDdrApi.Extensions;
 using AusDdrApi.GraphQL.DataLoader;
 using AusDdrApi.GraphQL.DataLoader.Summer2021;
 using AusDdrApi.Persistence;
@@ -31,6 +32,12 @@ namespace AusDdrApi.GraphQL.Types.Summer2021
             descriptor
                 .Field(t => t.GradedDishId)
                 .ID(nameof(GradedDish));
+            
+            descriptor
+                .Field(t => t.Scores)
+                .ResolveWith<GradedDancerDishResolvers>(t => 
+                    t.GetScoresAsync(default!, default!, default, default!))
+                .UseDbContext<DatabaseContext>();
         }
 
         private class GradedDancerDishResolvers

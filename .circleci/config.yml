@@ -74,14 +74,8 @@ jobs:
           name: Restore packages
           command: dotnet restore
       - run:
-          name: Run unit tests
-          command: dotnet test aus-ddr-api.UnitTests -v n
-      - run:
           name: Spin up Postgres
           command: docker-compose --env-file ./.integration.env up -d
-      - run:
-          name: Run integration tests
-          command: dotnet test aus-ddr-api.IntegrationTests -v n
       - run:
           name: Bring down Postgres
           command: docker-compose down

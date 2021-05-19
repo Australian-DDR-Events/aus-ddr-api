@@ -42,7 +42,7 @@ jobs:
             user_id=$(aws sts get-caller-identity | jq '.UserId' | sed -e 's/^"//' -e 's/"$//')
             ecr_repository=$( \
               aws cloudformation list-exports | \
-              jq '.Exports[] | select(.Name == '\"$AWS_STACK_NAME-ecr-repository\"') | .Value'| \
+              jq '.Exports[] | select(.Name == '\"AUS-DDR-BASE-STACK-ecr-repository\"') | .Value'| \
               sed -e 's/^"//' -e 's/"$//')
             aws --region ${AWS_REGION} ecr get-login-password | \
               docker login --username AWS --password-stdin ${user_id}.dkr.ecr.${AWS_REGION}.amazonaws.com

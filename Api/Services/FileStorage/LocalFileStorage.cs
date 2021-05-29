@@ -14,7 +14,9 @@ namespace AusDdrApi.Services.FileStorage
         public async Task<string> UploadFileFromStream(Stream stream, string destination)
         {
             var relativeDestination = destination.TrimStart('/');
-            await using Stream file = File.Create(string.Join('/', _basePath, relativeDestination));
+            var absoluteDestination = string.Join('/', _basePath, relativeDestination);
+            (new FileInfo(absoluteDestination)).Directory.Create();
+            await using Stream file = File.Create(absoluteDestination);
             await stream.CopyToAsync(file);
             return string.Join('/', _basePath, destination);
         }

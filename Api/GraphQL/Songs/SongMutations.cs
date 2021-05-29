@@ -28,8 +28,6 @@ namespace AusDdrApi.GraphQL.Songs
             [Service] IFileStorage fileStorage,
             CancellationToken cancellationToken)
         {
-            var authId = authorization.GetUserId();
-
             var song = new Song
             {
                 Name = input.Name,

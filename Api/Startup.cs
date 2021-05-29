@@ -90,8 +90,8 @@ namespace AusDdrApi
             });
 
             using var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope();
-            var context = serviceScope.ServiceProvider.GetService<DatabaseContext>();
-            context?.Database.Migrate();
+            var context = serviceScope.ServiceProvider.GetService<IDbContextFactory<DatabaseContext>>();
+            context?.CreateDbContext().Database.Migrate();
         }
     }
 }

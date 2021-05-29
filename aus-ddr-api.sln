@@ -11,15 +11,20 @@ Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
+		Local|Any CPU = Local|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{CA2B5F70-2BE1-4748-A163-A2CB2308FE4B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{CA2B5F70-2BE1-4748-A163-A2CB2308FE4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CA2B5F70-2BE1-4748-A163-A2CB2308FE4B}.Local|Any CPU.ActiveCfg = Debug|Any CPU
 		{370F6AF8-D444-40E6-A2DF-A34587423507}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{370F6AF8-D444-40E6-A2DF-A34587423507}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{370F6AF8-D444-40E6-A2DF-A34587423507}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{370F6AF8-D444-40E6-A2DF-A34587423507}.Release|Any CPU.Build.0 = Release|Any CPU
+		{370F6AF8-D444-40E6-A2DF-A34587423507}.Local|Any CPU.ActiveCfg = Debug|Any CPU
+		{370F6AF8-D444-40E6-A2DF-A34587423507}.Local|Any CPU.Build.0 = Debug|Any CPU
 		{3D17B6A5-0046-45D1-8B9B-C6281663AEAF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3D17B6A5-0046-45D1-8B9B-C6281663AEAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D17B6A5-0046-45D1-8B9B-C6281663AEAF}.Local|Any CPU.ActiveCfg = Debug|Any CPU
 	EndGlobalSection
 EndGlobal

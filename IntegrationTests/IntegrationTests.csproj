@@ -5,6 +5,8 @@
         <RootNamespace>aus_ddr_api.IntegrationTests</RootNamespace>
         <Nullable>enable</Nullable>
         <IsPackable>false</IsPackable>
+        <Configurations>Debug;Release</Configurations>
+        <Platforms>AnyCPU</Platforms>
     </PropertyGroup>
 
     <ItemGroup>

@@ -1,3 +1,6 @@
+using System;
+using AusDdrApi.Services.Authentication;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,17 +11,28 @@ namespace AusDdrApi.Authentication
     {
         public static void AddJwtAuthentication(this IServiceCollection services, IConfiguration configuration)
         {
-            services
-                .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(options =>
-                {
-                    options.Authority = configuration["Firebase:Url"];
-                    options.Audience = configuration["Firebase:Audience"];
-                });
-            services.AddAuthorization(options =>
+            if (configuration["AuthScheme"] == "local")
             {
-                options.AddPolicy("Admin", policy => policy.RequireClaim(UserContext.AdminClaimType));
-            });
+                services
+                    .AddAuthentication("BasicAuthentication")
+                    .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("BasicAuthentication", null);
+
+            }
+            else
+            {
+                services
+                    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                    .AddJwtBearer(options =>
+                    {
+                        options.Authority = configuration["Firebase:Url"];
+                        options.Audience = configuration["Firebase:Audience"];
+                    });
+            }
+            services
+                .AddAuthorization(options =>
+                {
+                    options.AddPolicy("Admin", policy => policy.RequireClaim(UserContext.AdminClaimType));
+                });
         }
     }
 }

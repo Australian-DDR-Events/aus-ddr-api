@@ -53,12 +53,31 @@ namespace AusDdrApi
                     });
             });
 
-            var credentials = new BasicAWSCredentials(Configuration["AwsAccessKey"], Configuration["AwsSecretKey"]);
-            var region = RegionEndpoint.GetBySystemName(Configuration["AwsConfiguration:Region"]);
-            var client = new AmazonS3Client(credentials, region);
-            var awsConfiguration = Configuration.GetSection("AwsConfiguration").Get<AwsConfiguration>();
+            switch (Configuration["FileStorage"])
+            {
+                case "filesystem":
+                {
+                    var basePath = Configuration["FilesystemConfig:BasePath"];
+                    if (string.IsNullOrEmpty(basePath))
+                    {
+                        basePath = AppDomain.CurrentDomain.BaseDirectory + "/filestorage";
+                    }
+
+                    services.AddSingleton<IFileStorage>(new LocalFileStorage(basePath));
+                    break;
+                }
+                default:
+                {
+                    var credentials = new BasicAWSCredentials(Configuration["AwsAccessKey"], Configuration["AwsSecretKey"]);
+                    var region = RegionEndpoint.GetBySystemName(Configuration["AwsConfiguration:Region"]);
+                    var client = new AmazonS3Client(credentials, region);
+                    var awsConfiguration = Configuration.GetSection("AwsConfiguration").Get<AwsConfiguration>();
             
-            services.AddSingleton<IFileStorage>(new S3FileStorage(client, awsConfiguration));
+                    services.AddSingleton<IFileStorage>(new S3FileStorage(client, awsConfiguration));
+                    break;
+                }
+                        
+            }
 
             services.AddHttpContextAuthorizationServices();
             services.AddGraphQLConfiguration();
@@ -90,8 +109,8 @@ namespace AusDdrApi
             });
 
             using var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope();
-            var context = serviceScope.ServiceProvider.GetService<DatabaseContext>();
-            context?.Database.Migrate();
+            var context = serviceScope.ServiceProvider.GetService<IDbContextFactory<DatabaseContext>>();
+            context?.CreateDbContext().Database.Migrate();
         }
     }
 }

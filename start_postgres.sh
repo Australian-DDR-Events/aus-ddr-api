@@ -1,3 +1,3 @@
 #!/bin/bash
 
-docker compose --env-file ./.integration.env up -d
+docker-compose --env-file ./.integration.env up -d

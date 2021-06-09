@@ -17,10 +17,10 @@ namespace AusDdrApi.Endpoints.DancerEndpoints
             _dancerService = dancerService;
         }
         
-        [HttpGet("/dancers/{Id:guid}")]
+        [HttpGet("/dancers/{request.Id:guid}")]
         public override async Task<ActionResult<GetDancerByIdResponse>> HandleAsync([FromRoute] GetDancerByIdRequest request, CancellationToken cancellationToken = new CancellationToken())
         {
-            return Ok(_dancerService.GetDancerByIdAsync(request.Id, cancellationToken));
+            return Ok(await _dancerService.GetDancerByIdAsync(request.Id, cancellationToken));
         }
     }
 }

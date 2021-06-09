@@ -5,7 +5,6 @@ using Amazon.S3;
 using Application.Core;
 using AusDdrApi.Authentication;
 using AusDdrApi.Context;
-using AusDdrApi.Extensions;
 using AusDdrApi.Middleware;
 using AusDdrApi.Services.FileStorage;
 using Infrastructure;
@@ -18,6 +17,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
+using Newtonsoft.Json;
 
 namespace AusDdrApi
 {
@@ -39,10 +39,7 @@ namespace AusDdrApi
                 sp => sp.GetService<IDbContextFactory<EFDatabaseContext>>().CreateDbContext());*/
             services.AddDbContext<EFDatabaseContext>(options => options.UseNpgsql(Configuration.GetConnectionString("DatabaseContext")));
             services.AddControllers()
-                .AddJsonOptions(options =>
-                {
-                    options.JsonSerializerOptions.IgnoreNullValues = true;
-                });
+                .AddNewtonsoftJson(c => c.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
             
             services.AddSwaggerGen(c => {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
@@ -93,7 +90,7 @@ namespace AusDdrApi
             services.LoadDefaultApplicationCoreModule();
             services.LoadDefaultInfrastructureModule();
 
-            services.AddHttpContextAuthorizationServices();
+            //services.AddHttpContextAuthorizationServices();
             //services.AddGraphQLConfiguration();
         }
 
@@ -107,13 +104,13 @@ namespace AusDdrApi
 
             app.UseOptions();
 
-            //app.UseAuthentication();
+            app.UseAuthentication();
             
             app.UseRouting();
 
             app.UseCors("CorsPolicy");
             
-            //app.UseAuthorization();
+            app.UseAuthorization();
             
             // Enable middleware to serve generated Swagger as a JSON endpoint.
             app.UseSwagger();
@@ -125,11 +122,9 @@ namespace AusDdrApi
 
             app.UseEndpoints(endpoints =>
             {
-                //endpoints.MapGraphQL();
                 endpoints.MapControllers();
             });
 
-            using var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope();
         }
     }
 }

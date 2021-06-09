@@ -1,3 +1,4 @@
+using System;
 using Amazon;
 using Amazon.Runtime;
 using Amazon.S3;
@@ -31,7 +32,8 @@ namespace AusDdrApi
         {
             services.AddPooledDbContextFactory<DatabaseContext>(
                 options => options.UseNpgsql(Configuration.GetConnectionString("DatabaseContext")));
-
+            services.AddScoped(
+                sp => sp.GetService<IDbContextFactory<DatabaseContext>>().CreateDbContext());
             services.AddControllers()
                 .AddJsonOptions(options =>
                 {

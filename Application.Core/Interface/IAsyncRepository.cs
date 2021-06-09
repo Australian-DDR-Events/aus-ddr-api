@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
-using Api.Core.Entities;
+using Application.Core.Entities;
 
-namespace Api.Core.Interface
+namespace Application.Core.Interface
 {
     public interface IAsyncRepository<T> where T : BaseEntity
     {

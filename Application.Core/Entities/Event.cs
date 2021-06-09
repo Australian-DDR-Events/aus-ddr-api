@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 
-namespace Api.Core.Entities
+namespace Application.Core.Entities
 {
     public class Event : BaseEntity
     {

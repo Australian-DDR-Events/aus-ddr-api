@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Api.Core.Entities
+namespace Application.Core.Entities
 {
     public class SongDifficulty : BaseEntity
     {

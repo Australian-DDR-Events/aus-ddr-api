@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
-using Api.Core.Entities;
-using Api.Core.Interface;
+using Application.Core.Entities;
+using Application.Core.Interface;
 
 namespace Infrastructure.Data
 {

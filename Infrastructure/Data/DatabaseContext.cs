@@ -1,7 +1,7 @@
-using System.Linq;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Api.Core.Entities;
+using Application.Core.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Data
@@ -19,6 +19,54 @@ namespace Infrastructure.Data
         public DbSet<Course> Courses { get; set; } = default!;
         public DbSet<Event> Events { get; set; } = default!;
         public DbSet<Badge> Badges { get; set; } = default!;
+        
+        public DbSet<Ingredient> Ingredients { get; set; } = default!;
+        public DbSet<GradedIngredient> GradedIngredients { get; set; } = default!;
+        public DbSet<Dish> Dishes { get; set; } = default!;
+        public DbSet<DishSong> DishSongs { get; set; } = default!;
+        public DbSet<GradedDancerIngredient> GradedDancerIngredients { get; set; } = default!;
+        public DbSet<GradedDish> GradedDishes { get; set; } = default!;
+        public DbSet<GradedDancerDish> GradedDancerDishes { get; set; } = default!;
+        public DbSet<BadgeThreshold> BadgeThresholds { get; set; } = default!;
+        
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Dancer>()
+                .HasIndex(p => p.AuthenticationId)
+                .IsUnique();
+
+            modelBuilder.Entity<Score>()
+                .Property(s => s.SubmissionTime)
+                .HasDefaultValue(DateTime.UtcNow);
+            
+            modelBuilder
+                .Entity<SongDifficulty>()
+                .Property(i => i.PlayMode)
+                .HasConversion(
+                    ig => ig.ToString(),
+                    ig => (PlayMode) Enum.Parse(typeof(PlayMode), ig));
+            
+            modelBuilder
+                .Entity<SongDifficulty>()
+                .Property(i => i.Difficulty)
+                .HasConversion(
+                    ig => ig.ToString(),
+                    ig => (Difficulty) Enum.Parse(typeof(Difficulty), ig));
+            
+            modelBuilder
+                .Entity<GradedIngredient>()
+                .Property(i => i.Grade)
+                .HasConversion(
+                    ig => ig.ToString(),
+                    ig => (Grade) Enum.Parse(typeof(Grade), ig));
+            
+            modelBuilder
+                .Entity<GradedDish>()
+                .Property(i => i.Grade)
+                .HasConversion(
+                    ig => ig.ToString(),
+                    ig => (Grade) Enum.Parse(typeof(Grade), ig));
+        }
         
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new())
         {

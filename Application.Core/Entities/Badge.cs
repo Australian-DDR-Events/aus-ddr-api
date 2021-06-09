@@ -1,6 +1,6 @@
 using System;
 
-namespace Api.Core.Entities
+namespace Application.Core.Entities
 {
     public class Badge : BaseEntity
     {

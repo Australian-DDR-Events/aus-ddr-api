@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Application.Core.Interfaces;
 using Ardalis.ApiEndpoints;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace AusDdrApi.Endpoints.DancerEndpoints
 {
@@ -17,7 +18,13 @@ namespace AusDdrApi.Endpoints.DancerEndpoints
             _dancerService = dancerService;
         }
         
-        [HttpGet("/dancers/{request.Id:guid}")]
+        [HttpGet(GetDancerByIdRequest.Route)]
+        [SwaggerOperation(
+            Summary = "Gets a single Dancer",
+            Description = "Gets a single Dancer by Id",
+            OperationId = "Dancers.GetById",
+            Tags = new[] { "Dancers" })
+        ]
         public override async Task<ActionResult<GetDancerByIdResponse>> HandleAsync([FromRoute] GetDancerByIdRequest request, CancellationToken cancellationToken = new CancellationToken())
         {
             return Ok(await _dancerService.GetDancerByIdAsync(request.Id, cancellationToken));

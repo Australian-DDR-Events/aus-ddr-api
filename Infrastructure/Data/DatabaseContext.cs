@@ -6,9 +6,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Data
 {
-    public class DatabaseContext : DbContext
+    public class EFDatabaseContext : DbContext
     {
-        public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options)
+        public EFDatabaseContext(DbContextOptions<EFDatabaseContext> options) : base(options)
         {
         }
 
@@ -27,7 +27,6 @@ namespace Infrastructure.Data
         public DbSet<GradedDancerIngredient> GradedDancerIngredients { get; set; } = default!;
         public DbSet<GradedDish> GradedDishes { get; set; } = default!;
         public DbSet<GradedDancerDish> GradedDancerDishes { get; set; } = default!;
-        public DbSet<BadgeThreshold> BadgeThresholds { get; set; } = default!;
         
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

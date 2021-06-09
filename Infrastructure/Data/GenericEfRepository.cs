@@ -10,9 +10,9 @@ namespace Infrastructure.Data
 {
     public class GenericEfRepository<T> : IAsyncRepository<T> where T : BaseEntity
     {
-        protected readonly DatabaseContext _dbContext;
+        protected readonly EFDatabaseContext _dbContext;
 
-        public GenericEfRepository(DatabaseContext dbContext)
+        public GenericEfRepository(EFDatabaseContext dbContext)
         {
             _dbContext = dbContext;
         }

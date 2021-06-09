@@ -2,12 +2,14 @@ using System;
 using Amazon;
 using Amazon.Runtime;
 using Amazon.S3;
+using Application.Core;
 using AusDdrApi.Authentication;
 using AusDdrApi.Context;
 using AusDdrApi.Extensions;
 using AusDdrApi.Middleware;
-using AusDdrApi.Persistence;
 using AusDdrApi.Services.FileStorage;
+using Infrastructure;
+using Infrastructure.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -15,6 +17,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Net.Http.Headers;
+using Microsoft.OpenApi.Models;
 
 namespace AusDdrApi
 {
@@ -30,15 +33,21 @@ namespace AusDdrApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddPooledDbContextFactory<DatabaseContext>(
+            /*services.AddPooledDbContextFactory<EFDatabaseContext>(
                 options => options.UseNpgsql(Configuration.GetConnectionString("DatabaseContext")));
             services.AddScoped(
-                sp => sp.GetService<IDbContextFactory<DatabaseContext>>().CreateDbContext());
+                sp => sp.GetService<IDbContextFactory<EFDatabaseContext>>().CreateDbContext());*/
+            services.AddDbContext<EFDatabaseContext>(options => options.UseNpgsql(Configuration.GetConnectionString("DatabaseContext")));
             services.AddControllers()
                 .AddJsonOptions(options =>
                 {
                     options.JsonSerializerOptions.IgnoreNullValues = true;
                 });
+            
+            services.AddSwaggerGen(c => {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
+            });
+            
             services.AddJwtAuthentication(Configuration);
             services.AddRouting(options => options.LowercaseUrls = true);
             services.AddCors(options =>
@@ -81,8 +90,11 @@ namespace AusDdrApi
                         
             }
 
+            services.LoadDefaultApplicationCoreModule();
+            services.LoadDefaultInfrastructureModule();
+
             services.AddHttpContextAuthorizationServices();
-            services.AddGraphQLConfiguration();
+            //services.AddGraphQLConfiguration();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -95,24 +107,29 @@ namespace AusDdrApi
 
             app.UseOptions();
 
-            app.UseAuthentication();
+            //app.UseAuthentication();
             
             app.UseRouting();
 
             app.UseCors("CorsPolicy");
             
-            app.UseAuthorization();
+            //app.UseAuthorization();
+            
+            // Enable middleware to serve generated Swagger as a JSON endpoint.
+            app.UseSwagger();
+
+            // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.), specifying the Swagger JSON endpoint.
+            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1"));
 
             app.Use(UserContext.UseUserContext);
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapGraphQL();
+                //endpoints.MapGraphQL();
+                endpoints.MapControllers();
             });
 
             using var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope();
-            var context = serviceScope.ServiceProvider.GetService<IDbContextFactory<DatabaseContext>>();
-            context?.CreateDbContext().Database.Migrate();
         }
     }
 }

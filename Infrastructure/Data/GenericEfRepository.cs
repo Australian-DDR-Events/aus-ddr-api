@@ -1,5 +1,5 @@
 using Application.Core.Entities;
-using Application.Core.Interface;
+using Application.Core.Interfaces;
 using Ardalis.Specification.EntityFrameworkCore;
 
 namespace Infrastructure.Data

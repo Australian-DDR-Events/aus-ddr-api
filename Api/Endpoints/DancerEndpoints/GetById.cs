@@ -25,9 +25,15 @@ namespace AusDdrApi.Endpoints.DancerEndpoints
             OperationId = "Dancers.GetById",
             Tags = new[] { "Dancers" })
         ]
-        public override async Task<ActionResult<GetDancerByIdResponse>> HandleAsync([FromRoute] GetDancerByIdRequest request, CancellationToken cancellationToken = new CancellationToken())
+        public override async Task<ActionResult<GetDancerByIdResponse>> HandleAsync([FromRoute] GetDancerByIdRequest request, CancellationToken cancellationToken = new())
         {
-            var dancer = await _dancerService.GetDancerByIdAsync(request.Id, cancellationToken);
+            var dancerResult = await _dancerService.GetDancerByIdAsync(request.Id, cancellationToken);
+            if (!dancerResult.IsSuccess)
+            {
+                return NotFound(dancerResult.Errors);
+            }
+
+            var dancer = dancerResult.Value;
             return Ok(new GetDancerByIdResponse
             {
                 Id = dancer.Id,

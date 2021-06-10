@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Application.Core.Entities;
 using Application.Core.Interfaces;
 using Application.Core.Specifications;
+using Ardalis.Result;
 
 namespace Application.Core.Services
 {
@@ -16,10 +17,11 @@ namespace Application.Core.Services
             _repository = repository;
         }
         
-        public Task<Dancer?> GetDancerByIdAsync(Guid id, CancellationToken cancellationToken)
+        public async Task<Result<Dancer>> GetDancerByIdAsync(Guid id, CancellationToken cancellationToken)
         {
             var dancerSpec = new DancerByIdSpec(id);
-            return _repository.GetBySpecAsync(dancerSpec, cancellationToken);
+            var dancer = await _repository.GetBySpecAsync(dancerSpec, cancellationToken);
+            return dancer == null ? Result<Dancer>.NotFound() : Result<Dancer>.Success(dancer);
         }
     }
 }

@@ -1,15 +1,14 @@
 using System.Threading;
 using System.Threading.Tasks;
+using Application.Core.Entities;
 using Application.Core.Interfaces;
-using Ardalis.ApiEndpoints;
+using AusDdrApi.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace AusDdrApi.Endpoints.DancerEndpoints
 {
-    public class GetById : BaseAsyncEndpoint
-        .WithRequest<GetDancerByIdRequest>
-        .WithResponse<GetDancerByIdResponse>
+    public class GetById : EndpointWithResponse<GetDancerByIdRequest, GetDancerByIdResponse, Dancer>
     {
         private readonly IDancerService _dancerService;
 
@@ -28,17 +27,9 @@ namespace AusDdrApi.Endpoints.DancerEndpoints
         public override async Task<ActionResult<GetDancerByIdResponse>> HandleAsync([FromRoute] GetDancerByIdRequest request, CancellationToken cancellationToken = new())
         {
             var dancerResult = await _dancerService.GetDancerByIdAsync(request.Id, cancellationToken);
-            if (!dancerResult.IsSuccess)
-            {
-                return NotFound(dancerResult.Errors);
-            }
-
-            var dancer = dancerResult.Value;
-            return Ok(new GetDancerByIdResponse
-            {
-                Id = dancer.Id,
-                Name = dancer.DdrName
-            });
+            return this.ConvertToActionResult(dancerResult);
         }
+        
+        public override GetDancerByIdResponse Convert(Dancer u) => new() {Id = u.Id, Name = u.DdrName};
     }
 }

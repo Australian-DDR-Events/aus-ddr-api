@@ -9,8 +9,8 @@ namespace UnitTests.Core.Specifications
 {
     public class DancerByIdSpecTests
     {
-        [Fact]
-        public void If_DataSourceContainsDancer_Then_ReturnsDancer()
+        [Fact(DisplayName = "If data source contains dancer id, then return the dancer")]
+        public void ReturnDancerIfFound()
         {
             var searchId = Guid.NewGuid();
             
@@ -30,8 +30,8 @@ namespace UnitTests.Core.Specifications
             Assert.Equal(dancer1.Id, discoveredDancer.Id);
         }
 
-        [Fact]
-        public void If_DataSourceDoesNotContainDancer_Then_ReturnNull()
+        [Fact(DisplayName = "If data source does not contain dancer id, then return null")]
+        public void ReturnDancerIfNotFound()
         {
             var dancer1 = new Dancer { Id = Guid.NewGuid() };
             var dancer2 = new Dancer { Id = Guid.NewGuid() };

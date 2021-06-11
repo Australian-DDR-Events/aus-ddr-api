@@ -33,11 +33,10 @@ namespace AusDdrApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            /*services.AddPooledDbContextFactory<EFDatabaseContext>(
+            services.AddPooledDbContextFactory<EFDatabaseContext>(
                 options => options.UseNpgsql(Configuration.GetConnectionString("DatabaseContext")));
             services.AddScoped(
-                sp => sp.GetService<IDbContextFactory<EFDatabaseContext>>().CreateDbContext());*/
-            services.AddDbContext<EFDatabaseContext>(options => options.UseNpgsql(Configuration.GetConnectionString("DatabaseContext")));
+                sp => sp.GetService<IDbContextFactory<EFDatabaseContext>>().CreateDbContext());
             services.AddControllers()
                 .AddNewtonsoftJson(c => c.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
             

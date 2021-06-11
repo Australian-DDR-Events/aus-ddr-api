@@ -1,27 +1,27 @@
 using System;
-using AusDdrApi.Persistence;
+using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
-namespace aus_ddr_api.IntegrationTests
+namespace IntegrationTests
 {
     public static class Setup
     {
-        public static DatabaseContext Connect()
+        public static EFDatabaseContext Connect()
         {
             var connectionString =
                 "Username=admin;Password=password;Host=localhost;Port=1235;Database=IntegrationTests";
-            var options = new DbContextOptionsBuilder<DatabaseContext>();
+            var options = new DbContextOptionsBuilder<EFDatabaseContext>();
             options
                 .UseNpgsql(connectionString);
-            return new DatabaseContext(options.Options);
+            return new EFDatabaseContext(options.Options);
         }
         
-        public static void Migrate(DatabaseContext context)
+        public static void Migrate(EFDatabaseContext context)
         {
             context.Database.Migrate();
         }
         
-        public static void DropAllRows(DatabaseContext context)
+        public static void DropAllRows(EFDatabaseContext context)
         {
             if (context.Database.GetDbConnection().Database != "IntegrationTests")
             {

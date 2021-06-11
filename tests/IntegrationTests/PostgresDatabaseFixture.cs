@@ -1,13 +1,12 @@
-
 using System;
-using AusDdrApi.Persistence;
+using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
-namespace aus_ddr_api.IntegrationTests
+namespace IntegrationTests
 {
     public class PostgresDatabaseFixture : IDisposable
     {
-        public DatabaseContext _context { get; }
+        public EFDatabaseContext _context { get; }
         
         public PostgresDatabaseFixture()
         {

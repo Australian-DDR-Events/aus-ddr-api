@@ -36,7 +36,7 @@ namespace AusDdrApi
             services.AddPooledDbContextFactory<EFDatabaseContext>(
                 options => options.UseNpgsql(Configuration.GetConnectionString("DatabaseContext")));
             services.AddScoped(
-                sp => sp.GetService<IDbContextFactory<EFDatabaseContext>>().CreateDbContext());
+                sp => sp.GetService<IDbContextFactory<EFDatabaseContext>>()!.CreateDbContext());
             services.AddControllers()
                 .AddNewtonsoftJson(c => c.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
             

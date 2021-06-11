@@ -57,7 +57,7 @@ namespace IntegrationTests.Core.Services
 
             var dancerFromDatabase = await _dancerService.GetDancerByIdAsync(invalidGuid, CancellationToken.None);
             
-            Assert.Equal(dancerFromDatabase.Status, ResultStatus.NotFound);
+            Assert.Equal(ResultStatus.NotFound, dancerFromDatabase.Status);
         }
     }
 }

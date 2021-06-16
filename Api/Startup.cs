@@ -1,13 +1,7 @@
-using System;
-using Amazon;
-using Amazon.Runtime;
-using Amazon.S3;
 using Application.Core;
 using AusDdrApi.Authentication;
-using AusDdrApi.Context;
 using AusDdrApi.Extensions;
 using AusDdrApi.Middleware;
-using AusDdrApi.Services.FileStorage;
 using Infrastructure;
 using Infrastructure.Data;
 using Microsoft.AspNetCore.Builder;
@@ -38,9 +32,9 @@ namespace AusDdrApi
                 options => options.UseNpgsql(Configuration.GetConnectionString("DatabaseContext")));
             services.AddScoped(
                 sp => sp.GetService<IDbContextFactory<EFDatabaseContext>>()!.CreateDbContext());
+            
             services.AddControllers()
                 .AddNewtonsoftJson(c => c.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
-            
             services.AddSwaggerGen(c => {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Australian DDR Events API", Version = "v1" });
                 c.EnableAnnotations();
@@ -62,34 +56,8 @@ namespace AusDdrApi
                     });
             });
 
-            switch (Configuration["FileStorage"])
-            {
-                case "filesystem":
-                {
-                    var basePath = Configuration["FilesystemConfig:BasePath"];
-                    if (string.IsNullOrEmpty(basePath))
-                    {
-                        basePath = AppDomain.CurrentDomain.BaseDirectory + "/filestorage";
-                    }
-
-                    services.AddSingleton<IFileStorage>(new LocalFileStorage(basePath));
-                    break;
-                }
-                default:
-                {
-                    var credentials = new BasicAWSCredentials(Configuration["AwsAccessKey"], Configuration["AwsSecretKey"]);
-                    var region = RegionEndpoint.GetBySystemName(Configuration["AwsConfiguration:Region"]);
-                    var client = new AmazonS3Client(credentials, region);
-                    var awsConfiguration = Configuration.GetSection("AwsConfiguration").Get<AwsConfiguration>();
-            
-                    services.AddSingleton<IFileStorage>(new S3FileStorage(client, awsConfiguration));
-                    break;
-                }
-                        
-            }
-
             services.LoadDefaultApplicationCoreModule();
-            services.LoadDefaultInfrastructureModule();
+            services.LoadDefaultInfrastructureModule(Configuration);
 
             services.AddHttpContextAuthorizationServices();
         }

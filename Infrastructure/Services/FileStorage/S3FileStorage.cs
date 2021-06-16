@@ -1,7 +1,11 @@
+using System;
 using System.IO;
+using System.Net;
 using System.Threading.Tasks;
 using Amazon.S3;
+using Amazon.S3.Model;
 using Amazon.S3.Transfer;
+using Application.Core.Interfaces;
 using AusDdrApi.Context;
 
 namespace AusDdrApi.Services.FileStorage
@@ -34,6 +38,18 @@ namespace AusDdrApi.Services.FileStorage
 
             return
                 $"https://{_awsConfiguration.AssetsBucketName}.s3-{_awsConfiguration.AssetsBucketLocation}.amazonaws.com/{destination}";
+        }
+
+        public async Task DeleteFile(string destination)
+        {
+            var deleteRequest = new DeleteObjectRequest
+            {
+                Key = destination,
+                BucketName = _awsConfiguration.AssetsBucketName,
+            };
+            var deleteResponse = await _s3Client.DeleteObjectAsync(deleteRequest);
+            if (deleteResponse.HttpStatusCode != HttpStatusCode.NoContent)
+                Console.WriteLine($"failed to delete object {destination}");
         }
     }
 }

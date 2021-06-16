@@ -5,6 +5,7 @@ using Amazon.S3;
 using Application.Core;
 using AusDdrApi.Authentication;
 using AusDdrApi.Context;
+using AusDdrApi.Extensions;
 using AusDdrApi.Middleware;
 using AusDdrApi.Services.FileStorage;
 using Infrastructure;
@@ -90,8 +91,7 @@ namespace AusDdrApi
             services.LoadDefaultApplicationCoreModule();
             services.LoadDefaultInfrastructureModule();
 
-            //services.AddHttpContextAuthorizationServices();
-            //services.AddGraphQLConfiguration();
+            services.AddHttpContextAuthorizationServices();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -33,35 +33,23 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Compile Remove="Entities\**" />
       <Compile Remove="GraphQL\**" />
-      <Compile Remove="Persistence\**" />
       <Compile Remove="Migrations\**" />
       <Compile Remove="Helpers\PopulateDatabase.cs" />
-      <Compile Remove="Extensions\**" />
     </ItemGroup>
 
     <ItemGroup>
-      <EmbeddedResource Remove="Entities\**" />
       <EmbeddedResource Remove="GraphQL\**" />
-      <EmbeddedResource Remove="Persistence\**" />
       <EmbeddedResource Remove="Migrations\**" />
-      <EmbeddedResource Remove="Extensions\**" />
     </ItemGroup>
 
     <ItemGroup>
-      <None Remove="Entities\**" />
       <None Remove="GraphQL\**" />
-      <None Remove="Persistence\**" />
       <None Remove="Migrations\**" />
-      <None Remove="Extensions\**" />
     </ItemGroup>
 
     <ItemGroup>
-      <Content Remove="Entities\**" />
       <Content Remove="GraphQL\**" />
-      <Content Remove="Persistence\**" />
       <Content Remove="Migrations\**" />
-      <Content Remove="Extensions\**" />
     </ItemGroup>
 </Project>

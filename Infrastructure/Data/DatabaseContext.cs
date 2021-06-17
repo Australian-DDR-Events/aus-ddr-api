@@ -66,7 +66,7 @@ namespace Infrastructure.Data
                     ig => ig.ToString(),
                     ig => (Grade) Enum.Parse(typeof(Grade), ig));
         }
-        
+
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new())
         {
             return await base.SaveChangesAsync(cancellationToken).ConfigureAwait(false);

@@ -1,3 +1,4 @@
+using System;
 using Application.Core;
 using AusDdrApi.Authentication;
 using AusDdrApi.Extensions;
@@ -65,7 +66,7 @@ namespace AusDdrApi
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
+            if (env.IsDevelopment() || env.IsEnvironment("Local"))
             {
                 app.UseDeveloperExceptionPage();
             }

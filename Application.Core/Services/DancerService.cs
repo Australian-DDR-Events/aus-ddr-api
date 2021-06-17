@@ -1,4 +1,7 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Core.Entities;
@@ -22,6 +25,14 @@ namespace Application.Core.Services
             var dancerSpec = new DancerByIdSpec(id);
             var dancer = await _repository.GetBySpecAsync(dancerSpec, cancellationToken);
             return dancer == null ? Result<Dancer>.NotFound() : Result<Dancer>.Success(dancer);
+        }
+
+        public async Task<Result<IList<Dancer>>> GetDancersAsync(int page, int limit, CancellationToken cancellationToken)
+        {
+            var skip = page * limit;
+            var dancersSpec = new DancersSpec(skip, limit);
+            var dancers = await _repository.ListAsync(dancersSpec, cancellationToken);
+            return Result<IList<Dancer>>.Success(dancers);
         }
     }
 }

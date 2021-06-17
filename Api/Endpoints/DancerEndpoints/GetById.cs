@@ -1,3 +1,4 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Core.Entities;
@@ -24,7 +25,7 @@ namespace AusDdrApi.Endpoints.DancerEndpoints
             OperationId = "Dancers.GetById",
             Tags = new[] { "Dancers" })
         ]
-        public override async Task<ActionResult<GetDancerByIdResponse>> HandleAsync([FromRoute] GetDancerByIdRequest request, CancellationToken cancellationToken = new())
+        public override async Task<ActionResult<GetDancerByIdResponse>> HandleAsync([FromRoute] [FromQuery] GetDancerByIdRequest request, CancellationToken cancellationToken = new())
         {
             var dancerResult = await _dancerService.GetDancerByIdAsync(request.Id, cancellationToken);
             return this.ConvertToActionResult(dancerResult);

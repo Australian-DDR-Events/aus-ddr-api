@@ -10,7 +10,8 @@ namespace Application.Core
             this IServiceCollection services)
         {
             return services
-                .AddScoped<IDancerService, DancerService>();
+                .AddScoped<IDancerService, DancerService>()
+                .AddScoped<IBadgeService, BadgeService>();
         }
     }
 }

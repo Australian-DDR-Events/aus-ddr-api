@@ -1,12 +1,10 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Core.Entities;
 using Application.Core.Interfaces;
-using Application.Core.Specifications;
+using Application.Core.Specifications.DancerSpecs;
 using Ardalis.Result;
 
 namespace Application.Core.Services

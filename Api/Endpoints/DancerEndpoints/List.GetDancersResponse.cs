@@ -4,6 +4,6 @@ namespace AusDdrApi.Endpoints.DancerEndpoints
 {
     public class GetDancersResponse
     {
-        public IList<DancerRecord> Dancers { get; set; }
+        public IList<DancerRecord> Dancers { get; set; } = default!;
     }
 }

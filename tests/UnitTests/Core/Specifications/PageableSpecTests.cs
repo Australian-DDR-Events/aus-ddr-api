@@ -7,7 +7,7 @@ using Xunit;
 
 namespace UnitTests.Core.Specifications
 {
-    public class DancersSpecTests
+    public class PageableSpecTests
     {
         [Fact(DisplayName = "If no data is skipped and limit equals number of entries, return full list")]
         public void ReturnFullListIfNoSkipAndEqualLimit()
@@ -18,7 +18,7 @@ namespace UnitTests.Core.Specifications
 
             var items = new List<Dancer> {dancer1, dancer2, dancer3};
 
-            var spec = new DancersSpec(0, 3);
+            var spec = new PageableSpec<Dancer>(0, 3);
 
             var discoveredDancers = spec.Evaluate(items);
             
@@ -34,7 +34,7 @@ namespace UnitTests.Core.Specifications
 
             var items = new List<Dancer> {dancer1, dancer2, dancer3};
 
-            var spec = new DancersSpec(0, 2);
+            var spec = new PageableSpec<Dancer>(0, 2);
 
             var discoveredDancers = spec.Evaluate(items);
             
@@ -50,7 +50,7 @@ namespace UnitTests.Core.Specifications
 
             var items = new List<Dancer> {dancer1, dancer2, dancer3};
 
-            var spec = new DancersSpec(1, 2);
+            var spec = new PageableSpec<Dancer>(1, 2);
 
             var discoveredDancers = spec.Evaluate(items);
             
@@ -66,7 +66,7 @@ namespace UnitTests.Core.Specifications
 
             var items = new List<Dancer> {dancer1, dancer2, dancer3};
 
-            var spec = new DancersSpec(1, 5);
+            var spec = new PageableSpec<Dancer>(1, 5);
 
             var discoveredDancers = spec.Evaluate(items);
             
@@ -82,7 +82,7 @@ namespace UnitTests.Core.Specifications
 
             var items = new List<Dancer> {dancer1, dancer2, dancer3};
 
-            var spec = new DancersSpec(5, 5);
+            var spec = new PageableSpec<Dancer>(5, 5);
 
             var discoveredDancers = spec.Evaluate(items);
             

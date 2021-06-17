@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
+using Application.Core.Interfaces;
 
 namespace Application.Core.Entities
 {
-    public class Badge : BaseEntity
+    public class Badge : BaseEntity, IAggregateRoot
     {
         public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;

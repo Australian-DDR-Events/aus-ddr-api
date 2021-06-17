@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Application.Core.Entities;
-using Application.Core.Specifications;
+using Application.Core.Specifications.DancerSpecs;
 using Xunit;
 
-namespace UnitTests.Core.Specifications
+namespace UnitTests.Core.Specifications.DancerSpecs
 {
     public class DancerByIdSpecTests
     {

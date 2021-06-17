@@ -2,7 +2,7 @@ using System;
 using Application.Core.Entities;
 using Ardalis.Specification;
 
-namespace Application.Core.Specifications
+namespace Application.Core.Specifications.DancerSpecs
 {
     public class DancerByIdSpec : Specification<Dancer>, ISingleResultSpecification
     {

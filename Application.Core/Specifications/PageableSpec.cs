@@ -1,11 +1,12 @@
 using Application.Core.Entities;
+using Application.Core.Interfaces;
 using Ardalis.Specification;
 
 namespace Application.Core.Specifications
 {
-    public class DancersSpec : Specification<Dancer>
+    public class PageableSpec<T> : Specification<T> where T : BaseEntity, IAggregateRoot
     {
-        public DancersSpec(int skip, int limit)
+        public PageableSpec(int skip, int limit)
         {
             Query
                 .OrderBy(d => d.Id)

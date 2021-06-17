@@ -21,9 +21,9 @@ namespace AusDdrApi.Endpoints.DancerEndpoints
         
         [HttpGet(GetDancersRequest.Route)]
         [SwaggerOperation(
-            Summary = "Gets a single Dancer",
-            Description = "Gets a single Dancer by Id",
-            OperationId = "Dancers.GetById",
+            Summary = "Gets a collection of dancers",
+            Description = "Gets a number of dancers by paging",
+            OperationId = "Dancers.List",
             Tags = new[] { "Dancers" })
         ]
         public override async Task<ActionResult<GetDancersResponse>> HandleAsync([FromQuery] GetDancersRequest request, CancellationToken cancellationToken = new CancellationToken())
@@ -34,7 +34,7 @@ namespace AusDdrApi.Endpoints.DancerEndpoints
 
         public override GetDancersResponse Convert(IList<Dancer> u)
         {
-            return new GetDancersResponse()
+            return new()
             {
                 Dancers = u.Select(d => new DancerRecord(d.Id, d.DdrName)).ToList()
             };

@@ -2,15 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Application.Core.Entities;
-using Application.Core.Specifications.DancerSpecs;
+using Application.Core.Specifications;
 using Xunit;
 
-namespace UnitTests.Core.Specifications.DancerSpecs
+namespace UnitTests.Core.Specifications
 {
-    public class DancerByIdSpecTests
+    public class ByIdSpecTests
     {
-        [Fact(DisplayName = "If data source contains dancer id, then return the dancer")]
-        public void ReturnDancerIfFound()
+        [Fact(DisplayName = "If data source contains id, then return the entity")]
+        public void ReturnEntityIfFound()
         {
             var searchId = Guid.NewGuid();
             
@@ -20,7 +20,7 @@ namespace UnitTests.Core.Specifications.DancerSpecs
 
             var items = new List<Dancer> {dancer1, dancer2, dancer3};
 
-            var spec = new DancerByIdSpec(searchId);
+            var spec = new ByIdSpec<Dancer>(searchId);
 
             var discoveredDancer = items
                 .Where(spec.WhereExpressions.First().Compile())
@@ -30,7 +30,7 @@ namespace UnitTests.Core.Specifications.DancerSpecs
             Assert.Equal(dancer1.Id, discoveredDancer.Id);
         }
 
-        [Fact(DisplayName = "If data source does not contain dancer id, then return null")]
+        [Fact(DisplayName = "If data source does not contain id, then return null")]
         public void ReturnDancerIfNotFound()
         {
             var dancer1 = new Dancer { Id = Guid.NewGuid() };
@@ -38,7 +38,7 @@ namespace UnitTests.Core.Specifications.DancerSpecs
 
             var items = new List<Dancer> {dancer1, dancer2};
 
-            var spec = new DancerByIdSpec(Guid.NewGuid());
+            var spec = new ByIdSpec<Dancer>(Guid.NewGuid());
 
             var discoveredDancer = items
                 .Where(spec.WhereExpressions.First().Compile())

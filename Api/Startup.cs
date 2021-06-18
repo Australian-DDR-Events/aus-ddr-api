@@ -94,6 +94,12 @@ namespace AusDdrApi
                 endpoints.MapControllers();
             });
 
+            if (env.IsEnvironment("Local"))
+            {
+                using var serviceScope =
+                    app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope();
+                serviceScope.ServiceProvider.GetRequiredService<EFDatabaseContext>().Database.Migrate();
+            }
         }
     }
 }

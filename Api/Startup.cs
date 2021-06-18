@@ -30,7 +30,7 @@ namespace AusDdrApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddPooledDbContextFactory<EFDatabaseContext>(
-                options => options.UseNpgsql(Configuration.GetConnectionString("DatabaseContext")));
+                options => options.UseNpgsql(Configuration.GetConnectionString("DatabaseContext")).LogTo(Console.WriteLine));
             services.AddScoped(
                 sp => sp.GetRequiredService<IDbContextFactory<EFDatabaseContext>>().CreateDbContext());
             

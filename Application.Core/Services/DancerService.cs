@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Application.Core.Entities;
 using Application.Core.Interfaces;
+using Application.Core.Interfaces.Services;
 using Application.Core.Specifications;
 using Ardalis.Result;
 

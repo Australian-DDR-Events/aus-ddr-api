@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Application.Core.Entities;
 using Ardalis.Result;
 
-namespace Application.Core.Interfaces
+namespace Application.Core.Interfaces.Services
 {
     public interface IDancerService
     {

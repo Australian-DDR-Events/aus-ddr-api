@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Core.Entities;
-using Application.Core.Interfaces;
 using Application.Core.Interfaces.Services;
 using AusDdrApi.Extensions;
 using Microsoft.AspNetCore.Mvc;
@@ -37,7 +36,9 @@ namespace AusDdrApi.Endpoints.DancerEndpoints
         {
             return new()
             {
-                Dancers = u.Select(d => new DancerRecord(d.Id, d.DdrName)).ToList()
+                Dancers = u.Select(d => new DancerRecord(
+                    d.Id, d.DdrName, d.DdrCode, d.PrimaryMachineLocation, d.State, $"/profile/picture/{d.Id}.png?time={d.ProfilePictureTimestamp?.Ticks}"
+                    )).ToList()
             };
         }
     }

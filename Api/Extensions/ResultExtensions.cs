@@ -13,7 +13,7 @@ namespace AusDdrApi.Extensions
             return result.Status switch
             {
                 ResultStatus.Ok => controller.Ok(controller.Convert(result)),
-                ResultStatus.Error => controller.Problem(result.Errors.ToString()),
+                ResultStatus.Error => controller.Problem(string.Join(",", result.Errors)),
                 ResultStatus.Forbidden => controller.Forbid(),
                 ResultStatus.Invalid => controller.BadRequest(result.ValidationErrors.ToModelStateDictionary(controller)),
                 ResultStatus.NotFound => controller.NotFound(),
@@ -27,7 +27,7 @@ namespace AusDdrApi.Extensions
             return result.Status switch
             {
                 ResultStatus.Ok => controller.Ok(controller.Convert(result)),
-                ResultStatus.Error => controller.Problem(result.Errors.ToString()),
+                ResultStatus.Error => controller.Problem(string.Join(",", result.Errors)),
                 ResultStatus.Forbidden => controller.Forbid(),
                 ResultStatus.Invalid => controller.BadRequest(result.ValidationErrors.ToModelStateDictionary(controller)),
                 ResultStatus.NotFound => controller.NotFound(),
@@ -41,7 +41,7 @@ namespace AusDdrApi.Extensions
             return result.Status switch
             {
                 ResultStatus.Ok => controller.Ok(),
-                ResultStatus.Error => controller.Problem(result.Errors.ToString()),
+                ResultStatus.Error => controller.Problem(string.Join(",", result.Errors)),
                 ResultStatus.Forbidden => controller.Forbid(),
                 ResultStatus.Invalid => controller.BadRequest(result.ValidationErrors.ToModelStateDictionary(controller)),
                 ResultStatus.NotFound => controller.NotFound(),
@@ -55,7 +55,7 @@ namespace AusDdrApi.Extensions
             return result.Status switch
             {
                 ResultStatus.Ok => controller.Ok(),
-                ResultStatus.Error => controller.Problem(result.Errors.ToString()),
+                ResultStatus.Error => controller.Problem(string.Join(",", result.Errors)),
                 ResultStatus.Forbidden => controller.Forbid(),
                 ResultStatus.Invalid => controller.BadRequest(result.ValidationErrors.ToModelStateDictionary(controller)),
                 ResultStatus.NotFound => controller.NotFound(),

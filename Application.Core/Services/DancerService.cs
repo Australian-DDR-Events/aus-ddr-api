@@ -6,6 +6,7 @@ using Application.Core.Entities;
 using Application.Core.Interfaces;
 using Application.Core.Interfaces.Services;
 using Application.Core.Specifications;
+using Application.Core.Specifications.DancerSpecs;
 using Ardalis.Result;
 
 namespace Application.Core.Services
@@ -18,7 +19,30 @@ namespace Application.Core.Services
         {
             _repository = repository;
         }
-        
+
+        public async Task<Result<bool>> AddNewDancerAsync(Guid id, string name, string code, string authenticationId, string primaryMachineLocation, string state, CancellationToken cancellationToken)
+        {
+            await _repository.AddAsync(new Dancer
+            {
+                Id = id,
+                DdrName = name,
+                DdrCode = code,
+                AuthenticationId = authenticationId,
+                PrimaryMachineLocation = primaryMachineLocation,
+                State = state
+            }, cancellationToken);
+            await _repository.SaveChangesAsync();
+
+            return true;
+        }
+
+        public async Task<Result<Dancer>> GetDancerByAuthIdAsync(string authId, CancellationToken cancellationToken)
+        {
+            var dancerSpec = new ByAuthIdSpec<Dancer>(authId);
+            var dancer = await _repository.GetBySpecAsync(dancerSpec, cancellationToken);
+            return dancer == null ? Result<Dancer>.NotFound() : Result<Dancer>.Success(dancer);
+        }
+
         public async Task<Result<Dancer>> GetDancerByIdAsync(Guid id, CancellationToken cancellationToken)
         {
             var dancerSpec = new ByIdSpec<Dancer>(id);

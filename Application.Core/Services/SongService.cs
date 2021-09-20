@@ -9,11 +9,11 @@ using Ardalis.Result;
 
 namespace Application.Core.Services
 {
-    public class SongService : ISongService
+    public class SongService : CommonService<Song>, ISongService
     {
         private readonly IAsyncRepository<Song> _repository;
 
-        public SongService(IAsyncRepository<Song> repository)
+        public SongService(IAsyncRepository<Song> repository) : base(repository)
         {
             _repository = repository;
         }

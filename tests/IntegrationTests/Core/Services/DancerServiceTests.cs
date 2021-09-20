@@ -42,7 +42,7 @@ namespace IntegrationTests.Core.Services
             _fixture._context.Dancers.Add(dancer);
             await _fixture._context.SaveChangesAsync();
 
-            var dancerFromDatabase = await _dancerService.GetDancerByIdAsync(dancerGuid, CancellationToken.None);
+            var dancerFromDatabase = await _dancerService.GetByIdAsync(dancerGuid, CancellationToken.None);
             
             Assert.True(dancerFromDatabase.IsSuccess);
             Assert.Equal(dancerFromDatabase.Value.Id, dancer.Id);
@@ -59,7 +59,7 @@ namespace IntegrationTests.Core.Services
             await _fixture._context.Dancers.AddAsync(dancer);
             await _fixture._context.SaveChangesAsync();
 
-            var dancerFromDatabase = await _dancerService.GetDancerByIdAsync(invalidGuid, CancellationToken.None);
+            var dancerFromDatabase = await _dancerService.GetByIdAsync(invalidGuid, CancellationToken.None);
             
             Assert.Equal(ResultStatus.NotFound, dancerFromDatabase.Status);
         }

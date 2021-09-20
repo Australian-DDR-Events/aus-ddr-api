@@ -26,7 +26,7 @@ namespace AusDdrApi.Endpoints.DancerEndpoints
         ]
         public override async Task<ActionResult<GetDancerByIdResponse>> HandleAsync([FromRoute] [FromQuery] GetDancerByIdRequest request, CancellationToken cancellationToken = new())
         {
-            var dancerResult = await _dancerService.GetDancerByIdAsync(request.Id, cancellationToken);
+            var dancerResult = await _dancerService.GetByIdAsync(request.Id, cancellationToken);
             return this.ConvertToActionResult(dancerResult);
         }
         

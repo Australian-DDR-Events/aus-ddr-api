@@ -30,23 +30,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Compile Remove="GraphQL\**" />
-      <Compile Remove="Migrations\**" />
       <Compile Remove="Helpers\PopulateDatabase.cs" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <EmbeddedResource Remove="GraphQL\**" />
-      <EmbeddedResource Remove="Migrations\**" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <None Remove="GraphQL\**" />
-      <None Remove="Migrations\**" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Content Remove="GraphQL\**" />
-      <Content Remove="Migrations\**" />
     </ItemGroup>
 </Project>

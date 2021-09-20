@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Core.Entities;
-using Application.Core.Interfaces;
 using Application.Core.Interfaces.Services;
 using AusDdrApi.Extensions;
 using Microsoft.AspNetCore.Mvc;

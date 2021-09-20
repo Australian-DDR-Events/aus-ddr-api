@@ -5,7 +5,9 @@ using Amazon.S3;
 using Application.Core.Interfaces;
 using AusDdrApi.Context;
 using AusDdrApi.Services.FileStorage;
+using Infrastructure.Cache;
 using Infrastructure.Data;
+using Infrastructure.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -17,6 +19,8 @@ namespace Infrastructure
             this IServiceCollection services, IConfiguration configuration)
         {
             return services
+                .AddSingleton<ICache, InMemoryCache>()
+                .AddIdentity(configuration)
                 .AddScoped(typeof(IAsyncRepository<>), typeof(GenericEfRepository<>))
                 .AddFileStorage(configuration);
         }
@@ -50,5 +54,20 @@ namespace Infrastructure
 
             return services;
         }
+
+        private static IServiceCollection AddIdentity(this IServiceCollection services, IConfiguration configuration)
+        {
+            if (configuration["AuthScheme"].Equals("local", StringComparison.InvariantCulture))
+            {
+                return services.AddSingleton(typeof(IIdentity<string>), typeof(LocalIdentity));
+            }
+            var oauth2IdentityConfig = new OAuth2IdentityConfig();
+            configuration.GetSection("oauth2identity")
+                .Bind(oauth2IdentityConfig, c => c.BindNonPublicProperties = true);
+            return services
+                .AddSingleton(oauth2IdentityConfig)
+                .AddSingleton(typeof(IIdentity<string>), typeof(OAuth2Identity));
+        }
+        
     }
 }

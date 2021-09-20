@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using Application.Core;
+using AusDdrApi.Attributes;
 using AusDdrApi.Authentication;
 using AusDdrApi.Extensions;
 using AusDdrApi.Middleware;
@@ -39,6 +41,38 @@ namespace AusDdrApi
             services.AddSwaggerGen(c => {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Australian DDR Events API", Version = "v1" });
                 c.EnableAnnotations();
+
+                var scheme = Configuration["AuthScheme"] == "local" ? "Basic" : "Bearer";
+                
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Description = @"JWT Authorization header using the Bearer scheme. \r\n\r\n 
+                      Enter 'Bearer' [space] and then your token in the text input below.
+                      \r\n\r\nExample: 'Bearer 12345abcdef'",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = scheme
+                });
+                
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement()
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = scheme
+                            },
+                            Scheme = "oauth2",
+                            Name = scheme,
+                            In = ParameterLocation.Header,
+
+                        },
+                        new List<string>()
+                    }
+                });
             });
             
             services.AddJwtAuthentication(Configuration);

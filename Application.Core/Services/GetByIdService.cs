@@ -14,7 +14,7 @@ namespace Application.Core.Services
         private readonly IAsyncRepository<T> _repository;
 
         public CommonService(IAsyncRepository<T> repository)
-        {
+         {
             _repository = repository;
         }
 

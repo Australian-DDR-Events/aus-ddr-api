@@ -4,46 +4,32 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Core.Entities;
-using Application.Core.Interfaces;
 using Application.Core.Models.Dancer;
 using Application.Core.Services;
 using Ardalis.Result;
-using Infrastructure.Data;
 using Xunit;
 
-namespace IntegrationTests.Core.Services
+namespace UnitTests.Core.Services
 {
-    [Collection("Postgres database collection")]
     public class DancerServiceTests
     {
-        private readonly PostgresDatabaseFixture _fixture;
-        private readonly IAsyncRepository<Dancer> _dancerRepository;
-        private readonly DancerService _dancerService;
-
-        public DancerServiceTests(PostgresDatabaseFixture fixture)
-        {
-            _fixture = fixture;
-
-            _dancerRepository = new GenericEfRepository<Dancer>(_fixture._context);
-            _dancerService = new DancerService(_dancerRepository);
-            
-            Setup.DropAllRows(_fixture._context);
-        }
-
         #region GetDancerByIdAsync Tests
         
         [Fact(DisplayName = "If data source contains dancer id, then return the dancer")]
         public async Task GetDancerByIdAsync_ReturnDancerIfFound()
         {
+            var repository = InMemoryDatabaseRepository<Dancer>.CreateRepository();
+            var service = new DancerService(repository);
+            
             var dancerGuid = Guid.NewGuid();
             var dancer = new Dancer()
             {
                 Id = dancerGuid
             };
-            _fixture._context.Dancers.Add(dancer);
-            await _fixture._context.SaveChangesAsync();
+            await repository.AddAsync(dancer);
+            await repository.SaveChangesAsync();
 
-            var dancerFromDatabase = await _dancerService.GetByIdAsync(dancerGuid, CancellationToken.None);
+            var dancerFromDatabase = await service.GetByIdAsync(dancerGuid, CancellationToken.None);
             
             Assert.True(dancerFromDatabase.IsSuccess);
             Assert.Equal(dancerFromDatabase.Value.Id, dancer.Id);
@@ -52,15 +38,18 @@ namespace IntegrationTests.Core.Services
         [Fact(DisplayName = "If data source does not contain dancer id, then return not found result")]
         public async Task GetDancerByIdAsync_ReturnNotFoundIfNotExist()
         {
+            var repository = InMemoryDatabaseRepository<Dancer>.CreateRepository();
+            var service = new DancerService(repository);
+            
             var invalidGuid = Guid.NewGuid();
             var dancer = new Dancer()
             {
                 Id = Guid.NewGuid()
             };
-            await _fixture._context.Dancers.AddAsync(dancer);
-            await _fixture._context.SaveChangesAsync();
+            await repository.AddAsync(dancer);
+            await repository.SaveChangesAsync();
 
-            var dancerFromDatabase = await _dancerService.GetByIdAsync(invalidGuid, CancellationToken.None);
+            var dancerFromDatabase = await service.GetByIdAsync(invalidGuid, CancellationToken.None);
             
             Assert.Equal(ResultStatus.NotFound, dancerFromDatabase.Status);
         }
@@ -72,6 +61,9 @@ namespace IntegrationTests.Core.Services
         [Fact(DisplayName = "If data source contains at least the number of dancers, return list of number of dancers")]
         public async Task GetDancersAsync_ReturnNumberOfDancersEqualToTake()
         {
+            var repository = InMemoryDatabaseRepository<Dancer>.CreateRepository();
+            var service = new DancerService(repository);
+            
             var dancers = new List<Dancer>
             {
                 new()
@@ -90,10 +82,10 @@ namespace IntegrationTests.Core.Services
                     AuthenticationId = Guid.NewGuid().ToString()
                 }
             };
-            await _fixture._context.Dancers.AddRangeAsync(dancers);
-            await _fixture._context.SaveChangesAsync();
+            Task.WaitAll(dancers.Select(d => repository.AddAsync(d)).ToArray());
+            await repository.SaveChangesAsync();
 
-            var dancersFromDatabase = await _dancerService.GetDancersAsync(0, 2, CancellationToken.None);
+            var dancersFromDatabase = await service.GetDancersAsync(0, 2, CancellationToken.None);
             
             Assert.True(dancersFromDatabase.IsSuccess);
             Assert.Equal(dancers.OrderBy(d => d.Id).Take(2), dancersFromDatabase.Value);
@@ -102,6 +94,9 @@ namespace IntegrationTests.Core.Services
         [Fact(DisplayName = "If data requested is out of range, return empty list")]
         public async Task GetDancersAsync_ReturnEmptyListWhenOutOfRange()
         {
+            var repository = InMemoryDatabaseRepository<Dancer>.CreateRepository();
+            var service = new DancerService(repository);
+            
             var dancers = new List<Dancer>
             {
                 new()
@@ -120,13 +115,15 @@ namespace IntegrationTests.Core.Services
                     AuthenticationId = Guid.NewGuid().ToString()
                 }
             };
-            await _fixture._context.Dancers.AddRangeAsync(dancers);
-            await _fixture._context.SaveChangesAsync();
+            
+            Task.WaitAll(dancers.Select(d => repository.AddAsync(d)).ToArray());
+            await repository.SaveChangesAsync();
 
-            var dancersFromDatabase = await _dancerService.GetDancersAsync(3, 2, CancellationToken.None);
+            var dancersFromDatabase = await service.GetDancersAsync(3, 2, CancellationToken.None);
             
             Assert.True(dancersFromDatabase.IsSuccess);
             Assert.Empty(dancersFromDatabase.Value);
+            
         }
         
         #endregion
@@ -136,6 +133,9 @@ namespace IntegrationTests.Core.Services
         [Fact(DisplayName = "If database does not contain auth id, create new entry")]
         public async Task InsertDancerByUpdateWhenDancerDoesNotExist()
         {
+            var repository = InMemoryDatabaseRepository<Dancer>.CreateRepository();
+            var service = new DancerService(repository);
+            
             var request = new UpdateDancerRequestModel
             {
                 AuthId = "my-auth-id",
@@ -145,8 +145,8 @@ namespace IntegrationTests.Core.Services
                 State = "vic"
             };
 
-            var newDancer = await _dancerService.UpdateDancerAsync(request, CancellationToken.None);
-            var expectedDancer = await _fixture._context.Dancers.FindAsync(newDancer.Value.Id);
+            var newDancer = await service.UpdateDancerAsync(request, CancellationToken.None);
+            var expectedDancer = await repository.GetByIdAsync(newDancer.Value.Id);
 
             Assert.NotNull(expectedDancer);
         }
@@ -154,12 +154,16 @@ namespace IntegrationTests.Core.Services
         [Fact(DisplayName = "If id matches auth id, update existing entry")]
         public async Task UpdateDancerByAuthId()
         {
+            var repository = InMemoryDatabaseRepository<Dancer>.CreateRepository();
+            var service = new DancerService(repository);
+            
             var dancer = new Dancer()
             {
                 AuthenticationId = "sample-123",
                 DdrName = "Bob"
             };
-            await _fixture._context.Dancers.AddAsync(dancer);
+            await repository.AddAsync(dancer);
+            await repository.SaveChangesAsync();
 
             var request = new UpdateDancerRequestModel()
             {
@@ -168,7 +172,7 @@ namespace IntegrationTests.Core.Services
                 State = "vic"
             };
             
-            var updatedDancer = await _dancerService.UpdateDancerAsync(request, CancellationToken.None);
+            var updatedDancer = await service.UpdateDancerAsync(request, CancellationToken.None);
             
             Assert.Equal("sample-123", updatedDancer.Value.AuthenticationId);
             Assert.Equal("Bill", updatedDancer.Value.DdrName);
@@ -178,12 +182,16 @@ namespace IntegrationTests.Core.Services
         [Fact(DisplayName = "If id matches legacy id, update existing entry")]
         public async Task UpdateDancerByLegacyId()
         {
+            var repository = InMemoryDatabaseRepository<Dancer>.CreateRepository();
+            var service = new DancerService(repository);
+            
             var dancer = new Dancer()
             {
                 AuthenticationId = "sample-123",
                 DdrName = "Bob"
             };
-            await _fixture._context.Dancers.AddAsync(dancer);
+            await repository.AddAsync(dancer);
+            await repository.SaveChangesAsync();
 
             var request = new UpdateDancerRequestModel()
             {
@@ -192,7 +200,7 @@ namespace IntegrationTests.Core.Services
                 DdrName = "Bob"
             };
             
-            var updatedDancer = await _dancerService.UpdateDancerAsync(request, CancellationToken.None);
+            var updatedDancer = await service.UpdateDancerAsync(request, CancellationToken.None);
             
             Assert.Equal("new-id", updatedDancer.Value.AuthenticationId);
         }

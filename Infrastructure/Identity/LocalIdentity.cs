@@ -1,5 +1,7 @@
 using System;
+using System.Threading.Tasks;
 using Application.Core.Interfaces;
+using Application.Core.Models;
 
 namespace Infrastructure.Identity
 {
@@ -8,6 +10,11 @@ namespace Infrastructure.Identity
         public bool IsAdmin(string source)
         {
             return source.Equals("admin", StringComparison.OrdinalIgnoreCase);
+        }
+
+        public Task<UserInfo> GetUserInfo(string source)
+        {
+            throw new NotImplementedException();
         }
     }
 }

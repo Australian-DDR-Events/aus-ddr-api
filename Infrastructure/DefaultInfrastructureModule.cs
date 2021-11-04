@@ -64,6 +64,7 @@ namespace Infrastructure
             var oauth2IdentityConfig = new OAuth2IdentityConfig();
             configuration.GetSection("oauth2identity")
                 .Bind(oauth2IdentityConfig, c => c.BindNonPublicProperties = true);
+            services.AddHttpClient<IIdentity<string>, OAuth2Identity>();
             return services
                 .AddSingleton(oauth2IdentityConfig)
                 .AddSingleton(typeof(IIdentity<string>), typeof(OAuth2Identity));

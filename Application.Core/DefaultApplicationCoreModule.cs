@@ -12,7 +12,8 @@ namespace Application.Core
         {
             return services
                 .AddScoped<IDancerService, DancerService>()
-                .AddScoped<IBadgeService, BadgeService>();
+                .AddScoped<IBadgeService, BadgeService>()
+                .AddScoped<ISongService, SongService>();
         }
     }
 }

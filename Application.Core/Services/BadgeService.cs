@@ -25,5 +25,11 @@ namespace Application.Core.Services
             var badges = await _repository.ListAsync(badgesSpec, cancellationToken);
             return Result<IList<Badge>>.Success(badges);
         }
+
+        public async Task<Result<Badge>> CreateBadgeAsync(Badge newBadge, CancellationToken cancellationToken)
+        {
+            var badge = await _repository.AddAsync(newBadge, cancellationToken);
+            return Result<Badge>.Success(badge);
+        }
     }
 }

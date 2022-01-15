@@ -24,5 +24,11 @@ namespace Application.Core.Services
             var songs = await _repository.ListAsync(songsSpec, cancellationToken);
             return Result<IList<Song>>.Success(songs);
         }
+
+        public async Task<Result<Song>> CreateSongAsync(Song song, CancellationToken cancellationToken)
+        {
+            var created = await _repository.AddAsync(song, cancellationToken);
+            return Result<Song>.Success(created);
+        }
     }
 }

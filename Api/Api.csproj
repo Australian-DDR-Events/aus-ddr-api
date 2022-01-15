@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
-        <TargetFramework>net5.0</TargetFramework>
+        <TargetFramework>net6.0</TargetFramework>
         <RootNamespace>AusDdrApi</RootNamespace>
         <UserSecretsId>6241a2f4-a414-44e2-a381-d8572551026a</UserSecretsId>
         <Nullable>enable</Nullable>
@@ -31,5 +31,64 @@
 
     <ItemGroup>
       <Compile Remove="Helpers\PopulateDatabase.cs" />
+      <Compile Update="Endpoints\EventEndpoints\CreateEventRequest.cs">
+        <DependentUpon>Create.Create.cs</DependentUpon>
+      </Compile>
+      <Compile Remove="Endpoints\EventEndpoints\**" />
+      <Compile Update="Endpoints\BadgeEndpoints\Create.CreateBadgeResponse.cs">
+        <DependentUpon>Create.cs</DependentUpon>
+      </Compile>
+      <Compile Update="Endpoints\BadgeEndpoints\Create.CreateCreateBadgeRequest.cs">
+        <DependentUpon>Create.cs</DependentUpon>
+      </Compile>
+      <Compile Update="Endpoints\BadgeEndpoints\List.GetBadgesRequest.cs">
+        <DependentUpon>List.cs</DependentUpon>
+      </Compile>
+      <Compile Update="Endpoints\BadgeEndpoints\List.GetBadgesResponse.cs">
+        <DependentUpon>List.cs</DependentUpon>
+      </Compile>
+      <Compile Update="Endpoints\SongEndpoints\Create.CreateSongRequest.cs">
+        <DependentUpon>Create.cs</DependentUpon>
+      </Compile>
+      <Compile Update="Endpoints\SongEndpoints\Create.CreateSongResponse.cs">
+        <DependentUpon>Create.cs</DependentUpon>
+      </Compile>
+      <Compile Update="Endpoints\SongEndpoints\List.GetAllSongsRequest.cs">
+        <DependentUpon>List.cs</DependentUpon>
+      </Compile>
+      <Compile Update="Endpoints\SongEndpoints\List.GetAllSongsResponse.cs">
+        <DependentUpon>List.cs</DependentUpon>
+      </Compile>
+      <Compile Update="Endpoints\DancerEndpoints\GetById.GetDancerByIdRequest.cs">
+        <DependentUpon>GetById.cs</DependentUpon>
+      </Compile>
+      <Compile Update="Endpoints\DancerEndpoints\GetById.GetDancerByIdResponse.cs">
+        <DependentUpon>GetById.cs</DependentUpon>
+      </Compile>
+      <Compile Update="Endpoints\DancerEndpoints\List.GetDancersRequest.cs">
+        <DependentUpon>List.cs</DependentUpon>
+      </Compile>
+      <Compile Update="Endpoints\DancerEndpoints\List.GetDancersResponse.cs">
+        <DependentUpon>List.cs</DependentUpon>
+      </Compile>
+      <Compile Update="Endpoints\DancerEndpoints\Update.UpdateDancerByAuthIdRequest.cs">
+        <DependentUpon>Update.cs</DependentUpon>
+      </Compile>
+      <Compile Update="Endpoints\DancerEndpoints\Update.UpdateDancerByAuthIdResponse.cs">
+        <DependentUpon>Update.cs</DependentUpon>
+      </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Remove="Endpoints\EventEndpoints\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="Endpoints\EventEndpoints\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Remove="Endpoints\EventEndpoints\**" />
+      <Content Remove="appsettings.Development.json" />
     </ItemGroup>
 </Project>

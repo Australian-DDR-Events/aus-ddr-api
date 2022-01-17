@@ -29,12 +29,33 @@ namespace Application.Core.Services
             return Result<IList<Dancer>>.Success(dancers);
         }
 
+        public async Task<Result<Dancer>> GetDancerByAuthId(string authId, CancellationToken cancellationToken)
+        {
+            var byAuthIdSpec = new ByAuthIdSpec(authId);
+            var dancer = await _repository.GetBySpecAsync(byAuthIdSpec, cancellationToken);
+            return dancer != null ? Result<Dancer>.Success(dancer) : Result<Dancer>.NotFound();
+        }
+
+        public async Task<Result<Dancer>> MigrateDancer(MigrateDancerRequestModel requestModel,
+            CancellationToken cancellationToken)
+        {
+            var dancer = await _repository.GetBySpecAsync(new ByAuthIdSpec(requestModel.AuthId), cancellationToken);
+            if (dancer != null) return Result<Dancer>.Success(dancer);
+            if (requestModel.LegacyId == null) return Result<Dancer>.NotFound();
+            
+            dancer = await _repository.GetBySpecAsync(new ByAuthIdSpec(requestModel.LegacyId), cancellationToken);
+            if (dancer == null) return Result<Dancer>.NotFound();
+
+            dancer.AuthenticationId = requestModel.AuthId;
+            await _repository.SaveChangesAsync(cancellationToken);
+
+            return Result<Dancer>.Success(dancer);
+        }
+
         public async Task<Result<Dancer>> UpdateDancerAsync(UpdateDancerRequestModel requestModel, CancellationToken cancellationToken)
         {
             var byAuthIdSpec = new ByAuthIdSpec(requestModel.AuthId);
-            var byLegacyAuthIdSpec = new ByAuthIdSpec(requestModel.LegacyAuthId);
             var dancer = await _repository.GetBySpecAsync(byAuthIdSpec, cancellationToken);
-            if (dancer == null && requestModel.LegacyAuthId != null) dancer = await _repository.GetBySpecAsync(byLegacyAuthIdSpec, cancellationToken);
             dancer ??= new Dancer();
 
             dancer = new Dancer

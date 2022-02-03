@@ -1,3 +1,4 @@
+using System;
 using AusDdrApi.Services.Authentication;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -20,6 +21,7 @@ namespace AusDdrApi.Authentication
             }
             else
             {
+                Console.WriteLine($"Enabling bearer auth for issuer {configuration["oauth2identity:Issuer"]} and userinfo from {configuration["oauth2identity:UserInfoEndpoint"]}");
                 services
                     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                     .AddJwtBearer(options =>

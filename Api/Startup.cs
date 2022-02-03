@@ -84,13 +84,15 @@ namespace AusDdrApi
                     {
                         builder.WithOrigins(
                                 "http://localhost:1234",
-                                "https://ausddrevents-e18b1--ausddrevents-staging-homst7uj.web.app",
-                                "https://ausddrevents-e18b1--ausddrevents-development-di3otvtf.web.app",
+                                "https://stg.ausddrevents.com",
                                 "https://ausddrevents.com")
-                            .WithHeaders(HeaderNames.Authorization);
+                            .WithHeaders(HeaderNames.Authorization)
+                            .AllowAnyMethod();
                     });
             });
 
+            Console.WriteLine(JsonConvert.SerializeObject(Configuration));
+            
             services.LoadDefaultApplicationCoreModule();
             services.LoadDefaultInfrastructureModule(Configuration);
 
@@ -128,12 +130,9 @@ namespace AusDdrApi
                 endpoints.MapControllers();
             });
 
-            if (env.IsEnvironment("Local"))
-            {
-                using var serviceScope =
-                    app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope();
-                serviceScope.ServiceProvider.GetRequiredService<EFDatabaseContext>().Database.Migrate();
-            }
+            using var serviceScope =
+                app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope();
+            serviceScope.ServiceProvider.GetRequiredService<EFDatabaseContext>().Database.Migrate();
         }
     }
 }

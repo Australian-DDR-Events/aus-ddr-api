@@ -49,7 +49,9 @@ jobs:
             PACKAGE=${CIRCLE_SHA1:0:12}
             scp package.tar.gz ec2-user@${API_HOST}:/home/ec2-user/${PACKAGE}.tar.gz
             ssh ec2-user@${API_HOST} "mkdir /home/ec2-user/${PACKAGE} && tar -zxvf /home/ec2-user/${PACKAGE}.tar.gz -C /home/ec2-user/${PACKAGE}"
-            ssh ec2-user@${API_HOST} "ln -s /home/ec2-user/${PACKAGE} /home/ec2-user/aus-ddr-api"
+            ssh ec2-user@${API_HOST} "ln -sfn /home/ec2-user/${PACKAGE} /home/ec2-user/aus-ddr-api"
+            ssh ec2-user@${API_HOST} "rm /home/ec2-user/${PACKAGE}.tar.gz"
+            ssh ec2-user@${API_HOST} "sudo systemctl restart ausddrapi"
 
 workflows:
   build_and_deploy:

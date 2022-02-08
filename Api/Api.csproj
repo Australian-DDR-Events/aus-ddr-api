@@ -78,6 +78,9 @@
       <Compile Update="Endpoints\DancerEndpoints\GetByToken.GetDancerByTokenResponse.cs">
         <DependentUpon>GetByToken.cs</DependentUpon>
       </Compile>
+      <Compile Update="Endpoints\DancerEndpoints\Create.CreateDancerByAuthIdRequest.cs">
+        <DependentUpon>Create.cs</DependentUpon>
+      </Compile>
     </ItemGroup>
 
     <ItemGroup>

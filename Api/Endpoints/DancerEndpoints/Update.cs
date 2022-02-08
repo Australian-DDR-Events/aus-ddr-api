@@ -1,7 +1,6 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Core.Entities;
 using Application.Core.Interfaces;
 using Application.Core.Interfaces.Services;
 using Application.Core.Models.Dancer;
@@ -23,7 +22,7 @@ namespace AusDdrApi.Endpoints.DancerEndpoints
             _identity = identity;
         }
         
-        [HttpPost(UpdateDancerByAuthIdRequest.Route)]
+        [HttpPut(UpdateDancerByAuthIdRequest.Route)]
         [SwaggerOperation(
             Summary = "Updates a dancer by AuthId",
             Description = "Attempts to update a given dancer using both the auth id, or the legacy auth id",

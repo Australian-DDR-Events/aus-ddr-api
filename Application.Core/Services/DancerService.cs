@@ -52,15 +52,18 @@ namespace Application.Core.Services
             return Result<Dancer>.Success(dancer);
         }
 
-        public async Task<Result<Dancer>> UpdateDancerAsync(UpdateDancerRequestModel requestModel, CancellationToken cancellationToken)
+        public async Task<Result<Dancer>> CreateDancerAsync(CreateDancerRequestModel requestModel,
+            CancellationToken cancellationToken)
         {
             var byAuthIdSpec = new ByAuthIdSpec(requestModel.AuthId);
             var dancer = await _repository.GetBySpecAsync(byAuthIdSpec, cancellationToken);
-            dancer ??= new Dancer();
+            if (dancer != null)
+            {
+                return Result<Dancer>.Error("Dancer already exists");
+            }
 
             dancer = new Dancer
             {
-                Id = dancer.Id,
                 AuthenticationId = requestModel.AuthId,
                 DdrCode = requestModel.DdrCode,
                 DdrName = requestModel.DdrName,
@@ -68,10 +71,24 @@ namespace Application.Core.Services
                 PrimaryMachineLocation = requestModel.PrimaryMachineLocation
             };
 
-            if (dancer.Id == Guid.Empty)
+            dancer = await _repository.AddAsync(dancer, cancellationToken);
+            await _repository.SaveChangesAsync(cancellationToken);
+            return Result<Dancer>.Success(dancer);
+        }
+
+        public async Task<Result<Dancer>> UpdateDancerAsync(UpdateDancerRequestModel requestModel, CancellationToken cancellationToken)
+        {
+            var byAuthIdSpec = new ByAuthIdSpec(requestModel.AuthId);
+            var dancer = await _repository.GetBySpecAsync(byAuthIdSpec, cancellationToken);
+            if (dancer == null)
             {
-                await _repository.AddAsync(dancer, cancellationToken);
+                return Result<Dancer>.NotFound();
             }
+
+            dancer.State = requestModel.State;
+            dancer.DdrCode = requestModel.DdrCode;
+            dancer.DdrName = requestModel.DdrName;
+            dancer.PrimaryMachineLocation = requestModel.PrimaryMachineLocation;
 
             await _repository.SaveChangesAsync(cancellationToken);
             return Result<Dancer>.Success(dancer);

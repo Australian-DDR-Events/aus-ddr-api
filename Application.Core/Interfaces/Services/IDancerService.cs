@@ -15,6 +15,9 @@ namespace Application.Core.Interfaces.Services
 
         Task<Result<Dancer>> GetDancerByAuthId(string authId, CancellationToken cancellationToken);
 
+        Task<Result<Dancer>> CreateDancerAsync(CreateDancerRequestModel requestModel,
+            CancellationToken cancellationToken);
+
         /// <summary>
         /// Given an auth id and legacy auth id, updates the database
         /// with the auth id given the legacy auth id is currently

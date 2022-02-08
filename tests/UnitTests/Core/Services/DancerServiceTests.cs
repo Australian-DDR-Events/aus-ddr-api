@@ -196,7 +196,6 @@ namespace UnitTests.Core.Services
             var request = new UpdateDancerRequestModel()
             {
                 AuthId = "new-id",
-                LegacyAuthId = "sample-123",
                 DdrName = "Bob"
             };
             

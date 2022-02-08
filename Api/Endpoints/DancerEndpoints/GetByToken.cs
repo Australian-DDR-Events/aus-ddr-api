@@ -35,5 +35,5 @@ public class GetByToken : EndpointWithResponse<GetDancerByTokenResponse, Dancer>
         return this.ConvertToActionResult(dancerResult);
     }
 
-    public override GetDancerByTokenResponse Convert(Dancer u) => new() {Id = u.Id, Name = u.DdrName};
+    public override GetDancerByTokenResponse Convert(Dancer u) => new() {Id = u.Id, Name = u.DdrName, Code = u.DdrCode, State = u.State, PrimaryLocation = u.PrimaryMachineLocation};
 }

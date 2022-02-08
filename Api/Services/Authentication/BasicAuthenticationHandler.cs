@@ -44,7 +44,6 @@ namespace AusDdrApi.Services.Authentication
                 rand.NextBytes(guid);
                 claims.Add(new Claim("sub", new Guid(guid).ToString()));
                 claims.Add(new Claim("name", username));
-                
             }
             catch
             {

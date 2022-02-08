@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Application.Core.Entities;
 using Application.Core.Interfaces;
 using Application.Core.Interfaces.Services;
+using Application.Core.Models.Dancer;
 using AusDdrApi.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -11,7 +12,7 @@ using Swashbuckle.AspNetCore.Annotations;
 
 namespace AusDdrApi.Endpoints.DancerEndpoints
 {
-    public class Update : EndpointWithResponse<UpdateDancerByAuthIdRequest, UpdateDancerByAuthIdResponse, Dancer>
+    public class Update : EndpointWithoutResponse<UpdateDancerByAuthIdRequest>
     {
         private readonly IDancerService _dancerService;
         private readonly IIdentity<string> _identity;
@@ -30,14 +31,21 @@ namespace AusDdrApi.Endpoints.DancerEndpoints
             Tags = new[] { "Dancers" })
         ]
         [Authorize]
-        public override async Task<ActionResult<UpdateDancerByAuthIdResponse>> HandleAsync([FromBody] UpdateDancerByAuthIdRequest request, CancellationToken cancellationToken = new())
+        public override async Task<ActionResult> HandleAsync([FromBody] UpdateDancerByAuthIdRequest request, CancellationToken cancellationToken = new())
         {
-            var a = await _identity.GetUserInfo(HttpContext.Request.Headers["authorization"].First().Split(" ")[1]);
-            //var dancerResult = await _dancerService.GetByIdAsync(request.Id, cancellationToken);
-            //return this.ConvertToActionResult(dancerResult);
-            return Accepted();
+            var userInfo = await _identity.GetUserInfo(HttpContext.Request.Headers["authorization"].First().Split(" ")[1]);
+
+            var requestModel = new UpdateDancerRequestModel
+            {
+                AuthId = userInfo.UserId,
+                DdrCode = request.DdrCode,
+                DdrName = request.DdrName,
+                PrimaryMachineLocation = request.PrimaryMachineLocation,
+                State = request.State
+            };
+
+            var dancerResult = await _dancerService.UpdateDancerAsync(requestModel, cancellationToken);
+            return this.ConvertToActionResult(dancerResult, Accepted());
         }
-        
-        public override UpdateDancerByAuthIdResponse Convert(Dancer u) => new() {Id = u.Id, Name = u.DdrName};
     }
 }

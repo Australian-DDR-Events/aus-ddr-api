@@ -49,6 +49,20 @@ namespace AusDdrApi.Extensions
             };
         }
         
+        public static ActionResult ConvertToActionResult<TRequest>(
+            this EndpointWithoutResponse<TRequest> controller, IResult result, ObjectResult okStatus) 
+        {
+            return result.Status switch
+            {
+                ResultStatus.Ok => okStatus,
+                ResultStatus.Error => controller.Problem(string.Join(",", result.Errors)),
+                ResultStatus.Forbidden => controller.Forbid(),
+                ResultStatus.Invalid => controller.BadRequest(result.ValidationErrors.ToModelStateDictionary(controller)),
+                ResultStatus.NotFound => controller.NotFound(),
+                _ => controller.Problem("unhandled")
+            };
+        }
+        
         public static ActionResult ConvertToActionResult(
             this EndpointWithoutResponse controller, IResult result)
         {

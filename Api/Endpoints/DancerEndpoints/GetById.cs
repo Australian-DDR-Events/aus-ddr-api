@@ -30,6 +30,6 @@ namespace AusDdrApi.Endpoints.DancerEndpoints
             return this.ConvertToActionResult(dancerResult);
         }
         
-        public override GetDancerByIdResponse Convert(Dancer u) => new() {Id = u.Id, Name = u.DdrName};
+        public override GetDancerByIdResponse Convert(Dancer u) => new() {Id = u.Id, Name = u.DdrName, Code = u.DdrCode, State = u.State, PrimaryLocation = u.PrimaryMachineLocation};
     }
 }

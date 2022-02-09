@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Application.Core.Entities;
 using Application.Core.Interfaces.Services;
+using AusDdrApi.Attributes;
 using AusDdrApi.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -27,6 +28,7 @@ namespace AusDdrApi.Endpoints.BadgeEndpoints
             Tags = new[] { "Song" })
         ]
         [Authorize]
+        [Admin]
         public override async Task<ActionResult<CreateBadgeResponse>> HandleAsync(CreateBadgeRequest request, CancellationToken cancellationToken = new CancellationToken())
         {
             var entity = new Badge

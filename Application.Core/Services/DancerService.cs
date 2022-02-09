@@ -93,5 +93,17 @@ namespace Application.Core.Services
             await _repository.SaveChangesAsync(cancellationToken);
             return Result<Dancer>.Success(dancer);
         }
+
+        public async Task<Result<ICollection<Badge>>> GetDancerBadgesAsync(Guid id,
+            CancellationToken cancellationToken)
+        {
+            var dancerBadgesSpec = new DancerBadgesSpec(id);
+            var dancer = await _repository.GetBySpecAsync(dancerBadgesSpec, cancellationToken);
+            if (dancer == null)
+            {
+                return Result<ICollection<Badge>>.NotFound();
+            }
+            return Result<ICollection<Badge>>.Success(dancer.Badges);
+        }
     }
 }

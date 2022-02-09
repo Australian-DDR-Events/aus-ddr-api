@@ -4,55 +4,77 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Core.Entities;
+using Application.Core.Interfaces;
+using Application.Core.Interfaces.Services;
 using Application.Core.Models.Dancer;
 using Application.Core.Services;
+using Application.Core.Specifications;
 using Ardalis.Result;
+using Ardalis.Specification;
+using Moq;
 using Xunit;
 
 namespace UnitTests.Core.Services
 {
     public class DancerServiceTests
     {
-        #region GetDancerByIdAsync Tests
+        private readonly Mock<IAsyncRepository<Dancer>> _repository;
+        private readonly IDancerService _dancerService;
         
-        [Fact(DisplayName = "If data source contains dancer id, then return the dancer")]
-        public async Task GetDancerByIdAsync_ReturnDancerIfFound()
+        public DancerServiceTests()
         {
-            var repository = InMemoryDatabaseRepository<Dancer>.CreateRepository();
-            var service = new DancerService(repository);
-            
-            var dancerGuid = Guid.NewGuid();
-            var dancer = new Dancer()
-            {
-                Id = dancerGuid
-            };
-            await repository.AddAsync(dancer);
-            await repository.SaveChangesAsync();
+            _repository = new Mock<IAsyncRepository<Dancer>>();
+            _dancerService = new DancerService(_repository.Object);
+        }
+        
+        #region GetDancerByIdAsync Tests
 
-            var dancerFromDatabase = await service.GetByIdAsync(dancerGuid, CancellationToken.None);
+        [Fact(DisplayName = "When GetDancerById, if dancer exists in source, then return Success with Dancer")]
+        public async Task GetDancerByIdAsync_DancerFound()
+        {
+            var id = new Guid();
+            var expectedSpec = new ByIdSpec<Dancer>(id);
+
+            var repositoryDancer = new Dancer
+            {
+                Id = id,
+                DdrName = "Name",
+                DdrCode = "Code",
+                AuthenticationId = "auth",
+                PrimaryMachineLocation = "Home",
+                State = "vic"
+            };
+
+            _repository.Setup(r =>
+                    r.GetBySpecAsync(
+                        It.Is<ByIdSpec<Dancer>>(s => s.ToString().Equals(expectedSpec.ToString())),
+                        It.IsAny<CancellationToken>()))
+                .ReturnsAsync(repositoryDancer);
+
+            var result = await _dancerService.GetByIdAsync(id, CancellationToken.None);
             
-            Assert.True(dancerFromDatabase.IsSuccess);
-            Assert.Equal(dancerFromDatabase.Value.Id, dancer.Id);
+            Assert.True(result.IsSuccess);
+            Assert.Equal(repositoryDancer, result.Value);
         }
 
-        [Fact(DisplayName = "If data source does not contain dancer id, then return not found result")]
-        public async Task GetDancerByIdAsync_ReturnNotFoundIfNotExist()
+        [Fact(DisplayName = "When GetDancerById, if dancer not found in source, then return NotFound result")]
+        public async Task GetDancerByIdAsync_DancerNotFound()
         {
-            var repository = InMemoryDatabaseRepository<Dancer>.CreateRepository();
-            var service = new DancerService(repository);
-            
-            var invalidGuid = Guid.NewGuid();
-            var dancer = new Dancer()
-            {
-                Id = Guid.NewGuid()
-            };
-            await repository.AddAsync(dancer);
-            await repository.SaveChangesAsync();
+            var id = new Guid();
+            var expectedSpec = new ByIdSpec<Dancer>(id);
 
-            var dancerFromDatabase = await service.GetByIdAsync(invalidGuid, CancellationToken.None);
+            _repository.Setup(r =>
+                    r.GetBySpecAsync(
+                        It.Is<ByIdSpec<Dancer>>(s => s.ToString().Equals(expectedSpec.ToString())),
+                        It.IsAny<CancellationToken>()))
+                .ReturnsAsync((Dancer) null);
+
+            var result = await _dancerService.GetByIdAsync(id, CancellationToken.None);
             
-            Assert.Equal(ResultStatus.NotFound, dancerFromDatabase.Status);
+            Assert.False(result.IsSuccess);
+            Assert.Equal(ResultStatus.NotFound, result.Status);
         }
+
         
         #endregion
         

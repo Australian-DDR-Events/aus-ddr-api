@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -28,6 +29,9 @@ namespace Application.Core.Interfaces.Services
         /// <returns></returns>
         Task<Result<Dancer>> MigrateDancer(MigrateDancerRequestModel requestModel, CancellationToken cancellationToken);
 
-        Task<Result<Dancer>> UpdateDancerAsync(UpdateDancerRequestModel requestModel, CancellationToken cancellationToken);
+        Task<Result<Dancer>> UpdateDancerAsync(UpdateDancerRequestModel requestModel,
+            CancellationToken cancellationToken);
+            
+        Task<Result<ICollection<Badge>>> GetDancerBadgesAsync(Guid id, CancellationToken cancellationToken);
     }
 }

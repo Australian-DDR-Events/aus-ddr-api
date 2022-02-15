@@ -87,6 +87,9 @@
       <Compile Update="Endpoints\DancerEndpoints\Badges.List.GetDancerBadgesByIdResponse.cs">
         <DependentUpon>Badges.List.cs</DependentUpon>
       </Compile>
+      <Compile Update="Endpoints\DancerEndpoints\Badges.Set.AddBadgeToDancerByIdRequest.cs">
+        <DependentUpon>Badges.Set.cs</DependentUpon>
+      </Compile>
     </ItemGroup>
 
     <ItemGroup>

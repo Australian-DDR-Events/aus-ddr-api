@@ -18,13 +18,15 @@ namespace UnitTests.Core.Services
 {
     public class DancerServiceTests
     {
-        private readonly Mock<IAsyncRepository<Dancer>> _repository;
+        private readonly Mock<IAsyncRepository<Dancer>> _dancerRepository;
+        private readonly Mock<IAsyncRepository<Badge>> _badgeRepository;
         private readonly IDancerService _dancerService;
         
         public DancerServiceTests()
         {
-            _repository = new Mock<IAsyncRepository<Dancer>>();
-            _dancerService = new DancerService(_repository.Object);
+            _dancerRepository = new Mock<IAsyncRepository<Dancer>>();
+            _badgeRepository = new Mock<IAsyncRepository<Badge>>();
+            _dancerService = new DancerService(_dancerRepository.Object, _badgeRepository.Object);
         }
         
         #region GetDancerByIdAsync Tests
@@ -32,7 +34,7 @@ namespace UnitTests.Core.Services
         [Fact(DisplayName = "When GetDancerById, if dancer exists in source, then return Success with Dancer")]
         public async Task GetDancerByIdAsync_DancerFound()
         {
-            var id = new Guid();
+            var id = Guid.NewGuid();
             var expectedSpec = new ByIdSpec<Dancer>(id);
 
             var repositoryDancer = new Dancer
@@ -45,7 +47,7 @@ namespace UnitTests.Core.Services
                 State = "vic"
             };
 
-            _repository.Setup(r =>
+            _dancerRepository.Setup(r =>
                     r.GetBySpecAsync(
                         It.Is<ByIdSpec<Dancer>>(s => s.ToString().Equals(expectedSpec.ToString())),
                         It.IsAny<CancellationToken>()))
@@ -60,10 +62,10 @@ namespace UnitTests.Core.Services
         [Fact(DisplayName = "When GetDancerById, if dancer not found in source, then return NotFound result")]
         public async Task GetDancerByIdAsync_DancerNotFound()
         {
-            var id = new Guid();
+            var id = Guid.NewGuid();
             var expectedSpec = new ByIdSpec<Dancer>(id);
 
-            _repository.Setup(r =>
+            _dancerRepository.Setup(r =>
                     r.GetBySpecAsync(
                         It.Is<ByIdSpec<Dancer>>(s => s.ToString().Equals(expectedSpec.ToString())),
                         It.IsAny<CancellationToken>()))
@@ -83,8 +85,9 @@ namespace UnitTests.Core.Services
         [Fact(DisplayName = "If data source contains at least the number of dancers, return list of number of dancers")]
         public async Task GetDancersAsync_ReturnNumberOfDancersEqualToTake()
         {
-            var repository = InMemoryDatabaseRepository<Dancer>.CreateRepository();
-            var service = new DancerService(repository);
+            var dancerRepository = InMemoryDatabaseRepository<Dancer>.CreateRepository();
+            var badgeRepository = InMemoryDatabaseRepository<Badge>.CreateRepository();
+            var service = new DancerService(dancerRepository, badgeRepository);
             
             var dancers = new List<Dancer>
             {
@@ -104,8 +107,8 @@ namespace UnitTests.Core.Services
                     AuthenticationId = Guid.NewGuid().ToString()
                 }
             };
-            Task.WaitAll(dancers.Select(d => repository.AddAsync(d)).ToArray());
-            await repository.SaveChangesAsync();
+            Task.WaitAll(dancers.Select(d => dancerRepository.AddAsync(d)).ToArray());
+            await dancerRepository.SaveChangesAsync();
 
             var dancersFromDatabase = await service.GetDancersAsync(0, 2, CancellationToken.None);
             
@@ -116,8 +119,9 @@ namespace UnitTests.Core.Services
         [Fact(DisplayName = "If data requested is out of range, return empty list")]
         public async Task GetDancersAsync_ReturnEmptyListWhenOutOfRange()
         {
-            var repository = InMemoryDatabaseRepository<Dancer>.CreateRepository();
-            var service = new DancerService(repository);
+            var dancerRepository = InMemoryDatabaseRepository<Dancer>.CreateRepository();
+            var badgeRepository = InMemoryDatabaseRepository<Badge>.CreateRepository();
+            var service = new DancerService(dancerRepository, badgeRepository);
             
             var dancers = new List<Dancer>
             {
@@ -138,8 +142,8 @@ namespace UnitTests.Core.Services
                 }
             };
             
-            Task.WaitAll(dancers.Select(d => repository.AddAsync(d)).ToArray());
-            await repository.SaveChangesAsync();
+            Task.WaitAll(dancers.Select(d => dancerRepository.AddAsync(d)).ToArray());
+            await dancerRepository.SaveChangesAsync();
 
             var dancersFromDatabase = await service.GetDancersAsync(3, 2, CancellationToken.None);
             
@@ -155,8 +159,9 @@ namespace UnitTests.Core.Services
         [Fact(DisplayName = "If database does not contain auth id, create new entry")]
         public async Task InsertDancerByUpdateWhenDancerDoesNotExist()
         {
-            var repository = InMemoryDatabaseRepository<Dancer>.CreateRepository();
-            var service = new DancerService(repository);
+            var dancerRepository = InMemoryDatabaseRepository<Dancer>.CreateRepository();
+            var badgeRepository = InMemoryDatabaseRepository<Badge>.CreateRepository();
+            var service = new DancerService(dancerRepository, badgeRepository);
             
             var request = new UpdateDancerRequestModel
             {
@@ -168,7 +173,7 @@ namespace UnitTests.Core.Services
             };
 
             var newDancer = await service.UpdateDancerAsync(request, CancellationToken.None);
-            var expectedDancer = await repository.GetByIdAsync(newDancer.Value.Id);
+            var expectedDancer = await dancerRepository.GetByIdAsync(newDancer.Value.Id);
 
             Assert.NotNull(expectedDancer);
         }
@@ -176,16 +181,17 @@ namespace UnitTests.Core.Services
         [Fact(DisplayName = "If id matches auth id, update existing entry")]
         public async Task UpdateDancerByAuthId()
         {
-            var repository = InMemoryDatabaseRepository<Dancer>.CreateRepository();
-            var service = new DancerService(repository);
+            var dancerRepository = InMemoryDatabaseRepository<Dancer>.CreateRepository();
+            var badgeRepository = InMemoryDatabaseRepository<Badge>.CreateRepository();
+            var service = new DancerService(dancerRepository, badgeRepository);
             
             var dancer = new Dancer()
             {
                 AuthenticationId = "sample-123",
                 DdrName = "Bob"
             };
-            await repository.AddAsync(dancer);
-            await repository.SaveChangesAsync();
+            await dancerRepository.AddAsync(dancer);
+            await dancerRepository.SaveChangesAsync();
 
             var request = new UpdateDancerRequestModel()
             {
@@ -204,16 +210,17 @@ namespace UnitTests.Core.Services
         [Fact(DisplayName = "If id matches legacy id, update existing entry")]
         public async Task UpdateDancerByLegacyId()
         {
-            var repository = InMemoryDatabaseRepository<Dancer>.CreateRepository();
-            var service = new DancerService(repository);
+            var dancerRepository = InMemoryDatabaseRepository<Dancer>.CreateRepository();
+            var badgeRepository = InMemoryDatabaseRepository<Badge>.CreateRepository();
+            var service = new DancerService(dancerRepository, badgeRepository);
             
             var dancer = new Dancer()
             {
                 AuthenticationId = "sample-123",
                 DdrName = "Bob"
             };
-            await repository.AddAsync(dancer);
-            await repository.SaveChangesAsync();
+            await dancerRepository.AddAsync(dancer);
+            await dancerRepository.SaveChangesAsync();
 
             var request = new UpdateDancerRequestModel()
             {
@@ -224,6 +231,111 @@ namespace UnitTests.Core.Services
             var updatedDancer = await service.UpdateDancerAsync(request, CancellationToken.None);
             
             Assert.Equal("new-id", updatedDancer.Value.AuthenticationId);
+        }
+
+        #endregion
+
+        #region AddBadgeToDancer Tests
+
+        [Fact(DisplayName = "When AddBadgeToDancer, if dancer and badge exists in source, then return success")]
+        public async Task AddBadgeToDancer_Created()
+        {
+            var badgeId = Guid.NewGuid();
+            var dancerId = Guid.NewGuid();
+
+            var repositoryDancer = new Dancer
+            {
+                Id = dancerId,
+                Badges = new List<Badge>()
+            };
+            var repositoryBadge = new Badge
+            {
+                Id = badgeId
+            };
+
+            _dancerRepository.Setup(r =>
+                    r.GetByIdAsync(
+                        It.IsAny<Guid>(),
+                        It.IsAny<CancellationToken>()))
+                .ReturnsAsync(repositoryDancer);
+
+            _badgeRepository.Setup(r =>
+                    r.GetByIdAsync(
+                        It.IsAny<Guid>(),
+                        It.IsAny<CancellationToken>()))
+                .ReturnsAsync(repositoryBadge);
+
+            var result = await _dancerService.AddBadgeToDancer(dancerId, badgeId, CancellationToken.None);
+            
+            _dancerRepository.Verify(repository => repository.GetByIdAsync(dancerId, It.IsAny<CancellationToken>()), Times.Once);
+            _badgeRepository.Verify(repository => repository.GetByIdAsync(badgeId, It.IsAny<CancellationToken>()), Times.Once);
+            
+            Assert.True(result.IsSuccess);
+        }
+
+        [Fact(DisplayName = "When AddBadgeToDancer, if dancer not found, then return not found")]
+        public async Task AddBadgeToDancer_NoDancerFound_NotFound()
+        {
+            var badgeId = Guid.NewGuid();
+            var dancerId = Guid.NewGuid();
+
+            var repositoryBadge = new Badge
+            {
+                Id = badgeId
+            };
+
+            _dancerRepository.Setup(r =>
+                    r.GetByIdAsync(
+                        It.IsAny<Guid>(),
+                        It.IsAny<CancellationToken>()))
+                .ReturnsAsync((Dancer) null);
+
+            _badgeRepository.Setup(r =>
+                    r.GetByIdAsync(
+                        It.IsAny<Guid>(),
+                        It.IsAny<CancellationToken>()))
+                .ReturnsAsync(repositoryBadge);
+
+            var result = await _dancerService.AddBadgeToDancer(dancerId, badgeId, CancellationToken.None);
+            
+            Assert.False(result.IsSuccess);
+            Assert.Equal(ResultStatus.NotFound, result.Status);
+            
+            _dancerRepository.Verify(repository => repository.GetByIdAsync(dancerId, It.IsAny<CancellationToken>()), Times.Once);
+            _badgeRepository.Verify(repository => repository.GetByIdAsync(badgeId, It.IsAny<CancellationToken>()), Times.Once);
+        }
+
+        [Fact(DisplayName = "When AddBadgeToDancer, if badge not found, then return not found")]
+        public async Task AddBadgeToDancer_NoBadgeFound_NotFound()
+        {
+            var badgeId = Guid.NewGuid();
+            var dancerId = Guid.NewGuid();
+
+            var repositoryDancer = new Dancer
+            {
+                Id = dancerId,
+                Badges = new List<Badge>()
+            };
+
+            _dancerRepository.Setup(r =>
+                    r.GetByIdAsync(
+                        It.IsAny<Guid>(),
+                        It.IsAny<CancellationToken>()))
+                .ReturnsAsync(repositoryDancer);
+
+            _badgeRepository.Setup(r =>
+                    r.GetByIdAsync(
+                        It.IsAny<Guid>(),
+                        It.IsAny<CancellationToken>()))
+                .ReturnsAsync((Badge) null);
+
+            var result = await _dancerService.AddBadgeToDancer(dancerId, badgeId, CancellationToken.None);
+            
+            Assert.False(result.IsSuccess);
+            Assert.Equal(ResultStatus.NotFound, result.Status);
+            
+            _dancerRepository.Verify(repository => repository.GetByIdAsync(dancerId, It.IsAny<CancellationToken>()), Times.Once);
+            _badgeRepository.Verify(repository => repository.GetByIdAsync(badgeId, It.IsAny<CancellationToken>()), Times.Once);
         }
 
         #endregion

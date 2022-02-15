@@ -15,10 +15,12 @@ namespace Application.Core.Services
     public class DancerService : CommonService<Dancer>, IDancerService
     {
         private readonly IAsyncRepository<Dancer> _repository;
+        private readonly IAsyncRepository<Badge> _badgeRepository;
 
-        public DancerService(IAsyncRepository<Dancer> repository) : base(repository)
+        public DancerService(IAsyncRepository<Dancer> repository, IAsyncRepository<Badge> badgeRepository) : base(repository)
         {
             _repository = repository;
+            _badgeRepository = badgeRepository;
         }
 
         public async Task<Result<IList<Dancer>>> GetDancersAsync(int page, int limit, CancellationToken cancellationToken)
@@ -104,6 +106,20 @@ namespace Application.Core.Services
                 return Result<ICollection<Badge>>.NotFound();
             }
             return Result<ICollection<Badge>>.Success(dancer.Badges);
+        }
+
+        public async Task<Result<bool>> AddBadgeToDancer(Guid dancerId, Guid badgeId, CancellationToken cancellationToken)
+        {
+            var dancer = await _repository.GetByIdAsync(dancerId, cancellationToken);
+            var badge = await _badgeRepository.GetByIdAsync(badgeId, cancellationToken);
+            if (dancer == null || badge == null)
+            {
+                return Result<bool>.NotFound();
+            }
+
+            dancer.Badges.Add(badge);
+            await _repository.SaveChangesAsync(cancellationToken);
+            return Result<bool>.Success(true);
         }
     }
 }

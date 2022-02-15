@@ -17,6 +17,7 @@ namespace IntegrationTests.Core.Services
     public class DancerServiceTests
     {
         private readonly PostgresDatabaseFixture _fixture;
+        private readonly IAsyncRepository<Badge> _badgeRepository;
         private readonly IAsyncRepository<Dancer> _dancerRepository;
         private readonly DancerService _dancerService;
 
@@ -24,8 +25,9 @@ namespace IntegrationTests.Core.Services
         {
             _fixture = fixture;
 
+            _badgeRepository = new GenericEfRepository<Badge>(_fixture._context);
             _dancerRepository = new GenericEfRepository<Dancer>(_fixture._context);
-            _dancerService = new DancerService(_dancerRepository);
+            _dancerService = new DancerService(_dancerRepository, _badgeRepository);
             
             Setup.DropAllRows(_fixture._context);
         }

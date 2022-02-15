@@ -1,9 +1,4 @@
-using System.Collections.Generic;
+using System;
 
-namespace AusDdrApi.Endpoints.BadgeEndpoints
-{
-    public class GetBadgesResponse
-    {
-        public IList<BadgeRecord> Badges { get; set; } = default!;
-    }
-}
+namespace AusDdrApi.Endpoints.BadgeEndpoints;
+public record GetBadgesResponse(Guid id, string name);

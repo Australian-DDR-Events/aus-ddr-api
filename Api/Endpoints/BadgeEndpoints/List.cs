@@ -10,7 +10,7 @@ using Swashbuckle.AspNetCore.Annotations;
 
 namespace AusDdrApi.Endpoints.BadgeEndpoints
 {
-    public class List : EndpointWithResponse<GetBadgesRequest, GetBadgesResponse, IList<Badge>>
+    public class List : EndpointWithResponse<GetBadgesRequest, IEnumerable<GetBadgesResponse>, IList<Badge>>
     {
         private readonly IBadgeService _badgeService;
 
@@ -26,18 +26,15 @@ namespace AusDdrApi.Endpoints.BadgeEndpoints
             OperationId = "Badges.List",
             Tags = new[] { "Badges" })
         ]
-        public override async Task<ActionResult<GetBadgesResponse>> HandleAsync(GetBadgesRequest request, CancellationToken cancellationToken = new CancellationToken())
+        public override async Task<ActionResult<IEnumerable<GetBadgesResponse>>> HandleAsync([FromQuery] GetBadgesRequest request, CancellationToken cancellationToken = new CancellationToken())
         {
             var badgesResult = await _badgeService.GetBadgesAsync(request.Page.GetValueOrDefault(0), request.Limit.GetValueOrDefault(20), cancellationToken);
             return this.ConvertToActionResult(badgesResult);
         }
 
-        public override GetBadgesResponse Convert(IList<Badge> u)
+        public override IEnumerable<GetBadgesResponse> Convert(IList<Badge> u)
         {
-            return new()
-            {
-                Badges = u.Select(b => new BadgeRecord(b.Id, b.Name, "temp")).ToList()
-            };
+            return u.Select(b => new GetBadgesResponse(b.Id, b.Name));
         }
     }
 }

@@ -110,7 +110,8 @@ namespace Application.Core.Services
 
         public async Task<Result<bool>> AddBadgeToDancer(Guid dancerId, Guid badgeId, CancellationToken cancellationToken)
         {
-            var dancer = await _repository.GetByIdAsync(dancerId, cancellationToken);
+            var dancerBadgesSpec = new DancerBadgesSpec(dancerId);
+            var dancer = await _repository.GetBySpecAsync(dancerBadgesSpec, cancellationToken);
             var badge = await _badgeRepository.GetByIdAsync(badgeId, cancellationToken);
             if (dancer == null || badge == null)
             {

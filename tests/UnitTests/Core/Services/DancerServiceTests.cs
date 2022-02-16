@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Core.Entities;
@@ -9,21 +10,25 @@ using Application.Core.Interfaces.Services;
 using Application.Core.Models.Dancer;
 using Application.Core.Services;
 using Application.Core.Specifications;
+using Application.Core.Specifications.DancerSpecs;
 using Ardalis.Result;
 using Ardalis.Specification;
 using Moq;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace UnitTests.Core.Services
 {
     public class DancerServiceTests
     {
+        private readonly ITestOutputHelper _testOutputHelper;
         private readonly Mock<IAsyncRepository<Dancer>> _dancerRepository;
         private readonly Mock<IAsyncRepository<Badge>> _badgeRepository;
         private readonly IDancerService _dancerService;
         
-        public DancerServiceTests()
+        public DancerServiceTests(ITestOutputHelper testOutputHelper)
         {
+            _testOutputHelper = testOutputHelper;
             _dancerRepository = new Mock<IAsyncRepository<Dancer>>();
             _badgeRepository = new Mock<IAsyncRepository<Badge>>();
             _dancerService = new DancerService(_dancerRepository.Object, _badgeRepository.Object);
@@ -254,8 +259,8 @@ namespace UnitTests.Core.Services
             };
 
             _dancerRepository.Setup(r =>
-                    r.GetByIdAsync(
-                        It.IsAny<Guid>(),
+                    r.GetBySpecAsync(
+                        It.IsAny<DancerBadgesSpec>(),
                         It.IsAny<CancellationToken>()))
                 .ReturnsAsync(repositoryDancer);
 
@@ -266,9 +271,9 @@ namespace UnitTests.Core.Services
                 .ReturnsAsync(repositoryBadge);
 
             var result = await _dancerService.AddBadgeToDancer(dancerId, badgeId, CancellationToken.None);
-            
-            _dancerRepository.Verify(repository => repository.GetByIdAsync(dancerId, It.IsAny<CancellationToken>()), Times.Once);
+
             _badgeRepository.Verify(repository => repository.GetByIdAsync(badgeId, It.IsAny<CancellationToken>()), Times.Once);
+            _dancerRepository.Verify(repository => repository.SaveChangesAsync(It.IsAny<CancellationToken>()),Times.Once);
             
             Assert.True(result.IsSuccess);
         }
@@ -285,8 +290,8 @@ namespace UnitTests.Core.Services
             };
 
             _dancerRepository.Setup(r =>
-                    r.GetByIdAsync(
-                        It.IsAny<Guid>(),
+                    r.GetBySpecAsync(
+                        It.IsAny<DancerBadgesSpec>(),
                         It.IsAny<CancellationToken>()))
                 .ReturnsAsync((Dancer) null);
 
@@ -300,8 +305,7 @@ namespace UnitTests.Core.Services
             
             Assert.False(result.IsSuccess);
             Assert.Equal(ResultStatus.NotFound, result.Status);
-            
-            _dancerRepository.Verify(repository => repository.GetByIdAsync(dancerId, It.IsAny<CancellationToken>()), Times.Once);
+
             _badgeRepository.Verify(repository => repository.GetByIdAsync(badgeId, It.IsAny<CancellationToken>()), Times.Once);
         }
 
@@ -318,8 +322,8 @@ namespace UnitTests.Core.Services
             };
 
             _dancerRepository.Setup(r =>
-                    r.GetByIdAsync(
-                        It.IsAny<Guid>(),
+                    r.GetBySpecAsync(
+                        It.IsAny<DancerBadgesSpec>(),
                         It.IsAny<CancellationToken>()))
                 .ReturnsAsync(repositoryDancer);
 
@@ -333,8 +337,7 @@ namespace UnitTests.Core.Services
             
             Assert.False(result.IsSuccess);
             Assert.Equal(ResultStatus.NotFound, result.Status);
-            
-            _dancerRepository.Verify(repository => repository.GetByIdAsync(dancerId, It.IsAny<CancellationToken>()), Times.Once);
+
             _badgeRepository.Verify(repository => repository.GetByIdAsync(badgeId, It.IsAny<CancellationToken>()), Times.Once);
         }
 

@@ -90,6 +90,9 @@
       <Compile Update="Endpoints\DancerEndpoints\Badges.Set.AddBadgeToDancerByIdRequest.cs">
         <DependentUpon>Badges.Set.cs</DependentUpon>
       </Compile>
+      <Compile Update="Endpoints\DancerEndpoints\Badges.Delete.RevokeBadgeFromDancerByIdRequest.cs">
+        <DependentUpon>Badges.Delete.cs</DependentUpon>
+      </Compile>
     </ItemGroup>
 
     <ItemGroup>

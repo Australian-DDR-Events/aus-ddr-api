@@ -342,5 +342,84 @@ namespace UnitTests.Core.Services
         }
 
         #endregion
+        
+        
+        #region RemoveBadgeFromDancer Tests
+
+        [Fact(DisplayName = "When RemoveBadgeFromDancer, if dancer and badge exists in source, and dancer has badge, then return success")]
+        public async Task RemoveBadgeFromDancer_Success()
+        {
+            var badgeId = Guid.NewGuid();
+            var dancerId = Guid.NewGuid();
+
+            var repositoryBadge = new Badge
+            {
+                Id = badgeId
+            };
+            var repositoryDancer = new Dancer
+            {
+                Id = dancerId,
+                Badges = new List<Badge>(){repositoryBadge}
+            };
+
+            _dancerRepository.Setup(r =>
+                    r.GetBySpecAsync(
+                        It.IsAny<DancerBadgesSpec>(),
+                        It.IsAny<CancellationToken>()))
+                .ReturnsAsync(repositoryDancer);
+
+            _badgeRepository.Setup(r =>
+                    r.GetByIdAsync(
+                        It.IsAny<Guid>(),
+                        It.IsAny<CancellationToken>()))
+                .ReturnsAsync(repositoryBadge);
+
+            var result = await _dancerService.RemoveBadgeFromDancer(dancerId, badgeId, CancellationToken.None);
+
+            _badgeRepository.Verify(repository => repository.GetByIdAsync(badgeId, It.IsAny<CancellationToken>()), Times.Once);
+            _dancerRepository.Verify(repository => repository.SaveChangesAsync(It.IsAny<CancellationToken>()),Times.Once);
+            
+            Assert.True(result.IsSuccess);
+            Assert.True(result.Value);
+        }
+
+        [Fact(DisplayName = "When RemoveBadgeFromDancer, if dancer and badge exists in source, and dancer does not have badge, then return success")]
+        public async Task RemoveBadgeFromDancer_Success_NoChange()
+        {
+            var badgeId = Guid.NewGuid();
+            var dancerId = Guid.NewGuid();
+
+            var repositoryBadge = new Badge
+            {
+                Id = badgeId
+            };
+            var repositoryDancer = new Dancer
+            {
+                Id = dancerId,
+                Badges = new List<Badge>()
+            };
+
+            _dancerRepository.Setup(r =>
+                    r.GetBySpecAsync(
+                        It.IsAny<DancerBadgesSpec>(),
+                        It.IsAny<CancellationToken>()))
+                .ReturnsAsync(repositoryDancer);
+
+            _badgeRepository.Setup(r =>
+                    r.GetByIdAsync(
+                        It.IsAny<Guid>(),
+                        It.IsAny<CancellationToken>()))
+                .ReturnsAsync(repositoryBadge);
+
+            var result = await _dancerService.RemoveBadgeFromDancer(dancerId, badgeId, CancellationToken.None);
+
+            _badgeRepository.Verify(repository => repository.GetByIdAsync(badgeId, It.IsAny<CancellationToken>()), Times.Once);
+            _dancerRepository.Verify(repository => repository.SaveChangesAsync(It.IsAny<CancellationToken>()),Times.Once);
+            
+            Assert.True(result.IsSuccess);
+            Assert.False(result.Value);
+        }
+        
+        #endregion
     }
 }

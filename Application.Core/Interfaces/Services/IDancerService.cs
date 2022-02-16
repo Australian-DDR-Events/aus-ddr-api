@@ -35,5 +35,6 @@ namespace Application.Core.Interfaces.Services
         Task<Result<ICollection<Badge>>> GetDancerBadgesAsync(Guid id, CancellationToken cancellationToken);
 
         Task<Result<bool>> AddBadgeToDancer(Guid dancerId, Guid badgeId, CancellationToken cancellationToken);
+        Task<Result<bool>> RemoveBadgeFromDancer(Guid dancerId, Guid badgeId, CancellationToken cancellationToken);
     }
 }

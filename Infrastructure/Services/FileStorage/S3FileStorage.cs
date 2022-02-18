@@ -24,20 +24,19 @@ namespace AusDdrApi.Services.FileStorage
         
         public async Task<string> UploadFileFromStream(Stream stream, string destination)
         {
+            stream.Position = 0;
             var uploadRequest = new TransferUtilityUploadRequest
             {
                 InputStream = stream,
                 Key = destination,
                 BucketName = _awsConfiguration.AssetsBucketName,
-                CannedACL = S3CannedACL.PublicRead,
+                CannedACL = S3CannedACL.Private,
             };
 
             var fileTransferUtility = new TransferUtility(_s3Client);
             await fileTransferUtility.UploadAsync(uploadRequest);
-            await stream.DisposeAsync();
 
-            return
-                $"https://{_awsConfiguration.AssetsBucketName}.s3-{_awsConfiguration.AssetsBucketLocation}.amazonaws.com/{destination}";
+            return "";
         }
 
         public async Task DeleteFile(string destination)

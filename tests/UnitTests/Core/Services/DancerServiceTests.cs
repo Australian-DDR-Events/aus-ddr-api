@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Core.Entities;
@@ -12,26 +11,24 @@ using Application.Core.Services;
 using Application.Core.Specifications;
 using Application.Core.Specifications.DancerSpecs;
 using Ardalis.Result;
-using Ardalis.Specification;
 using Moq;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace UnitTests.Core.Services
 {
     public class DancerServiceTests
     {
-        private readonly ITestOutputHelper _testOutputHelper;
         private readonly Mock<IAsyncRepository<Dancer>> _dancerRepository;
         private readonly Mock<IAsyncRepository<Badge>> _badgeRepository;
+        private readonly Mock<IFileStorage> _fileStorage;
         private readonly IDancerService _dancerService;
         
-        public DancerServiceTests(ITestOutputHelper testOutputHelper)
+        public DancerServiceTests()
         {
-            _testOutputHelper = testOutputHelper;
             _dancerRepository = new Mock<IAsyncRepository<Dancer>>();
             _badgeRepository = new Mock<IAsyncRepository<Badge>>();
-            _dancerService = new DancerService(_dancerRepository.Object, _badgeRepository.Object);
+            _fileStorage = new Mock<IFileStorage>();
+            _dancerService = new DancerService(_dancerRepository.Object, _badgeRepository.Object, _fileStorage.Object);
         }
         
         #region GetDancerByIdAsync Tests
@@ -92,7 +89,7 @@ namespace UnitTests.Core.Services
         {
             var dancerRepository = InMemoryDatabaseRepository<Dancer>.CreateRepository();
             var badgeRepository = InMemoryDatabaseRepository<Badge>.CreateRepository();
-            var service = new DancerService(dancerRepository, badgeRepository);
+            var service = new DancerService(dancerRepository, badgeRepository, _fileStorage.Object);
             
             var dancers = new List<Dancer>
             {
@@ -126,7 +123,7 @@ namespace UnitTests.Core.Services
         {
             var dancerRepository = InMemoryDatabaseRepository<Dancer>.CreateRepository();
             var badgeRepository = InMemoryDatabaseRepository<Badge>.CreateRepository();
-            var service = new DancerService(dancerRepository, badgeRepository);
+            var service = new DancerService(dancerRepository, badgeRepository, _fileStorage.Object);
             
             var dancers = new List<Dancer>
             {
@@ -166,7 +163,7 @@ namespace UnitTests.Core.Services
         {
             var dancerRepository = InMemoryDatabaseRepository<Dancer>.CreateRepository();
             var badgeRepository = InMemoryDatabaseRepository<Badge>.CreateRepository();
-            var service = new DancerService(dancerRepository, badgeRepository);
+            var service = new DancerService(dancerRepository, badgeRepository, _fileStorage.Object);
             
             var request = new UpdateDancerRequestModel
             {
@@ -188,7 +185,7 @@ namespace UnitTests.Core.Services
         {
             var dancerRepository = InMemoryDatabaseRepository<Dancer>.CreateRepository();
             var badgeRepository = InMemoryDatabaseRepository<Badge>.CreateRepository();
-            var service = new DancerService(dancerRepository, badgeRepository);
+            var service = new DancerService(dancerRepository, badgeRepository, _fileStorage.Object);
             
             var dancer = new Dancer()
             {
@@ -217,7 +214,7 @@ namespace UnitTests.Core.Services
         {
             var dancerRepository = InMemoryDatabaseRepository<Dancer>.CreateRepository();
             var badgeRepository = InMemoryDatabaseRepository<Badge>.CreateRepository();
-            var service = new DancerService(dancerRepository, badgeRepository);
+            var service = new DancerService(dancerRepository, badgeRepository, _fileStorage.Object);
             
             var dancer = new Dancer()
             {

@@ -8,6 +8,7 @@ using Application.Core.Interfaces;
 using Application.Core.Models.Dancer;
 using Application.Core.Services;
 using Ardalis.Result;
+using AusDdrApi.Services.FileStorage;
 using Infrastructure.Data;
 using Xunit;
 
@@ -19,6 +20,7 @@ namespace IntegrationTests.Core.Services
         private readonly PostgresDatabaseFixture _fixture;
         private readonly IAsyncRepository<Badge> _badgeRepository;
         private readonly IAsyncRepository<Dancer> _dancerRepository;
+        private readonly IFileStorage _fileStorage;
         private readonly DancerService _dancerService;
 
         public DancerServiceTests(PostgresDatabaseFixture fixture)
@@ -27,7 +29,8 @@ namespace IntegrationTests.Core.Services
 
             _badgeRepository = new GenericEfRepository<Badge>(_fixture._context);
             _dancerRepository = new GenericEfRepository<Dancer>(_fixture._context);
-            _dancerService = new DancerService(_dancerRepository, _badgeRepository);
+            _fileStorage = new LocalFileStorage("");
+            _dancerService = new DancerService(_dancerRepository, _badgeRepository, _fileStorage);
             
             Setup.DropAllRows(_fixture._context);
         }

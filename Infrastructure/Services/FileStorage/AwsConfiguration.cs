@@ -7,7 +7,6 @@ namespace AusDdrApi.Context
 
         public AwsConfiguration()
         {
-            AssetsBucketLocation = "";
             AssetsBucketName = "";
         }
     }

@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Core.Entities;
@@ -9,6 +11,8 @@ using Application.Core.Models.Dancer;
 using Application.Core.Specifications;
 using Application.Core.Specifications.DancerSpecs;
 using Ardalis.Result;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
 
 namespace Application.Core.Services
 {
@@ -16,11 +20,13 @@ namespace Application.Core.Services
     {
         private readonly IAsyncRepository<Dancer> _repository;
         private readonly IAsyncRepository<Badge> _badgeRepository;
+        private readonly IFileStorage _fileStorage;
 
-        public DancerService(IAsyncRepository<Dancer> repository, IAsyncRepository<Badge> badgeRepository) : base(repository)
+        public DancerService(IAsyncRepository<Dancer> repository, IAsyncRepository<Badge> badgeRepository, IFileStorage fileStorage) : base(repository)
         {
             _repository = repository;
             _badgeRepository = badgeRepository;
+            _fileStorage = fileStorage;
         }
 
         public async Task<Result<IList<Dancer>>> GetDancersAsync(int page, int limit, CancellationToken cancellationToken)
@@ -136,6 +142,29 @@ namespace Application.Core.Services
             var result = Result<bool>.Success(dancer.Badges.Remove(badge));
             await _repository.SaveChangesAsync(cancellationToken);
             return result;
+        }
+
+        public async Task<Result<bool>> SetAvatarForDancerByAuthId(string authId, Stream fileStream, CancellationToken cancellationToken)
+        {
+            var byAuthIdSpec = new ByAuthIdSpec(authId);
+            var dancer = await _repository.GetBySpecAsync(byAuthIdSpec, cancellationToken);
+            if (dancer == null)
+            {
+                return Result<bool>.NotFound();
+            }
+            var imageSizes = new List<int>() {128, 256};
+            var baseImage = await Image.LoadAsync(fileStream, cancellationToken);
+            
+            var uploadProcess = imageSizes.Select(async size =>
+            {
+                var copiedImage = baseImage.Clone(image => image.Resize(size, size));
+                using var stream = new MemoryStream();
+                await copiedImage.SaveAsPngAsync(stream, cancellationToken);
+                await _fileStorage.UploadFileFromStream(stream, $"profile/avatar/{dancer.Id}.{size}.png");
+            });
+
+            await Task.WhenAll(uploadProcess);
+            return Result<bool>.Success(true);
         }
     }
 }

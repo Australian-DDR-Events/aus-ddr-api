@@ -32,10 +32,6 @@
 
     <ItemGroup>
       <Compile Remove="Helpers\PopulateDatabase.cs" />
-      <Compile Update="Endpoints\EventEndpoints\CreateEventRequest.cs">
-        <DependentUpon>Create.Create.cs</DependentUpon>
-      </Compile>
-      <Compile Remove="Endpoints\EventEndpoints\**" />
       <Compile Update="Endpoints\BadgeEndpoints\Create.CreateBadgeResponse.cs">
         <DependentUpon>Create.cs</DependentUpon>
       </Compile>
@@ -54,10 +50,10 @@
       <Compile Update="Endpoints\SongEndpoints\Create.CreateSongResponse.cs">
         <DependentUpon>Create.cs</DependentUpon>
       </Compile>
-      <Compile Update="Endpoints\SongEndpoints\List.GetAllSongsRequest.cs">
+      <Compile Update="Endpoints\SongEndpoints\List.GetSongsRequest.cs">
         <DependentUpon>List.cs</DependentUpon>
       </Compile>
-      <Compile Update="Endpoints\SongEndpoints\List.GetAllSongsResponse.cs">
+      <Compile Update="Endpoints\SongEndpoints\List.GetSongsResponse.cs">
         <DependentUpon>List.cs</DependentUpon>
       </Compile>
       <Compile Update="Endpoints\DancerEndpoints\GetById.GetDancerByIdRequest.cs">
@@ -96,18 +92,15 @@
       <Compile Update="Endpoints\DancerEndpoints\Avatar.Set.SetAvatarForDancerByTokenRequest.cs">
         <DependentUpon>Avatar.Set.cs</DependentUpon>
       </Compile>
+      <Compile Update="Endpoints\EventEndpoints\List.ListEventRequest.cs">
+        <DependentUpon>List.cs</DependentUpon>
+      </Compile>
+      <Compile Update="Endpoints\EventEndpoints\List.ListEventResponse.cs">
+        <DependentUpon>List.cs</DependentUpon>
+      </Compile>
     </ItemGroup>
 
     <ItemGroup>
-      <EmbeddedResource Remove="Endpoints\EventEndpoints\**" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <None Remove="Endpoints\EventEndpoints\**" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Content Remove="Endpoints\EventEndpoints\**" />
       <Content Remove="appsettings.Development.json" />
     </ItemGroup>
 </Project>

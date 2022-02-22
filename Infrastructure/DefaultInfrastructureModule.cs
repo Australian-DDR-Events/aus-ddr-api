@@ -3,6 +3,7 @@ using Amazon;
 using Amazon.Runtime;
 using Amazon.S3;
 using Application.Core.Interfaces;
+using Application.Core.Interfaces.Repositories;
 using AusDdrApi.Context;
 using AusDdrApi.Services.FileStorage;
 using Infrastructure.Cache;
@@ -22,6 +23,7 @@ namespace Infrastructure
                 .AddSingleton<ICache, InMemoryCache>()
                 .AddIdentity(configuration)
                 .AddScoped(typeof(IAsyncRepository<>), typeof(GenericEfRepository<>))
+                .AddScoped<ISongRepository, SongRepository>()
                 .AddFileStorage(configuration);
         }
 

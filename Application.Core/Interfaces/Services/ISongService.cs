@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,5 +11,6 @@ namespace Application.Core.Interfaces.Services
     {
         Task<Result<IList<Song>>> GetSongsAsync(int page, int limit, CancellationToken cancellationToken);
         Task<Result<Song>> CreateSongAsync(Song song, CancellationToken cancellationToken);
+        Task<Result<Song>> GetSongWithTopScores(Guid songId, CancellationToken cancellationToken);
     }
 }

@@ -5,6 +5,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Application.Core.Entities;
 using Application.Core.Services;
+using Infrastructure.Data;
+using Moq;
 using Xunit;
 
 namespace UnitTests.Core.Services
@@ -18,7 +20,8 @@ namespace UnitTests.Core.Services
         public async Task GetSongsAsync_ReturnSongsWithDifficulties()
         {
             var repository = InMemoryDatabaseRepository<Song>.CreateRepository();
-            var service = new SongService(repository);
+            var songRepository = new Mock<SongRepository>();
+            var service = new SongService(repository, songRepository.Object);
             var song1 = new Song
             {
                 Id = Guid.NewGuid(),
@@ -62,7 +65,8 @@ namespace UnitTests.Core.Services
         public async Task GetSongsAsync_OnlyTakeSongsWithinPageSize()
         {
             var repository = InMemoryDatabaseRepository<Song>.CreateRepository();
-            var service = new SongService(repository);
+            var songRepository = new Mock<SongRepository>();
+            var service = new SongService(repository, songRepository.Object);
             var songs = new List<Song>
             {
                 new()

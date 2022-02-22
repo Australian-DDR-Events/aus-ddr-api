@@ -98,6 +98,12 @@
       <Compile Update="Endpoints\EventEndpoints\List.ListEventResponse.cs">
         <DependentUpon>List.cs</DependentUpon>
       </Compile>
+      <Compile Update="Endpoints\SongEndpoints\GetById.GetSongWithTopScoresResponse.cs">
+        <DependentUpon>GetById.cs</DependentUpon>
+      </Compile>
+      <Compile Update="Endpoints\SongEndpoints\GetById.GetSongWithTopScoresRequest.cs">
+        <DependentUpon>GetById.cs</DependentUpon>
+      </Compile>
     </ItemGroup>
 
     <ItemGroup>

@@ -24,7 +24,7 @@ namespace IntegrationTests.Core.Services
             _fixture = fixture;
 
             _songRepository = new GenericEfRepository<Song>(_fixture._context);
-            _songService = new SongService(_songRepository);
+            _songService = new SongService(_songRepository, new SongRepository(_fixture._context));
             
             Setup.DropAllRows(_fixture._context);
         }

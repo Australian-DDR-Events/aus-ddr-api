@@ -98,6 +98,9 @@
       <Compile Update="Endpoints\EventEndpoints\List.ListEventResponse.cs">
         <DependentUpon>List.cs</DependentUpon>
       </Compile>
+      <Compile Update="Endpoints\AdminEndpoints\ImageUploader.UploadImageRequest.cs">
+          <DependentUpon>ImageUploader.cs</DependentUpon>
+      </Compile>
     </ItemGroup>
 
     <ItemGroup>

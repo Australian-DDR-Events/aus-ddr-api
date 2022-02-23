@@ -14,6 +14,7 @@ namespace Application.Core
                 .AddScoped<IDancerService, DancerService>()
                 .AddScoped<IEventService, EventService>()
                 .AddScoped<IBadgeService, BadgeService>()
+                .AddScoped<IAdminService, AdminService>()
                 .AddScoped<ISongService, SongService>();
         }
     }

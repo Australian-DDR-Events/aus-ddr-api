@@ -11,6 +11,18 @@ namespace Infrastructure.Data
         public EFDatabaseContext(DbContextOptions<EFDatabaseContext> options) : base(options)
         {
         }
+        
+        /**
+         * Uncomment the below to create a migration
+         * dotnet ef migrations add MyMigrationName --project Infrastructure --verbose
+        **/
+        // public EFDatabaseContext() : base()
+        // {
+        // }
+        // protected override void OnConfiguring(DbContextOptionsBuilder options)
+        // {
+        //     options.UseNpgsql("Username=admin;Password=password;Host=localhost;Port=1235;Database=local");
+        // }
 
         public DbSet<Dancer> Dancers { get; set; } = default!;
         public DbSet<Score> Scores { get; set; } = default!;

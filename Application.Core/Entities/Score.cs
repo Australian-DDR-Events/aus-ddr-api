@@ -4,6 +4,7 @@ namespace Application.Core.Entities
     public class Score : BaseEntity
     {
         public int Value { get; set; }
+        public int ExScore { get; set; }
         public DateTime SubmissionTime { get; set; }
 
         public Guid DancerId { get; set; }

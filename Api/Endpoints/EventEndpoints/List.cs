@@ -10,7 +10,7 @@ using Swashbuckle.AspNetCore.Annotations;
 
 namespace AusDdrApi.Endpoints.EventEndpoints;
 
-public class List : EndpointWithResponse<ListEventRequest, IList<ListEventResponse>, IList<Event>>
+public class List : EndpointWithResponse<IList<ListEventResponse>, IList<Event>>
 {
     private readonly IEventService _eventService;
     
@@ -26,7 +26,7 @@ public class List : EndpointWithResponse<ListEventRequest, IList<ListEventRespon
         OperationId = "Events.List",
         Tags = new[] { "Events" })
     ]
-    public override async Task<ActionResult<IList<ListEventResponse>>> HandleAsync([FromQuery] ListEventRequest request, CancellationToken cancellationToken = new CancellationToken())
+    public override async Task<ActionResult<IList<ListEventResponse>>> HandleAsync(CancellationToken cancellationToken = new CancellationToken())
     {
         var events = await _eventService.GetEventsAsync(cancellationToken);
         return this.ConvertToActionResult(events);

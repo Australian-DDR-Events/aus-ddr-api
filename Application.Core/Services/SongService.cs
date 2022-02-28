@@ -1,8 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Core.Entities;
 using Application.Core.Interfaces;
+using Application.Core.Interfaces.Repositories;
 using Application.Core.Interfaces.Services;
 using Application.Core.Specifications.SongSpecs;
 using Ardalis.Result;
@@ -12,10 +14,12 @@ namespace Application.Core.Services
     public class SongService : CommonService<Song>, ISongService
     {
         private readonly IAsyncRepository<Song> _repository;
+        private readonly ISongRepository _songRepository;
 
-        public SongService(IAsyncRepository<Song> repository) : base(repository)
+        public SongService(IAsyncRepository<Song> repository, ISongRepository songRepository) : base(repository)
         {
             _repository = repository;
+            _songRepository = songRepository;
         }
         public async Task<Result<IList<Song>>> GetSongsAsync(int page, int limit, CancellationToken cancellationToken)
         {
@@ -29,6 +33,12 @@ namespace Application.Core.Services
         {
             var created = await _repository.AddAsync(song, cancellationToken);
             return Result<Song>.Success(created);
+        }
+
+        public async Task<Result<Song>> GetSongWithTopScores(Guid songId, CancellationToken cancellationToken)
+        {
+            var result = _songRepository.GetSongWithTopScores(songId);
+            return result == null ? Result<Song>.NotFound() : Result<Song>.Success(result);
         }
     }
 }

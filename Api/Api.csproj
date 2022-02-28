@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
@@ -98,6 +98,11 @@
       <Compile Update="Endpoints\EventEndpoints\List.ListEventResponse.cs">
         <DependentUpon>List.cs</DependentUpon>
       </Compile>
+      <Compile Update="Endpoints\SongEndpoints\GetById.GetSongWithTopScoresResponse.cs">
+        <DependentUpon>GetById.cs</DependentUpon>
+      </Compile>
+      <Compile Update="Endpoints\SongEndpoints\GetById.GetSongWithTopScoresRequest.cs">
+        <DependentUpon>GetById.cs</DependentUpon>
       <Compile Update="Endpoints\AdminEndpoints\ImageUploader.UploadImageRequest.cs">
           <DependentUpon>ImageUploader.cs</DependentUpon>
       </Compile>

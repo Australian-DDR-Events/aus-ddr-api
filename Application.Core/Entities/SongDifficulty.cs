@@ -15,6 +15,8 @@ namespace Application.Core.Entities
         
         public ICollection<Score> Scores { get; set; } = default!;
         public virtual ICollection<Course> Courses { get; set; } = default!;
+
+        public virtual ICollection<Event> Events { get; set; } = default!;
     }
     
     public enum PlayMode {

@@ -26,9 +26,9 @@ public class GetById : EndpointWithResponse<GetSongWithTopScoresRequest, GetSong
         OperationId = "Songs.GetById",
         Tags = new[] { "Songs" })
     ]
-    public override async Task<ActionResult<GetSongWithTopScoresResponse>> HandleAsync([FromRoute] GetSongWithTopScoresRequest request, CancellationToken cancellationToken = new CancellationToken())
+    public override async Task<ActionResult<GetSongWithTopScoresResponse>> HandleAsync([FromRoute] [FromQuery] GetSongWithTopScoresRequest request, CancellationToken cancellationToken = new CancellationToken())
     {
-        var result = await _songService.GetSongWithTopScores(request.Id, cancellationToken);
+        var result = await _songService.GetSong(request.Id, request.WithTopScores, cancellationToken);
 
         return this.ConvertToActionResult(result);
     }
@@ -44,7 +44,6 @@ public class GetById : EndpointWithResponse<GetSongWithTopScoresRequest, GetSong
 
         return difficulties.Select(d =>
         {
-            d.Scores ??= new List<Score>();
             return new SongDifficultyApiResponse(d.Id, d.PlayMode, d.Difficulty, d.Level,
                 d.Scores.Select(s => new ScoreApiResponse(s.Value, s.DancerId)));
         });

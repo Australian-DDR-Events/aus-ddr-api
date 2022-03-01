@@ -35,9 +35,9 @@ namespace Application.Core.Services
             return Result<Song>.Success(created);
         }
 
-        public async Task<Result<Song>> GetSongWithTopScores(Guid songId, CancellationToken cancellationToken)
+        public async Task<Result<Song>> GetSong(Guid songId, bool withTopScores, CancellationToken cancellationToken)
         {
-            var result = _songRepository.GetSongWithTopScores(songId);
+            var result = _songRepository.GetSong(songId, withTopScores);
             return result == null ? Result<Song>.NotFound() : Result<Song>.Success(result);
         }
     }

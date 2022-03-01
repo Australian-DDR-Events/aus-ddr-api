@@ -9,5 +9,7 @@ namespace Application.Core.Entities
         public string Description { get; set; } = string.Empty;
         
         public virtual ICollection<SongDifficulty> SongDifficulties { get; set; } = default!;
+
+        public virtual ICollection<Event> Events { get; set; } = default!;
     }
 }

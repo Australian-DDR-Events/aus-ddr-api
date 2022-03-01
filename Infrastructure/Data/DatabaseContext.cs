@@ -13,7 +13,7 @@ namespace Infrastructure.Data
         }
         
         /**
-         * Uncomment the below to create a migration
+         * Uncomment the below and comment the above to create a migration
          * dotnet ef migrations add MyMigrationName --project Infrastructure --verbose
         **/
         // public EFDatabaseContext() : base()

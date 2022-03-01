@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Application.Core.Entities;
 using Application.Core.Interfaces.Repositories;
@@ -15,7 +16,7 @@ public class SongRepository : ISongRepository
         _context = context;
     }
 
-    public Song GetSongWithTopScores(Guid songId)
+    public Song GetSong(Guid songId, bool withTopScores)
     {
         return _context
             .Songs
@@ -31,7 +32,9 @@ public class SongRepository : ISongRepository
                     Difficulty = sd.Difficulty,
                     Level = sd.Level,
                     PlayMode = sd.PlayMode,
-                    Scores = sd.Scores.OrderByDescending(score => score.Value).Take(3).ToArray()
+                    Scores = withTopScores
+                        ? sd.Scores.OrderByDescending(score => score.Value).Take(3).ToList()
+                        : new List<Score>()
                 }).ToList()
             }).FirstOrDefault();
     }

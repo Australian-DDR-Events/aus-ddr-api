@@ -10,4 +10,6 @@ public class GetSongWithTopScoresRequest
         
     [FromRoute]
     public Guid Id { get; set; }
+    [FromQuery]
+    public bool WithTopScores { get; set; }
 }

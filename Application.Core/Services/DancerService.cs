@@ -162,6 +162,9 @@ namespace Application.Core.Services
                 await copiedImage.SaveAsPngAsync(stream, cancellationToken);
                 await _fileStorage.UploadFileFromStream(stream, $"profile/avatar/{dancer.Id}.{size}.png");
             });
+            
+            dancer.ProfilePictureTimestamp = DateTime.Now;
+            await _repository.SaveChangesAsync(cancellationToken);
 
             await Task.WhenAll(uploadProcess);
             return Result<bool>.Success(true);

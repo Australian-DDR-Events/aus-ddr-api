@@ -48,15 +48,15 @@ namespace Application.Core.Services
         public async Task<Result<Dancer>> MigrateDancer(MigrateDancerRequestModel requestModel,
             CancellationToken cancellationToken)
         {
-            var dancer = await _repository.GetBySpecAsync(new ByAuthIdSpec(requestModel.AuthId), cancellationToken);
+            var dancer = _dancerRepository.GetDancerByAuthId(requestModel.AuthId);
             if (dancer != null) return Result<Dancer>.Success(dancer);
             if (requestModel.LegacyId == null) return Result<Dancer>.NotFound();
             
-            dancer = await _repository.GetBySpecAsync(new ByAuthIdSpec(requestModel.LegacyId), cancellationToken);
+            dancer = _dancerRepository.GetDancerByAuthId(requestModel.LegacyId);
             if (dancer == null) return Result<Dancer>.NotFound();
 
             dancer.AuthenticationId = requestModel.AuthId;
-            await _repository.SaveChangesAsync(cancellationToken);
+            await _dancerRepository.UpdateDancer(dancer, cancellationToken);
 
             return Result<Dancer>.Success(dancer);
         }

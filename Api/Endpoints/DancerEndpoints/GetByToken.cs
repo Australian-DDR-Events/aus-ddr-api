@@ -5,13 +5,15 @@ using Application.Core.Entities;
 using Application.Core.Interfaces;
 using Application.Core.Interfaces.Services;
 using Application.Core.Models.Dancer;
+using Ardalis.Result;
 using AusDdrApi.Extensions;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AusDdrApi.Endpoints.DancerEndpoints;
 
-public class GetByToken : EndpointWithResponse<GetDancerByTokenResponse, Dancer>
+public class GetByToken : ControllerBase
 {
     private readonly IDancerService _dancerService;
     private readonly IIdentity<string> _identity;
@@ -24,16 +26,16 @@ public class GetByToken : EndpointWithResponse<GetDancerByTokenResponse, Dancer>
 
     [Authorize]
     [HttpGet("/dancers/me")]
-    public override async Task<ActionResult<GetDancerByTokenResponse>> HandleAsync(CancellationToken cancellationToken = new CancellationToken())
+    public async Task<ActionResult<GetDancerByTokenResponse>> HandleAsync([FromHeader] string authorization, CancellationToken cancellationToken = new())
     {
-        var userInfo = await _identity.GetUserInfo(HttpContext.Request.Headers["authorization"].First().Split(" ")[1]);
+        var userInfo = await _identity.GetUserInfo(authorization);
         var dancerResult = await _dancerService.MigrateDancer(new MigrateDancerRequestModel
         {
             AuthId = userInfo.UserId,
             LegacyId = userInfo.LegacyId,
         }, cancellationToken);
-        return this.ConvertToActionResult(dancerResult);
+        if (dancerResult.IsSuccess) return Ok(GetDancerByTokenResponse.Convert(dancerResult.Value));
+        if (dancerResult.Status == ResultStatus.NotFound) return NotFound();
+        return new StatusCodeResult(StatusCodes.Status500InternalServerError);
     }
-
-    public override GetDancerByTokenResponse Convert(Dancer u) => new() {Id = u.Id, Name = u.DdrName, Code = u.DdrCode, State = u.State, PrimaryLocation = u.PrimaryMachineLocation};
 }

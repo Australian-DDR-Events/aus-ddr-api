@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Core.Entities;
@@ -114,6 +113,119 @@ namespace UnitTests.Core.Services
             );
         }
         
+        #endregion
+
+        #region MigrateDancer
+
+        [Fact(DisplayName = "When dancer found by authId, update is not called")]
+        public async Task WhenMigrateDancer_FoundByAuthId_NoUpdate()
+        {
+            var repositoryResponse = new Dancer
+            {
+                Id = Guid.NewGuid()
+            };
+
+            var requestModel = new MigrateDancerRequestModel
+            {
+                AuthId = Guid.NewGuid().ToString(),
+                LegacyId = Guid.NewGuid().ToString()
+            };
+
+            _dancerRepository2.Setup(r =>
+                r.GetDancerByAuthId(It.Is<string>(value => value == requestModel.AuthId))
+            ).Returns(repositoryResponse);
+
+            var result = await _dancerService.MigrateDancer(requestModel, CancellationToken.None);
+            
+            Assert.True(result.IsSuccess);
+            Assert.Equal(repositoryResponse.Id, result.Value.Id);
+            
+            _dancerRepository2.Verify(mock => mock.UpdateDancer(It.IsAny<Dancer>(), It.IsAny<CancellationToken>()), Times.Never);
+        }
+
+        [Fact(DisplayName = "When dancer found by legacyId, update is called with new id")]
+        public async Task WhenMigrateDancer_FoundByLegacyId_Update()
+        {
+            var repositoryResponse = new Dancer
+            {
+                Id = Guid.NewGuid()
+            };
+
+            var requestModel = new MigrateDancerRequestModel
+            {
+                AuthId = Guid.NewGuid().ToString(),
+                LegacyId = Guid.NewGuid().ToString()
+            };
+
+            _dancerRepository2.Setup(r =>
+                r.GetDancerByAuthId(It.Is<string>(value => value == requestModel.AuthId))
+            ).Returns(null as Dancer);
+            _dancerRepository2.Setup(r =>
+                r.GetDancerByAuthId(It.Is<string>(value => value == requestModel.LegacyId))
+            ).Returns(repositoryResponse);
+
+            var result = await _dancerService.MigrateDancer(requestModel, CancellationToken.None);
+            
+            Assert.True(result.IsSuccess);
+            Assert.Equal(repositoryResponse.Id, result.Value.Id);
+            
+            _dancerRepository2.Verify(
+                mock => mock.UpdateDancer(
+                    It.Is<Dancer>(d => d.AuthenticationId.Equals(requestModel.AuthId)),
+                    It.IsAny<CancellationToken>()),
+                Times.Once
+            );
+        }
+
+        [Fact(DisplayName = "When legacyId not provided, and not found by authId, return not found")]
+        public async Task WhenMigrateDancer_NotFoundByAuthId_LegacyIdNotProvided_ReturnNotFound()
+        {
+            var requestModel = new MigrateDancerRequestModel
+            {
+                AuthId = Guid.NewGuid().ToString(),
+                LegacyId = null
+            };
+
+            _dancerRepository2.Setup(r =>
+                r.GetDancerByAuthId(It.Is<string>(value => value == requestModel.AuthId))
+            ).Returns(null as Dancer);
+
+            var result = await _dancerService.MigrateDancer(requestModel, CancellationToken.None);
+            
+            Assert.Equal(ResultStatus.NotFound, result.Status);
+            
+            _dancerRepository2.Verify(
+                mock => mock.UpdateDancer(It.IsAny<Dancer>(), It.IsAny<CancellationToken>()),
+                Times.Never
+            );
+        }
+
+        [Fact(DisplayName = "When legacyId not provided, and not found by authId, return not found")]
+        public async Task WhenMigrateDancer_NotFoundByAuthId_NotFoundByLegacyId_ReturnNotFound()
+        {
+            var requestModel = new MigrateDancerRequestModel
+            {
+                AuthId = Guid.NewGuid().ToString(),
+                LegacyId = Guid.NewGuid().ToString()
+            };
+
+            _dancerRepository2.Setup(r =>
+                r.GetDancerByAuthId(It.Is<string>(value => value == requestModel.AuthId))
+            ).Returns(null as Dancer);
+            _dancerRepository2.Setup(r =>
+                r.GetDancerByAuthId(It.Is<string>(value => value == requestModel.LegacyId))
+            ).Returns(null as Dancer);
+
+            var result = await _dancerService.MigrateDancer(requestModel, CancellationToken.None);
+            
+            Assert.Equal(ResultStatus.NotFound, result.Status);
+            
+            _dancerRepository2.Verify(
+                mock => mock.UpdateDancer(It.IsAny<Dancer>(), It.IsAny<CancellationToken>()),
+                Times.Never
+            );
+        }
+
         #endregion
 
         #region AddBadgeToDancer Tests

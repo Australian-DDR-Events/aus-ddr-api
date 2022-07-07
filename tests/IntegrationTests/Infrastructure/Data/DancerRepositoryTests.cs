@@ -1,5 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Application.Core.Entities;
 using Infrastructure.Data;
 using IntegrationTests.Helpers.DataGenerators;
@@ -47,6 +50,96 @@ public class DancerRepositoryTests
         
         Assert.Single(result);
         Assert.Equal("c", result.First().DdrName);
+    }
+
+    #endregion
+
+    #region GetDancerById
+
+    [Fact(DisplayName = "Returns dancer when exists in table")]
+    public void GetDancerById_ReturnWhenFound()
+    {
+        var dancer = DancerGenerator.CreateDancer();
+        _fixture._context.Dancers.Add(dancer);
+        _fixture._context.SaveChanges();
+
+        var result = _dancerRepository.GetDancerById(dancer.Id);
+
+        Assert.NotNull(result);
+        Assert.Equal(dancer.Id, result.Id);
+    }
+
+    [Fact(DisplayName = "Returns null when does not exist in table")]
+    public void GetDancerById_NullWhenNotFound()
+    {
+        var dancer = DancerGenerator.CreateDancer();
+        _fixture._context.Dancers.Add(dancer);
+        _fixture._context.SaveChanges();
+
+        var result = _dancerRepository.GetDancerById(Guid.NewGuid());
+
+        Assert.Null(result);
+    }
+
+    #endregion
+
+    #region GetDancerByAuthId
+
+    [Fact(DisplayName = "Returns dancer when exists in table")]
+    public void GetDancerByAuthId_ReturnWhenFound()
+    {
+        var dancer = DancerGenerator.CreateDancer();
+        _fixture._context.Dancers.Add(dancer);
+        _fixture._context.SaveChanges();
+
+        var result = _dancerRepository.GetDancerByAuthId(dancer.AuthenticationId);
+
+        Assert.NotNull(result);
+        Assert.Equal(dancer.Id, result.Id);
+        Assert.Equal(dancer.AuthenticationId, result.AuthenticationId);
+    }
+
+    [Fact(DisplayName = "Returns null when does not exist in table")]
+    public void GetDancerByAuthId_NullWhenNotFound()
+    {
+        var dancer = DancerGenerator.CreateDancer();
+        _fixture._context.Dancers.Add(dancer);
+        _fixture._context.SaveChanges();
+
+        var result = _dancerRepository.GetDancerByAuthId(Guid.NewGuid().ToString());
+
+        Assert.Null(result);
+    }
+
+    #endregion
+
+    #region UpdateDancer
+
+    [Fact(DisplayName = "Updates existing record when dancer exists in the table")]
+    public async Task UpdateDancer_UpdateRecord()
+    {
+        var dancer = DancerGenerator.CreateDancer("InitialName");
+        _fixture._context.Dancers.Add(dancer);
+        _fixture._context.SaveChanges();
+
+        dancer.DdrName = "NewName";
+        await _dancerRepository.UpdateDancer(dancer, CancellationToken.None);
+
+        var result = _dancerRepository.GetDancerById(dancer.Id);
+        
+        Assert.NotNull(result);
+        Assert.Equal(dancer.DdrName, result.DdrName);
+    }
+
+    [Fact(DisplayName = "No change when dancer does not exist in the table")]
+    public async Task UpdateDancer_NoChangeToTable()
+    {
+        var dancer = DancerGenerator.CreateDancer("InitialName");
+        await _dancerRepository.UpdateDancer(dancer, CancellationToken.None);
+
+        var result = _dancerRepository.GetDancerById(dancer.Id);
+        
+        Assert.Null(result);
     }
 
     #endregion

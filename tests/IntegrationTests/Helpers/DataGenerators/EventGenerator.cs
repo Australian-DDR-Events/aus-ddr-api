@@ -7,6 +7,7 @@ public static class EventGenerator
 {
     public static Event CreateEvent() => new Event
     {
-        Id = Guid.NewGuid()
+        Id = Guid.NewGuid(),
+        StartDate = DateTime.Now
     };
 }

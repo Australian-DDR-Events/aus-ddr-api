@@ -1,7 +1,11 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Application.Core.Entities;
 using Application.Core.Interfaces.Repositories;
+using JetBrains.Annotations;
 
 namespace Infrastructure.Data;
 
@@ -28,5 +32,31 @@ public class DancerRepository : IDancerRepository
                 ProfilePictureTimestamp = d.ProfilePictureTimestamp
             })
             .ToList();
+    }
+
+    [CanBeNull]
+    public Dancer GetDancerById(Guid id)
+    {
+        return _context
+            .Dancers
+            .FirstOrDefault(d => d.Id.Equals(id));
+    }
+
+    [CanBeNull]
+    public Dancer GetDancerByAuthId(string id)
+    {
+        return _context
+            .Dancers
+            .FirstOrDefault(d => d.AuthenticationId.Equals(id));
+    }
+
+    public async Task UpdateDancer(Dancer dancer, CancellationToken cancellationToken)
+    {
+        var dbDancer = GetDancerById(dancer.Id);
+        if (dbDancer == null) return;
+        _context
+            .Dancers
+            .Update(dancer);
+        await _context.SaveChangesAsync(cancellationToken);
     }
 }

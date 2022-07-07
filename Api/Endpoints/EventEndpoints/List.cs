@@ -29,6 +29,6 @@ public class List : ControllerBase
     {
         var events = await _eventService.GetEventsAsync(cancellationToken);
         if (!events.IsSuccess) return new StatusCodeResult(StatusCodes.Status500InternalServerError);
-        return Ok(events.Value.Select(ListEventResponse.Convert).GetEnumerator());
+        return Ok(events.Value.Select(ListEventResponse.Convert));
     }
 }

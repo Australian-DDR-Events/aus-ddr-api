@@ -1,9 +1,25 @@
-using System.Collections.Generic;
+using System;
+using Application.Core.Entities;
 
-namespace AusDdrApi.Endpoints.DancerEndpoints
+namespace AusDdrApi.Endpoints.DancerEndpoints;
+
+public class GetDancersResponse
 {
-    public class GetDancersResponse
+    private GetDancersResponse(Guid id, string ddrName, string profilePictureUrl)
     {
-        public IList<DancerRecord> Dancers { get; set; } = default!;
+        Id = id;
+        DdrName = ddrName;
+        ProfilePictureUrl = profilePictureUrl;
     }
+    
+    public Guid Id { get; }
+    public string DdrName { get; }
+    public string ProfilePictureUrl { get; }
+
+    public static GetDancersResponse Convert(Dancer d) =>
+        new(
+            d.Id,
+            d.DdrName,
+            $"/profile/picture/{d.Id}.png?time={d.ProfilePictureTimestamp?.GetHashCode()}"
+        );
 }

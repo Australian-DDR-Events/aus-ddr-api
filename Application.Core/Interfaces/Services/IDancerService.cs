@@ -13,7 +13,7 @@ namespace Application.Core.Interfaces.Services
     {
         // Task<Result<Dancer>> GetDancerByIdAsync(Guid id, CancellationToken cancellationToken);
 
-        Task<Result<IList<Dancer>>> GetDancersAsync(int page, int limit, CancellationToken cancellationToken);
+        Task<Result<IEnumerable<Dancer>>> GetDancersAsync(int page, int limit, CancellationToken cancellationToken);
 
         Task<Result<Dancer>> GetDancerByAuthId(string authId, CancellationToken cancellationToken);
 

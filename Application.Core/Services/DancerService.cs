@@ -6,9 +6,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Application.Core.Entities;
 using Application.Core.Interfaces;
+using Application.Core.Interfaces.Repositories;
 using Application.Core.Interfaces.Services;
 using Application.Core.Models.Dancer;
-using Application.Core.Specifications;
 using Application.Core.Specifications.DancerSpecs;
 using Ardalis.Result;
 using SixLabors.ImageSharp;
@@ -20,21 +20,22 @@ namespace Application.Core.Services
     {
         private readonly IAsyncRepository<Dancer> _repository;
         private readonly IAsyncRepository<Badge> _badgeRepository;
+        private readonly IDancerRepository _dancerRepository;
         private readonly IFileStorage _fileStorage;
 
-        public DancerService(IAsyncRepository<Dancer> repository, IAsyncRepository<Badge> badgeRepository, IFileStorage fileStorage) : base(repository)
+        public DancerService(IAsyncRepository<Dancer> repository, IAsyncRepository<Badge> badgeRepository, IDancerRepository dancerRepository, IFileStorage fileStorage) : base(repository)
         {
             _repository = repository;
             _badgeRepository = badgeRepository;
+            _dancerRepository = dancerRepository;
             _fileStorage = fileStorage;
         }
 
-        public async Task<Result<IList<Dancer>>> GetDancersAsync(int page, int limit, CancellationToken cancellationToken)
+        public async Task<Result<IEnumerable<Dancer>>> GetDancersAsync(int page, int limit, CancellationToken cancellationToken)
         {
             var skip = page * limit;
-            var dancersSpec = new PageableSpec<Dancer>(skip, limit);
-            var dancers = await _repository.ListAsync(dancersSpec, cancellationToken);
-            return Result<IList<Dancer>>.Success(dancers);
+            var dancers = _dancerRepository.GetDancers(skip, limit);
+            return Result<IEnumerable<Dancer>>.Success(dancers);
         }
 
         public async Task<Result<Dancer>> GetDancerByAuthId(string authId, CancellationToken cancellationToken)

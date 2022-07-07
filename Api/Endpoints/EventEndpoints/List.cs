@@ -2,15 +2,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Core.Entities;
 using Application.Core.Interfaces.Services;
-using AusDdrApi.Extensions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace AusDdrApi.Endpoints.EventEndpoints;
 
-public class List : EndpointWithResponse<IList<ListEventResponse>, IList<Event>>
+public class List : ControllerBase
 {
     private readonly IEventService _eventService;
     
@@ -19,21 +18,17 @@ public class List : EndpointWithResponse<IList<ListEventResponse>, IList<Event>>
         _eventService = eventService;
     }
 
-    [HttpGet(ListEventRequest.Route)]
+    [HttpGet("/events")]
     [SwaggerOperation(
         Summary = "Gets a collection of Events",
         Description = "Gets a collection of events",
         OperationId = "Events.List",
         Tags = new[] { "Events" })
     ]
-    public override async Task<ActionResult<IList<ListEventResponse>>> HandleAsync(CancellationToken cancellationToken = new CancellationToken())
+    public async Task<ActionResult<IEnumerable<ListEventResponse>>> HandleAsync(CancellationToken cancellationToken = new CancellationToken())
     {
         var events = await _eventService.GetEventsAsync(cancellationToken);
-        return this.ConvertToActionResult(events);
-    }
-
-    public override IList<ListEventResponse> Convert(IList<Event> u)
-    {
-        return u.Select(e => new ListEventResponse(e.Id, e.Name, e.Description, e.StartDate, e.EndDate)).ToList();
+        if (!events.IsSuccess) return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+        return Ok(events.Value.Select(ListEventResponse.Convert).GetEnumerator());
     }
 }

@@ -24,6 +24,7 @@ namespace Infrastructure
                 .AddIdentity(configuration)
                 .AddScoped(typeof(IAsyncRepository<>), typeof(GenericEfRepository<>))
                 .AddScoped<ISongRepository, SongRepository>()
+                .AddScoped<IEventRepository, EventRepository>()
                 .AddFileStorage(configuration);
         }
 

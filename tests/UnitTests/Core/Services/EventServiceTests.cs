@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Application.Core.Entities;
 using Application.Core.Interfaces;
+using Application.Core.Interfaces.Repositories;
 using Application.Core.Interfaces.Services;
 using Application.Core.Services;
 using Moq;
@@ -14,18 +15,20 @@ namespace UnitTests.Core.Services;
 public class EventServiceTests
 {
     private readonly Mock<IAsyncRepository<Event>> _eventRepository;
+    private readonly Mock<IEventRepository> _repository;
     private readonly IEventService _eventService;
 
     public EventServiceTests()
     {
         _eventRepository = new Mock<IAsyncRepository<Event>>();
-        _eventService = new EventService(_eventRepository.Object);
+        _repository = new Mock<IEventRepository>();
+        _eventService = new EventService(_eventRepository.Object, _repository.Object);
     }
 
     #region EventService GetEventsAsync
 
-    [Fact(DisplayName = "ListAsync is called on the Event Repository")]
-    public async Task When_EventServiceGetEventsAsync_Then_ListAsyncCalledOnRepository()
+    [Fact(DisplayName = "GetEvents is called on the repository")]
+    public async Task WhenGetEventsAsync_ThenCallGetEventsOnRepository()
     {
         var repositoryResponse = new List<Event>()
         {
@@ -34,13 +37,17 @@ public class EventServiceTests
                 Id = Guid.NewGuid()
             }
         };
-        _eventRepository.Setup(r =>
-            r.ListAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(repositoryResponse));
 
+        _repository.Setup(r => 
+            r.GetEvents()
+        ).Returns(repositoryResponse);
+        
         var result = await _eventService.GetEventsAsync(new CancellationToken());
         
         Assert.True(result.IsSuccess);
         Assert.Equal(repositoryResponse, result.Value);
+        
+        _repository.Verify(mock => mock.GetEvents(), Times.Once());
     }
 
     #endregion

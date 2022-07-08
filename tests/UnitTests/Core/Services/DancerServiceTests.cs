@@ -299,6 +299,61 @@ namespace UnitTests.Core.Services
 
         #endregion
 
+        #region CreateDancerAsync
+
+        [Fact(DisplayName = "When dancer does not exist in repository, then Create is called")]
+        public async Task CreateDancerAsync_DancerDoesNotExist_CreateDancer()
+        {
+            var requestModel = new CreateDancerRequestModel
+            {
+                AuthId = Guid.NewGuid().ToString()
+            };
+
+            _dancerRepository2.Setup(r =>
+                r.GetDancerByAuthId(It.Is<string>(value => value.Equals(requestModel.AuthId)))
+            ).Returns(null as Dancer);
+
+            var result = await _dancerService.CreateDancerAsync(requestModel, CancellationToken.None);
+            
+            Assert.True(result.IsSuccess);
+            Assert.True(
+                result.Value.AuthenticationId == requestModel.AuthId
+            );
+            
+            _dancerRepository2.Verify(r =>
+                r.CreateDancer(It.Is<Dancer>(value =>
+                    value.AuthenticationId == requestModel.AuthId
+                    ), It.IsAny<CancellationToken>()
+                ), Times.Once
+            );
+        }
+
+        [Fact(DisplayName = "When dancer already exists, then return error")]
+        public async Task CreateDancerAsync_DancerExists_RaiseError()
+        {
+            var requestModel = new CreateDancerRequestModel
+            {
+                AuthId = Guid.NewGuid().ToString()
+            };
+            var repositoryResponse = new Dancer
+            {
+                Id = Guid.NewGuid(),
+                AuthenticationId = requestModel.AuthId
+            };
+
+            _dancerRepository2.Setup(r =>
+                r.GetDancerByAuthId(It.Is<string>(value => value.Equals(requestModel.AuthId)))
+            ).Returns(repositoryResponse);
+            
+            var result = await _dancerService.CreateDancerAsync(requestModel, CancellationToken.None);
+            Assert.Equal(ResultStatus.Error,result.Status);
+            _dancerRepository2.Verify(r =>
+                r.UpdateDancer(It.IsAny<Dancer>(), It.IsAny<CancellationToken>()), Times.Never
+            );
+        }
+
+        #endregion
+
         #region AddBadgeToDancer Tests
 
         [Fact(DisplayName = "When AddBadgeToDancer, if dancer and badge exists in source, then return success")]

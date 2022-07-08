@@ -64,8 +64,7 @@ namespace Application.Core.Services
         public async Task<Result<Dancer>> CreateDancerAsync(CreateDancerRequestModel requestModel,
             CancellationToken cancellationToken)
         {
-            var byAuthIdSpec = new ByAuthIdSpec(requestModel.AuthId);
-            var dancer = await _repository.GetBySpecAsync(byAuthIdSpec, cancellationToken);
+            var dancer = _dancerRepository.GetDancerByAuthId(requestModel.AuthId);
             if (dancer != null)
             {
                 return Result<Dancer>.Error("Dancer already exists");
@@ -73,6 +72,7 @@ namespace Application.Core.Services
 
             dancer = new Dancer
             {
+                Id = Guid.NewGuid(),
                 AuthenticationId = requestModel.AuthId,
                 DdrCode = requestModel.DdrCode,
                 DdrName = requestModel.DdrName,
@@ -80,8 +80,7 @@ namespace Application.Core.Services
                 PrimaryMachineLocation = requestModel.PrimaryMachineLocation
             };
 
-            dancer = await _repository.AddAsync(dancer, cancellationToken);
-            await _repository.SaveChangesAsync(cancellationToken);
+            await _dancerRepository.CreateDancer(dancer, cancellationToken);
             return Result<Dancer>.Success(dancer);
         }
 

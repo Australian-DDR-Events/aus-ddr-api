@@ -89,4 +89,32 @@ public class DancerServiceTests
     }
 
     #endregion
+
+    #region CreateDancerAsync
+
+    [Fact(DisplayName = "Creates dancer record")]
+    public async Task CreateDancerAsync_CreatesDancerRecord()
+    {
+        var model = new CreateDancerRequestModel
+        {
+            AuthId = Guid.NewGuid().ToString(),
+            DdrCode = "123",
+            DdrName = "abc",
+            PrimaryMachineLocation = "Def456",
+            State = "Wvu"
+        };
+
+        var result = await _dancerService.CreateDancerAsync(model, CancellationToken.None);
+        
+        Assert.True(result.IsSuccess);
+        Assert.True(
+            result.Value.State == model.State &&
+            result.Value.DdrCode == model.DdrCode &&
+            result.Value.DdrName == model.DdrName &&
+            result.Value.PrimaryMachineLocation == model.PrimaryMachineLocation &&
+            result.Value.AuthenticationId == model.AuthId
+        );
+    }
+
+    #endregion
 }

@@ -146,4 +146,70 @@ public class DancerTests
     }
 
     #endregion
+
+    #region Create
+
+    [Fact(DisplayName = "When dancer is created, return Accepted result")]
+    public async Task Create_DancerCreated_ResponseIsAccepted()
+    {
+        var endpoint = new DancerEndpoints.Create(_dancerService.Object, _identityService.Object);
+
+        var identityResponse = new UserInfo
+        {
+            LegacyId = Guid.NewGuid().ToString(),
+            UserId = Guid.NewGuid().ToString()
+        };
+        var requestModel = new DancerEndpoints.CreateDancerByAuthIdRequest
+        {
+            DdrCode = "123",
+            DdrName = "abc",
+            PrimaryMachineLocation = "zyx",
+            State = "xyz"
+        };
+
+        _identityService.Setup(i =>
+            i.GetUserInfo(It.IsAny<string>())
+        ).ReturnsAsync(identityResponse);
+
+        _dancerService.Setup(d =>
+            d.CreateDancerAsync(It.Is<CreateDancerRequestModel>(value =>
+                value.AuthId == identityResponse.UserId), It.IsAny<CancellationToken>())
+        ).ReturnsAsync(Result<Dancer>.Success(new Dancer {Id = Guid.NewGuid()}));
+
+        var response = await endpoint.HandleAsync(requestModel, "", CancellationToken.None);
+        Assert.IsType<AcceptedResult>(response);
+    }
+
+    [Fact(DisplayName = "When dancer already exists, return Conflict result")]
+    public async Task Create_DancerExists_ResponseIsConflict()
+    {
+        var endpoint = new DancerEndpoints.Create(_dancerService.Object, _identityService.Object);
+
+        var identityResponse = new UserInfo
+        {
+            LegacyId = Guid.NewGuid().ToString(),
+            UserId = Guid.NewGuid().ToString()
+        };
+        var requestModel = new DancerEndpoints.CreateDancerByAuthIdRequest
+        {
+            DdrCode = "123",
+            DdrName = "abc",
+            PrimaryMachineLocation = "zyx",
+            State = "xyz"
+        };
+
+        _identityService.Setup(i =>
+            i.GetUserInfo(It.IsAny<string>())
+        ).ReturnsAsync(identityResponse);
+
+        _dancerService.Setup(d =>
+            d.CreateDancerAsync(It.Is<CreateDancerRequestModel>(value =>
+                value.AuthId == identityResponse.UserId), It.IsAny<CancellationToken>())
+        ).ReturnsAsync(Result<Dancer>.Error("error"));
+
+        var response = await endpoint.HandleAsync(requestModel, "", CancellationToken.None);
+        Assert.IsType<ConflictResult>(response);
+    }
+
+    #endregion
 }

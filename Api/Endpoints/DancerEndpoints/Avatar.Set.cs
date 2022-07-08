@@ -32,7 +32,7 @@ public class Avatar_Set : EndpointWithoutResponse<SetAvatarForDancerByTokenReque
     public override async Task<ActionResult> HandleAsync([FromForm] SetAvatarForDancerByTokenRequest request,
         CancellationToken cancellationToken = new CancellationToken())
     {
-        var userInfo = await _identity.GetUserInfo(HttpContext.Request.Headers["authorization"].First().Split(" ")[1]);
+        var userInfo = await _identity.GetUserInfo(HttpContext.Request.Headers["authorization"].First());
         if (request.Image == null)
         {
             return new BadRequestResult();

@@ -36,10 +36,12 @@ namespace Infrastructure.Identity
 
         public async Task<UserInfo> GetUserInfo(string source)
         {
+            if (!source.StartsWith("bearer ", StringComparison.OrdinalIgnoreCase)) return new UserInfo();
+            var token = source.Split(" ")[1];
             using var requestMessage =
                 new HttpRequestMessage(HttpMethod.Post, _config.UserinfoEndpoint);
             requestMessage.Headers.Authorization =
-                new AuthenticationHeaderValue("Bearer", source);
+                new AuthenticationHeaderValue("Bearer", token);
     
             var response = await _client.SendAsync(requestMessage);
             var body = await response.Content.ReadAsStringAsync();

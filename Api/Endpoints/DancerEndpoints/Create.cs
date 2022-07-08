@@ -32,7 +32,7 @@ public class Create : EndpointWithoutResponse<CreateDancerByAuthIdRequest>
     [Authorize]
     public override async Task<ActionResult> HandleAsync([FromBody] CreateDancerByAuthIdRequest request, CancellationToken cancellationToken = new())
     {
-        var userInfo = await _identity.GetUserInfo(HttpContext.Request.Headers["authorization"].First().Split(" ")[1]);
+        var userInfo = await _identity.GetUserInfo(HttpContext.Request.Headers["authorization"].First());
 
         var requestModel = new CreateDancerRequestModel
         {

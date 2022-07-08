@@ -5,7 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Application.Core.Entities;
 using Application.Core.Interfaces.Services;
-using Application.Core.Specifications.SongSpecs;
 using Ardalis.Result;
 using Microsoft.AspNetCore.Mvc;
 using Moq;

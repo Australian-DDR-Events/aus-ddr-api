@@ -228,6 +228,77 @@ namespace UnitTests.Core.Services
 
         #endregion
 
+        #region UpdateDancerAsync
+
+        [Fact(DisplayName = "When dancer is returned from repository, result is updated")]
+        public async Task WhenDancerFound_ThenUpdateDancer()
+        {
+            var initialDancer = new Dancer
+            {
+                Id = Guid.NewGuid(),
+                AuthenticationId = Guid.NewGuid().ToString(),
+                DdrCode = "123",
+                DdrName = "Abc",
+                PrimaryMachineLocation = "Abc123",
+                ProfilePictureTimestamp = DateTime.Now,
+                State = "Zyx"
+            };
+            var requestModel = new UpdateDancerRequestModel
+            {
+                AuthId = initialDancer.AuthenticationId,
+                DdrCode = "456",
+                DdrName = "Def",
+                PrimaryMachineLocation = "Def456",
+                State = "Wvu"
+            };
+
+            _dancerRepository2.Setup(r =>
+                r.GetDancerByAuthId(It.Is<string>(value => value.Equals(initialDancer.AuthenticationId)))
+            ).Returns(initialDancer);
+
+            var result = await _dancerService.UpdateDancerAsync(requestModel, CancellationToken.None);
+            
+            Assert.True(result.IsSuccess);
+            Assert.Equal(initialDancer.Id, result.Value.Id);
+
+            _dancerRepository2.Verify(r =>
+                r.UpdateDancer(It.Is<Dancer>(value =>
+                    value.State == requestModel.State &&
+                    value.AuthenticationId == requestModel.AuthId &&
+                    value.DdrCode == requestModel.DdrCode &&
+                    value.DdrName == requestModel.DdrName &&
+                    value.PrimaryMachineLocation == requestModel.PrimaryMachineLocation &&
+                    value.Id == initialDancer.Id
+                ), It.IsAny<CancellationToken>()),
+                Times.Once
+            );
+        }
+
+        [Fact(DisplayName = "When dancer is not found in repository, return not found result")]
+        public async Task UpdateDancerAsync_DancerNotFound_NotFoundResult()
+        {
+            var requestModel = new UpdateDancerRequestModel
+            {
+                AuthId = Guid.NewGuid().ToString(),
+                DdrCode = "456",
+                DdrName = "Def",
+                PrimaryMachineLocation = "Def456",
+                State = "Wvu"
+            };
+            _dancerRepository2.Setup(r =>
+                r.GetDancerByAuthId(It.IsAny<string>())
+            ).Returns(null as Dancer);
+        
+            var result = await _dancerService.UpdateDancerAsync(requestModel, CancellationToken.None);
+            
+            Assert.Equal(ResultStatus.NotFound, result.Status);
+            _dancerRepository2.Verify(r =>
+                r.UpdateDancer(It.IsAny<Dancer>(), It.IsAny<CancellationToken>()), Times.Never
+            );
+        }
+
+        #endregion
+
         #region AddBadgeToDancer Tests
 
         [Fact(DisplayName = "When AddBadgeToDancer, if dancer and badge exists in source, then return success")]

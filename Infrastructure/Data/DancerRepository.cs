@@ -50,13 +50,20 @@ public class DancerRepository : IDancerRepository
             .FirstOrDefault(d => d.AuthenticationId.Equals(id));
     }
 
+    public async Task CreateDancer(Dancer dancer, CancellationToken cancellationToken)
+    {
+        if (GetDancerByAuthId(dancer.AuthenticationId) != null) return;
+        _context
+            .Dancers
+            .Add(dancer);
+        await _context.SaveChangesAsync(cancellationToken);
+    }
+
     public async Task UpdateDancer(Dancer dancer, CancellationToken cancellationToken)
     {
         var dbDancer = GetDancerById(dancer.Id);
         if (dbDancer == null) return;
-        _context
-            .Dancers
-            .Update(dancer);
+        _context.Entry(dbDancer).CurrentValues.SetValues(dancer);
         await _context.SaveChangesAsync(cancellationToken);
     }
 }

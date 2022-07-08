@@ -1,6 +1,7 @@
 using System;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 
 namespace IntegrationTests
 {
@@ -12,7 +13,9 @@ namespace IntegrationTests
                 "Username=admin;Password=password;Host=localhost;Port=1235;Database=IntegrationTests";
             var options = new DbContextOptionsBuilder<EFDatabaseContext>();
             options
-                .UseNpgsql(connectionString);
+                .UseNpgsql(connectionString)
+                .EnableSensitiveDataLogging()
+                .EnableDetailedErrors();
             return new EFDatabaseContext(options.Options);
         }
         

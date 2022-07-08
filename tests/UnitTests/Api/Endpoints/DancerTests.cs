@@ -83,4 +83,67 @@ public class DancerTests
     }
 
     #endregion
+
+    #region Update
+
+    [Fact(DisplayName = "When dancer updates, return Accepted result")]
+    public async Task Update_DancerUpdates_ResponseIsAccepted()
+    {
+        var endpoint = new DancerEndpoints.Update(_dancerService.Object, _identityService.Object);
+
+        var identityResponse = new UserInfo
+        {
+            LegacyId = Guid.NewGuid().ToString(),
+            UserId = Guid.NewGuid().ToString()
+        };
+        var requestModel = new DancerEndpoints.UpdateDancerByAuthIdRequest
+        {
+            DdrCode = "123",
+            DdrName = "abc",
+            PrimaryMachineLocation = "zyx",
+            State = "xyz"
+        };
+        _identityService.Setup(i =>
+            i.GetUserInfo(It.IsAny<string>())
+        ).ReturnsAsync(identityResponse);
+
+        _dancerService.Setup(d =>
+            d.UpdateDancerAsync(It.Is<UpdateDancerRequestModel>(value =>
+                value.AuthId == identityResponse.UserId), It.IsAny<CancellationToken>())
+        ).ReturnsAsync(Result<Dancer>.Success(new Dancer {Id = Guid.NewGuid()}));
+
+        var response = await endpoint.HandleAsync(requestModel, "", CancellationToken.None);
+        Assert.IsType<AcceptedResult>(response);
+    }
+
+    [Fact(DisplayName = "When dancer does not update, return not found result")]
+    public async Task Update_DancerNotFound_ResponseIsNotFound()
+    {
+        var endpoint = new DancerEndpoints.Update(_dancerService.Object, _identityService.Object);
+
+        var identityResponse = new UserInfo
+        {
+            LegacyId = Guid.NewGuid().ToString(),
+            UserId = Guid.NewGuid().ToString()
+        };
+        var requestModel = new DancerEndpoints.UpdateDancerByAuthIdRequest
+        {
+            DdrCode = "123",
+            DdrName = "abc",
+            PrimaryMachineLocation = "zyx",
+            State = "xyz"
+        };
+        _identityService.Setup(i =>
+            i.GetUserInfo(It.IsAny<string>())
+        ).ReturnsAsync(identityResponse);
+
+        _dancerService.Setup(d =>
+            d.UpdateDancerAsync(It.IsAny<UpdateDancerRequestModel>(), It.IsAny<CancellationToken>())
+        ).ReturnsAsync(Result<Dancer>.NotFound());
+
+        var response = await endpoint.HandleAsync(requestModel, "", CancellationToken.None);
+        Assert.IsType<NotFoundResult>(response);
+    }
+
+    #endregion
 }

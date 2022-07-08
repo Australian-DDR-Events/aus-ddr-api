@@ -87,8 +87,7 @@ namespace Application.Core.Services
 
         public async Task<Result<Dancer>> UpdateDancerAsync(UpdateDancerRequestModel requestModel, CancellationToken cancellationToken)
         {
-            var byAuthIdSpec = new ByAuthIdSpec(requestModel.AuthId);
-            var dancer = await _repository.GetBySpecAsync(byAuthIdSpec, cancellationToken);
+            var dancer = _dancerRepository.GetDancerByAuthId(requestModel.AuthId);
             if (dancer == null)
             {
                 return Result<Dancer>.NotFound();
@@ -99,7 +98,7 @@ namespace Application.Core.Services
             dancer.DdrName = requestModel.DdrName;
             dancer.PrimaryMachineLocation = requestModel.PrimaryMachineLocation;
 
-            await _repository.SaveChangesAsync(cancellationToken);
+            await _dancerRepository.UpdateDancer(dancer, cancellationToken);
             return Result<Dancer>.Success(dancer);
         }
 

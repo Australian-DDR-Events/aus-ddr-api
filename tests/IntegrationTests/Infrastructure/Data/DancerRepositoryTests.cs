@@ -23,6 +23,13 @@ public class DancerRepositoryTests
         Setup.DropAllRows(_fixture._context);
     }
 
+    private void AddDancerToTable(Dancer d)
+    {
+        _fixture._context.Dancers.Add(d);
+        _fixture._context.SaveChanges();
+        _fixture._context.ChangeTracker.Clear();
+    }
+
     #region GetDancers
 
     [Fact(DisplayName = "Limits to N entries")]
@@ -43,8 +50,7 @@ public class DancerRepositoryTests
     {
         var dancers = new List<Dancer>
             {DancerGenerator.CreateDancer("a"), DancerGenerator.CreateDancer("b"), DancerGenerator.CreateDancer("c")};
-        dancers.ForEach(d => _fixture._context.Dancers.Add(d));
-        _fixture._context.SaveChanges();
+        dancers.ForEach(AddDancerToTable);
 
         var result = _dancerRepository.GetDancers(2, 2);
         
@@ -60,8 +66,7 @@ public class DancerRepositoryTests
     public void GetDancerById_ReturnWhenFound()
     {
         var dancer = DancerGenerator.CreateDancer();
-        _fixture._context.Dancers.Add(dancer);
-        _fixture._context.SaveChanges();
+        AddDancerToTable(dancer);
 
         var result = _dancerRepository.GetDancerById(dancer.Id);
 
@@ -73,8 +78,7 @@ public class DancerRepositoryTests
     public void GetDancerById_NullWhenNotFound()
     {
         var dancer = DancerGenerator.CreateDancer();
-        _fixture._context.Dancers.Add(dancer);
-        _fixture._context.SaveChanges();
+        AddDancerToTable(dancer);
 
         var result = _dancerRepository.GetDancerById(Guid.NewGuid());
 
@@ -89,8 +93,7 @@ public class DancerRepositoryTests
     public void GetDancerByAuthId_ReturnWhenFound()
     {
         var dancer = DancerGenerator.CreateDancer();
-        _fixture._context.Dancers.Add(dancer);
-        _fixture._context.SaveChanges();
+        AddDancerToTable(dancer);
 
         var result = _dancerRepository.GetDancerByAuthId(dancer.AuthenticationId);
 
@@ -103,12 +106,42 @@ public class DancerRepositoryTests
     public void GetDancerByAuthId_NullWhenNotFound()
     {
         var dancer = DancerGenerator.CreateDancer();
-        _fixture._context.Dancers.Add(dancer);
-        _fixture._context.SaveChanges();
+        AddDancerToTable(dancer);
 
         var result = _dancerRepository.GetDancerByAuthId(Guid.NewGuid().ToString());
 
         Assert.Null(result);
+    }
+
+    #endregion
+
+    #region CreateDancer
+
+    [Fact(DisplayName = "Creates a new dancer when dancer does not exist in table")]
+    public async Task CreateDancer_CreateNewRecord()
+    {
+        var dancer = DancerGenerator.CreateDancer("InitialName");
+        await _dancerRepository.CreateDancer(dancer, CancellationToken.None);
+
+        var result = _dancerRepository.GetDancerByAuthId(dancer.AuthenticationId);
+        
+        Assert.NotNull(result);
+        Assert.Equal(dancer.DdrName, result.DdrName);
+    }
+
+    [Fact(DisplayName = "Does not insert into table when dancer already exists")]
+    public async Task CreateDancer_DancerExists_NoInsert()
+    {
+        var dancer = DancerGenerator.CreateDancer("InitialName");
+        AddDancerToTable(dancer);
+
+        dancer.DdrName = "NewName";
+        await _dancerRepository.CreateDancer(dancer, CancellationToken.None);
+
+        var result = _dancerRepository.GetDancerByAuthId(dancer.AuthenticationId);
+        
+        Assert.NotNull(result);
+        Assert.Equal("InitialName", result.DdrName);
     }
 
     #endregion
@@ -119,8 +152,7 @@ public class DancerRepositoryTests
     public async Task UpdateDancer_UpdateRecord()
     {
         var dancer = DancerGenerator.CreateDancer("InitialName");
-        _fixture._context.Dancers.Add(dancer);
-        _fixture._context.SaveChanges();
+        AddDancerToTable(dancer);
 
         dancer.DdrName = "NewName";
         await _dancerRepository.UpdateDancer(dancer, CancellationToken.None);

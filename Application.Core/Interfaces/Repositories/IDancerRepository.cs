@@ -11,5 +11,6 @@ public interface IDancerRepository
     IEnumerable<Dancer> GetDancers(int skip, int limit);
     Dancer? GetDancerById(Guid id);
     Dancer? GetDancerByAuthId(string authId);
+    Task CreateDancer(Dancer dancer, CancellationToken cancellationToken);
     Task UpdateDancer(Dancer dancer, CancellationToken cancellationToken);
 }

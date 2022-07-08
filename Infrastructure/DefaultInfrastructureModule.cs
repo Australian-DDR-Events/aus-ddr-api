@@ -25,6 +25,7 @@ namespace Infrastructure
                 .AddScoped(typeof(IAsyncRepository<>), typeof(GenericEfRepository<>))
                 .AddScoped<ISongRepository, SongRepository>()
                 .AddScoped<IEventRepository, EventRepository>()
+                .AddScoped<IDancerRepository, DancerRepository>()
                 .AddFileStorage(configuration);
         }
 

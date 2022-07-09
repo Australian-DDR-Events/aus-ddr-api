@@ -33,51 +33,37 @@ namespace UnitTests.Core.Services
             _dancerService = new DancerService(_dancerRepository.Object, _badgeRepository.Object, _dancerRepository2.Object, _fileStorage.Object);
         }
         
-        #region GetDancerByIdAsync Tests
+        #region GetDancerById Tests
 
-        [Fact(DisplayName = "When GetDancerById, if dancer exists in source, then return Success with Dancer")]
+        [Fact(DisplayName = "When GetDancerById, if dancer exists in repository, then return Success with Dancer")]
         public async Task GetDancerByIdAsync_DancerFound()
         {
-            var id = Guid.NewGuid();
-            var expectedSpec = new ByIdSpec<Dancer>(id);
-
-            var repositoryDancer = new Dancer
+            var dancer = new Dancer
             {
-                Id = id,
-                DdrName = "Name",
-                DdrCode = "Code",
-                AuthenticationId = "auth",
-                PrimaryMachineLocation = "Home",
-                State = "vic"
+                Id = Guid.NewGuid()
             };
 
-            _dancerRepository.Setup(r =>
-                    r.GetBySpecAsync(
-                        It.Is<ByIdSpec<Dancer>>(s => s.ToString().Equals(expectedSpec.ToString())),
-                        It.IsAny<CancellationToken>()))
-                .ReturnsAsync(repositoryDancer);
+            _dancerRepository2.Setup(r =>
+                r.GetDancerById(It.Is<Guid>(value => value.Equals(dancer.Id)))
+            ).Returns(dancer);
 
-            var result = await _dancerService.GetByIdAsync(id, CancellationToken.None);
+            var result = _dancerService.GetDancerById(dancer.Id);
             
             Assert.True(result.IsSuccess);
-            Assert.Equal(repositoryDancer, result.Value);
+            Assert.Equal(dancer.Id, result.Value.Id);
         }
 
         [Fact(DisplayName = "When GetDancerById, if dancer not found in source, then return NotFound result")]
         public async Task GetDancerByIdAsync_DancerNotFound()
         {
             var id = Guid.NewGuid();
-            var expectedSpec = new ByIdSpec<Dancer>(id);
 
-            _dancerRepository.Setup(r =>
-                    r.GetBySpecAsync(
-                        It.Is<ByIdSpec<Dancer>>(s => s.ToString().Equals(expectedSpec.ToString())),
-                        It.IsAny<CancellationToken>()))
-                .ReturnsAsync((Dancer) null);
+            _dancerRepository2.Setup(r =>
+                r.GetDancerById(It.IsAny<Guid>())
+            ).Returns(null as Dancer);
 
-            var result = await _dancerService.GetByIdAsync(id, CancellationToken.None);
-            
-            Assert.False(result.IsSuccess);
+            var result = _dancerService.GetDancerById(id);
+
             Assert.Equal(ResultStatus.NotFound, result.Status);
         }
 

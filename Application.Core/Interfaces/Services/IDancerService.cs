@@ -9,11 +9,13 @@ using Ardalis.Result;
 
 namespace Application.Core.Interfaces.Services
 {
-    public interface IDancerService : ICommonService<Dancer>
+    public interface IDancerService
     {
         // Task<Result<Dancer>> GetDancerByIdAsync(Guid id, CancellationToken cancellationToken);
 
         Task<Result<IEnumerable<Dancer>>> GetDancersAsync(int page, int limit, CancellationToken cancellationToken);
+
+        Result<Dancer> GetDancerById(Guid id);
 
         Task<Result<Dancer>> GetDancerByAuthId(string authId, CancellationToken cancellationToken);
 

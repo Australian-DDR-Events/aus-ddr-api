@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AusDdrApi.Endpoints.DancerEndpoints;
 
+[ApiController]
 public class GetByToken : ControllerBase
 {
     private readonly IDancerService _dancerService;

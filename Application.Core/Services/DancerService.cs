@@ -38,6 +38,12 @@ namespace Application.Core.Services
             return Result<IEnumerable<Dancer>>.Success(dancers);
         }
 
+        public Result<Dancer> GetDancerById(Guid id)
+        {
+            var dancer = _dancerRepository.GetDancerById(id);
+            return dancer != null ? Result<Dancer>.Success(dancer) : Result<Dancer>.NotFound();
+        }
+
         public async Task<Result<Dancer>> GetDancerByAuthId(string authId, CancellationToken cancellationToken)
         {
             var byAuthIdSpec = new ByAuthIdSpec(authId);

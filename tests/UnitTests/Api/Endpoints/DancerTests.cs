@@ -19,6 +19,59 @@ public class DancerTests
     private readonly Mock<IDancerService> _dancerService = new();
     private readonly Mock<IIdentity<string>> _identityService = new();
 
+    #region GetById
+
+    
+    [Fact(DisplayName = "When dancer is returned from service, return ok result")]
+    public async Task GetById_WhenDancerReturned_ResponseIsOk()
+    {
+        var endpoint = new DancerEndpoints.GetById(_dancerService.Object);
+
+        var request = new DancerEndpoints.GetDancerByIdRequest
+        {
+            Id = Guid.NewGuid()
+        };
+        var dancer = new Dancer
+        {
+            Id = request.Id
+        };
+
+        _dancerService.Setup(ds =>
+            ds.GetDancerById(It.Is<Guid>(source => source.Equals(request.Id)
+            ))
+        ).Returns(Result<Dancer>.Success(dancer));
+
+        var response = await endpoint.HandleAsync(request, CancellationToken.None);
+        
+        Assert.IsType<OkObjectResult>(response.Result);
+        var convertedResult = response.Result as OkObjectResult;
+        Assert.NotNull(convertedResult);
+        var data = convertedResult.Value as DancerEndpoints.GetDancerByIdResponse;
+        Assert.NotNull(data);
+        Assert.Equal(dancer.Id, data.Id);
+    }
+
+    [Fact(DisplayName = "When dancer is not found, return NotFound result")]
+    public async Task GetById_DancerNotFound_ResponseIsNotFound()
+    {
+        var endpoint = new DancerEndpoints.GetById(_dancerService.Object);
+        
+        var request = new DancerEndpoints.GetDancerByIdRequest
+        {
+            Id = Guid.NewGuid()
+        };
+
+        _dancerService.Setup(ds =>
+            ds.GetDancerById(It.IsAny<Guid>())
+        ).Returns(Result<Dancer>.NotFound());
+
+        var response = await endpoint.HandleAsync(request, CancellationToken.None);
+
+        Assert.IsType<NotFoundResult>(response.Result);
+    }
+
+    #endregion
+
     #region GetByToken
 
     [Fact(DisplayName = "When dancer is returned from service, return ok result")]

@@ -1,14 +1,15 @@
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Core.Entities;
 using Application.Core.Interfaces.Services;
-using AusDdrApi.Extensions;
+using Ardalis.Result;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace AusDdrApi.Endpoints.DancerEndpoints
 {
-    public class GetById : EndpointWithResponse<GetDancerByIdRequest, GetDancerByIdResponse, Dancer>
+    [ApiController]
+    public class GetById : ControllerBase
     {
         private readonly IDancerService _dancerService;
 
@@ -17,19 +18,19 @@ namespace AusDdrApi.Endpoints.DancerEndpoints
             _dancerService = dancerService;
         }
         
-        [HttpGet(GetDancerByIdRequest.Route)]
+        [HttpGet("/dancers/{Id}")]
         [SwaggerOperation(
             Summary = "Gets a single Dancer",
             Description = "Gets a single Dancer by Id",
             OperationId = "Dancers.GetById",
             Tags = new[] { "Dancers" })
         ]
-        public override async Task<ActionResult<GetDancerByIdResponse>> HandleAsync([FromRoute] [FromQuery] GetDancerByIdRequest request, CancellationToken cancellationToken = new())
+        public async Task<ActionResult<GetDancerByIdResponse>> HandleAsync([FromRoute] GetDancerByIdRequest request, CancellationToken cancellationToken = new())
         {
-            var dancerResult = await _dancerService.GetByIdAsync(request.Id, cancellationToken);
-            return this.ConvertToActionResult(dancerResult);
+            var dancerResult = _dancerService.GetDancerById(request.Id);
+            if (dancerResult.IsSuccess) return Ok(GetDancerByIdResponse.Convert(dancerResult.Value));
+            if (dancerResult.Status == ResultStatus.NotFound) return NotFound();
+            return new StatusCodeResult(StatusCodes.Status500InternalServerError);
         }
-        
-        public override GetDancerByIdResponse Convert(Dancer u) => new() {Id = u.Id, Name = u.DdrName, Code = u.DdrCode, State = u.State, PrimaryLocation = u.PrimaryMachineLocation};
     }
 }

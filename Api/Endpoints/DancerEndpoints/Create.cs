@@ -11,6 +11,7 @@ using Swashbuckle.AspNetCore.Annotations;
 
 namespace AusDdrApi.Endpoints.DancerEndpoints;
 
+[ApiController]
 public class Create : ControllerBase
 {
     private readonly IDancerService _dancerService;

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Core.Entities;
@@ -262,6 +263,39 @@ public class DancerTests
 
         var response = await endpoint.HandleAsync(requestModel, "", CancellationToken.None);
         Assert.IsType<ConflictResult>(response);
+    }
+
+    #endregion
+
+    #region Badges_List
+
+    [Fact(DisplayName = "When success response with badges, return Ok result")]
+    public async Task Badges_List_BadgesFound_OkResponse()
+    {
+        var endpoint = new DancerEndpoints.Badges_List(_dancerService.Object);
+
+        var request = new DancerEndpoints.GetDancerBadgesByIdRequest
+        {
+            Id = Guid.NewGuid()
+        };
+
+        var serviceResponse = new List<GetDancerBadgesResponseModel>()
+        {
+            new()
+        };
+
+        _dancerService.Setup(ds =>
+            ds.GetDancerBadges(It.Is<Guid>(value => value.Equals(request.Id)))
+        ).Returns(serviceResponse);
+
+        var response = await endpoint.HandleAsync(request);
+
+        Assert.IsType<OkObjectResult>(response.Result);
+        var convertedResult = response.Result as OkObjectResult;
+        Assert.NotNull(convertedResult);
+        var data = convertedResult.Value as IEnumerable<DancerEndpoints.GetDancerBadgesByIdResponse>;
+        Assert.NotNull(data);
+        Assert.Single(data);
     }
 
     #endregion

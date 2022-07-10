@@ -226,7 +226,7 @@ namespace UnitTests.Core.Services
                 DdrCode = "123",
                 DdrName = "Abc",
                 PrimaryMachineLocation = "Abc123",
-                ProfilePictureTimestamp = DateTime.Now,
+                ProfilePictureTimestamp = DateTime.UtcNow,
                 State = "Zyx"
             };
             var requestModel = new UpdateDancerRequestModel
@@ -336,6 +336,40 @@ namespace UnitTests.Core.Services
             _dancerRepository2.Verify(r =>
                 r.UpdateDancer(It.IsAny<Dancer>(), It.IsAny<CancellationToken>()), Times.Never
             );
+        }
+
+        #endregion
+
+        #region GetDancerBadges
+
+        [Fact(DisplayName = "When GetDancerBadges, if dancer has badges in repository, return success")]
+        public void GetDancerBadges_DancerHasBadges_Success()
+        {
+            var id = Guid.NewGuid();
+            var badges = new List<GetDancerBadgesResponseModel>() {new GetDancerBadgesResponseModel {Id = Guid.NewGuid()}};
+
+            _dancerRepository2.Setup(r =>
+                r.GetBadgesForDancer(It.Is<Guid>(value => value.Equals(id)))
+            ).Returns(badges);
+
+            var result = _dancerService.GetDancerBadges(id);
+            
+            Assert.Equal(ResultStatus.Ok, result.Status);
+            Assert.Equal(badges, result.Value);
+        }
+
+        [Fact(DisplayName = "When GetDancerBadges, if dancer has no badges in repository, return not found")]
+        public void GetDancerBadges_DancerHasNoBadges_NotFound()
+        {
+            var id = Guid.NewGuid();
+
+            _dancerRepository2.Setup(r =>
+                r.GetBadgesForDancer(It.Is<Guid>(value => value.Equals(id)))
+            ).Returns(new List<GetDancerBadgesResponseModel>());
+
+            var result = _dancerService.GetDancerBadges(id);
+            
+            Assert.Equal(ResultStatus.NotFound, result.Status);
         }
 
         #endregion

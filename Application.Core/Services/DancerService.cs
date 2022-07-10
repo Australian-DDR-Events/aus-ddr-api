@@ -107,16 +107,14 @@ namespace Application.Core.Services
             return Result<Dancer>.Success(dancer);
         }
 
-        public async Task<Result<ICollection<Badge>>> GetDancerBadgesAsync(Guid id,
-            CancellationToken cancellationToken)
+        public Result<IEnumerable<GetDancerBadgesResponseModel>> GetDancerBadges(Guid id)
         {
-            var dancerBadgesSpec = new DancerBadgesSpec(id);
-            var dancer = await _repository.GetBySpecAsync(dancerBadgesSpec, cancellationToken);
-            if (dancer == null)
+            var badges = _dancerRepository.GetBadgesForDancer(id);
+            if (!badges.Any())
             {
-                return Result<ICollection<Badge>>.NotFound();
+                return Result<IEnumerable<GetDancerBadgesResponseModel>>.NotFound();
             }
-            return Result<ICollection<Badge>>.Success(dancer.Badges);
+            return Result<IEnumerable<GetDancerBadgesResponseModel>>.Success(badges);
         }
 
         public async Task<Result<bool>> AddBadgeToDancer(Guid dancerId, Guid badgeId, CancellationToken cancellationToken)
@@ -168,7 +166,7 @@ namespace Application.Core.Services
                 await _fileStorage.UploadFileFromStream(stream, $"profile/avatar/{dancer.Id}.{size}.png");
             });
             
-            dancer.ProfilePictureTimestamp = DateTime.Now;
+            dancer.ProfilePictureTimestamp = DateTime.UtcNow;
             await _repository.SaveChangesAsync(cancellationToken);
 
             await Task.WhenAll(uploadProcess);

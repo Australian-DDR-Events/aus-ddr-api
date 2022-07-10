@@ -175,4 +175,70 @@ public class DancerRepositoryTests
     }
 
     #endregion
+
+    #region GetBadgesForDancer
+
+    [Fact(DisplayName = "When dancer has badges, return badges")]
+    public async Task GetBadgesForDancer_AssignedBadges_ListOfBadges()
+    {
+        var badges = new List<Badge>() {BadgeGenerator.CreateBadge(), BadgeGenerator.CreateBadge()};
+        var dancer = DancerGenerator.CreateDancer();
+        dancer.Badges = badges;
+        badges.ForEach(b => _fixture._context.Badges.Add(b));
+        _fixture._context.Dancers.Add(dancer);
+        await _fixture._context.SaveChangesAsync();
+
+        var result = _dancerRepository.GetBadgesForDancer(dancer.Id);
+        
+        Assert.Equal(2, result.Count());
+    }
+
+    [Fact(DisplayName = "When dancer has no badges, return empty list")]
+    public async Task GetBadgesForDancer_NoAssignedBadges_EmptyResult()
+    {
+        var badges = new List<Badge>() {BadgeGenerator.CreateBadge(), BadgeGenerator.CreateBadge()};
+        var dancer = DancerGenerator.CreateDancer();
+        badges.ForEach(b => _fixture._context.Badges.Add(b));
+        _fixture._context.Dancers.Add(dancer);
+        await _fixture._context.SaveChangesAsync();
+
+        var result = _dancerRepository.GetBadgesForDancer(dancer.Id);
+        
+        Assert.Empty(result);
+    }
+
+    [Fact(DisplayName = "When dancer not found, return empty list")]
+    public async Task GetBadgesForDancer_NoDancerExists_EmptyResult()
+    {
+        var badges = new List<Badge>() {BadgeGenerator.CreateBadge(), BadgeGenerator.CreateBadge()};
+        badges.ForEach(b => _fixture._context.Badges.Add(b));
+        await _fixture._context.SaveChangesAsync();
+
+        var result = _dancerRepository.GetBadgesForDancer(Guid.NewGuid());
+        
+        Assert.Empty(result);
+    }
+
+    [Fact(DisplayName = "When dancer has badge, badge has associated event, return badges with event name")]
+    public async Task GetBadgesForDancer_DancerHasBadge_BadgeHasName()
+    {
+        var e = EventGenerator.CreateEvent();
+        e.Name = "EventName";
+        var badge = BadgeGenerator.CreateBadge();
+        badge.Event = e;
+        var dancer = DancerGenerator.CreateDancer();
+        dancer.Badges = new List<Badge>(){badge};
+        _fixture._context.Events.Add(e);
+        _fixture._context.Badges.Add(badge);
+        _fixture._context.Dancers.Add(dancer);
+        await _fixture._context.SaveChangesAsync();
+
+        var result = _dancerRepository.GetBadgesForDancer(dancer.Id);
+
+        var badges = result.ToList();
+        Assert.Single(badges);
+        Assert.Equal(e.Name, badges.ToList()[0].EventName);
+    }
+
+    #endregion
 }

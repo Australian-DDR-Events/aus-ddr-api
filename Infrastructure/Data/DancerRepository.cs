@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Application.Core.Entities;
 using Application.Core.Interfaces.Repositories;
+using Application.Core.Models.Dancer;
 using JetBrains.Annotations;
 
 namespace Infrastructure.Data;
@@ -65,5 +66,20 @@ public class DancerRepository : IDancerRepository
         if (dbDancer == null) return;
         _context.Entry(dbDancer).CurrentValues.SetValues(dancer);
         await _context.SaveChangesAsync(cancellationToken);
+    }
+
+    public IEnumerable<GetDancerBadgesResponseModel> GetBadgesForDancer(Guid dancerId)
+    {
+        return _context
+            .Dancers
+            .Where(d => d.Id.Equals(dancerId))
+            .Select(d => d.Badges.Select(b => new GetDancerBadgesResponseModel
+                {
+                    Id = b.Id,
+                    Name = b.Name,
+                    Description = b.Description,
+                    EventName = b.EventId.HasValue ? b.Event!.Name : string.Empty
+                })
+            ).FirstOrDefault() ?? new List<GetDancerBadgesResponseModel>();
     }
 }

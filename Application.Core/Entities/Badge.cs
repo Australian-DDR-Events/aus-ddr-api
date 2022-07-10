@@ -10,7 +10,7 @@ namespace Application.Core.Entities
         public string Description { get; set; } = string.Empty;
         public int? Threshold { get; set; } = null;
         
-        public Guid EventId { get; set; }
+        public Guid? EventId { get; set; }
         public Event? Event { get; set; }
         
         public virtual ICollection<Dancer> Dancers { get; set; } = default!;

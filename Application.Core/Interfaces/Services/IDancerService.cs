@@ -35,7 +35,7 @@ namespace Application.Core.Interfaces.Services
         Task<Result<Dancer>> UpdateDancerAsync(UpdateDancerRequestModel requestModel,
             CancellationToken cancellationToken);
             
-        Task<Result<ICollection<Badge>>> GetDancerBadgesAsync(Guid id, CancellationToken cancellationToken);
+        Result<IEnumerable<GetDancerBadgesResponseModel>> GetDancerBadges(Guid id);
 
         Task<Result<bool>> AddBadgeToDancer(Guid dancerId, Guid badgeId, CancellationToken cancellationToken);
         Task<Result<bool>> RemoveBadgeFromDancer(Guid dancerId, Guid badgeId, CancellationToken cancellationToken);

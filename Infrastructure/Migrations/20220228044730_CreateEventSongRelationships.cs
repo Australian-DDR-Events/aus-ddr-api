@@ -10,11 +10,11 @@ namespace Infrastructure.Migrations
             migrationBuilder.AlterColumn<DateTime>(
                 name: "SubmissionTime",
                 table: "Scores",
-                type: "timestamp without time zone",
+                type: "timestamp with time zone",
                 nullable: false,
                 defaultValue: new DateTime(2022, 2, 28, 4, 47, 29, 615, DateTimeKind.Utc).AddTicks(7480),
                 oldClrType: typeof(DateTime),
-                oldType: "timestamp without time zone",
+                oldType: "timestamp with time zone",
                 oldDefaultValue: new DateTime(2022, 2, 22, 23, 58, 42, 457, DateTimeKind.Utc).AddTicks(5010));
 
             migrationBuilder.CreateTable(
@@ -87,11 +87,11 @@ namespace Infrastructure.Migrations
             migrationBuilder.AlterColumn<DateTime>(
                 name: "SubmissionTime",
                 table: "Scores",
-                type: "timestamp without time zone",
+                type: "timestamp with time zone",
                 nullable: false,
                 defaultValue: new DateTime(2022, 2, 22, 23, 58, 42, 457, DateTimeKind.Utc).AddTicks(5010),
                 oldClrType: typeof(DateTime),
-                oldType: "timestamp without time zone",
+                oldType: "timestamp with time zone",
                 oldDefaultValue: new DateTime(2022, 2, 28, 4, 47, 29, 615, DateTimeKind.Utc).AddTicks(7480));
         }
     }

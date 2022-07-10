@@ -30,7 +30,7 @@ namespace Infrastructure.Migrations
                     DdrCode = table.Column<string>(type: "text", nullable: false),
                     PrimaryMachineLocation = table.Column<string>(type: "text", nullable: false),
                     State = table.Column<string>(type: "text", nullable: false),
-                    ProfilePictureTimestamp = table.Column<DateTime>(type: "timestamp without time zone", nullable: true)
+                    ProfilePictureTimestamp = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -57,8 +57,8 @@ namespace Infrastructure.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: false),
-                    StartDate = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
-                    EndDate = table.Column<DateTime>(type: "timestamp without time zone", nullable: false)
+                    StartDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    EndDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -266,7 +266,7 @@ namespace Infrastructure.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Value = table.Column<int>(type: "integer", nullable: false),
-                    SubmissionTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: false, defaultValue: new DateTime(2021, 6, 9, 8, 29, 6, 807, DateTimeKind.Utc).AddTicks(9110)),
+                    SubmissionTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValue: new DateTime(2021, 6, 9, 8, 29, 6, 807, DateTimeKind.Utc).AddTicks(9110)),
                     DancerId = table.Column<Guid>(type: "uuid", nullable: false),
                     SongDifficultyId = table.Column<Guid>(type: "uuid", nullable: false),
                     GradedDancerDishId = table.Column<Guid>(type: "uuid", nullable: true)

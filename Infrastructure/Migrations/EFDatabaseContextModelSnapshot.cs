@@ -6,6 +6,8 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
+#nullable disable
+
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(EFDatabaseContext))]
@@ -15,9 +17,10 @@ namespace Infrastructure.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("Relational:MaxIdentifierLength", 63)
                 .HasAnnotation("ProductVersion", "5.0.6")
-                .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
+
+            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("Application.Core.Entities.Badge", b =>
                 {
@@ -43,7 +46,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("EventId");
 
-                    b.ToTable("Badges");
+                    b.ToTable("Badges", (string)null);
                 });
 
             modelBuilder.Entity("Application.Core.Entities.Course", b =>
@@ -62,7 +65,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Courses");
+                    b.ToTable("Courses", (string)null);
                 });
 
             modelBuilder.Entity("Application.Core.Entities.Dancer", b =>
@@ -88,7 +91,7 @@ namespace Infrastructure.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime?>("ProfilePictureTimestamp")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("State")
                         .IsRequired()
@@ -99,7 +102,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("AuthenticationId")
                         .IsUnique();
 
-                    b.ToTable("Dancers");
+                    b.ToTable("Dancers", (string)null);
                 });
 
             modelBuilder.Entity("Application.Core.Entities.Dish", b =>
@@ -117,7 +120,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Dishes");
+                    b.ToTable("Dishes", (string)null);
                 });
 
             modelBuilder.Entity("Application.Core.Entities.DishSong", b =>
@@ -145,7 +148,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("SongDifficultyId");
 
-                    b.ToTable("DishSongs");
+                    b.ToTable("DishSongs", (string)null);
                 });
 
             modelBuilder.Entity("Application.Core.Entities.Event", b =>
@@ -159,18 +162,18 @@ namespace Infrastructure.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime>("EndDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateTime>("StartDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Events");
+                    b.ToTable("Events", (string)null);
                 });
 
             modelBuilder.Entity("Application.Core.Entities.GradedDancerDish", b =>
@@ -191,7 +194,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("GradedDishId");
 
-                    b.ToTable("GradedDancerDishes");
+                    b.ToTable("GradedDancerDishes", (string)null);
                 });
 
             modelBuilder.Entity("Application.Core.Entities.GradedDancerIngredient", b =>
@@ -217,7 +220,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("ScoreId");
 
-                    b.ToTable("GradedDancerIngredients");
+                    b.ToTable("GradedDancerIngredients", (string)null);
                 });
 
             modelBuilder.Entity("Application.Core.Entities.GradedDish", b =>
@@ -241,7 +244,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("DishId");
 
-                    b.ToTable("GradedDishes");
+                    b.ToTable("GradedDishes", (string)null);
                 });
 
             modelBuilder.Entity("Application.Core.Entities.GradedIngredient", b =>
@@ -268,7 +271,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("IngredientId");
 
-                    b.ToTable("GradedIngredients");
+                    b.ToTable("GradedIngredients", (string)null);
                 });
 
             modelBuilder.Entity("Application.Core.Entities.Ingredient", b =>
@@ -288,7 +291,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("SongDifficultyId");
 
-                    b.ToTable("Ingredients");
+                    b.ToTable("Ingredients", (string)null);
                 });
 
             modelBuilder.Entity("Application.Core.Entities.Score", b =>
@@ -311,7 +314,7 @@ namespace Infrastructure.Migrations
 
                     b.Property<DateTime>("SubmissionTime")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp without time zone")
+                        .HasColumnType("timestamp with time zone")
                         .HasDefaultValue(new DateTime(2022, 7, 10, 13, 48, 57, 842, DateTimeKind.Utc).AddTicks(7570));
 
                     b.Property<int>("Value")
@@ -325,7 +328,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("SongDifficultyId");
 
-                    b.ToTable("Scores");
+                    b.ToTable("Scores", (string)null);
                 });
 
             modelBuilder.Entity("Application.Core.Entities.Song", b =>
@@ -348,7 +351,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Songs");
+                    b.ToTable("Songs", (string)null);
                 });
 
             modelBuilder.Entity("Application.Core.Entities.SongDifficulty", b =>
@@ -378,7 +381,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("SongId");
 
-                    b.ToTable("SongDifficulties");
+                    b.ToTable("SongDifficulties", (string)null);
                 });
 
             modelBuilder.Entity("BadgeDancer", b =>
@@ -393,7 +396,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("DancersId");
 
-                    b.ToTable("BadgeDancer");
+                    b.ToTable("BadgeDancer", (string)null);
                 });
 
             modelBuilder.Entity("CourseEvent", b =>
@@ -408,7 +411,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("EventsId");
 
-                    b.ToTable("CourseEvent");
+                    b.ToTable("CourseEvent", (string)null);
                 });
 
             modelBuilder.Entity("CourseSongDifficulty", b =>
@@ -423,7 +426,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("SongDifficultiesId");
 
-                    b.ToTable("CourseSongDifficulty");
+                    b.ToTable("CourseSongDifficulty", (string)null);
                 });
 
             modelBuilder.Entity("DishIngredient", b =>
@@ -438,7 +441,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("IngredientsId");
 
-                    b.ToTable("DishIngredient");
+                    b.ToTable("DishIngredient", (string)null);
                 });
 
             modelBuilder.Entity("EventSongDifficulty", b =>
@@ -453,7 +456,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("SongDifficultiesId");
 
-                    b.ToTable("EventSongDifficulty");
+                    b.ToTable("EventSongDifficulty", (string)null);
                 });
 
             modelBuilder.Entity("Application.Core.Entities.Badge", b =>

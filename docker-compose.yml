@@ -3,6 +3,7 @@ services:
   db:
     container_name: aus-ddr-events-db
     image: postgres:latest
+    command: ["postgres", "-c", "log_statement=all", "-c", "log_destination=stderr"]
     environment:
       POSTGRES_DB: ${AUS_DDR_EVENTS_DB_DB}
       POSTGRES_USER: ${AUS_DDR_EVENTS_DB_USERNAME}

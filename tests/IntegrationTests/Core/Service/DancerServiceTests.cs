@@ -12,7 +12,7 @@ using Xunit;
 
 namespace IntegrationTests.Core.Service;
 
-[Collection("Postgres database collection")]
+[Collection("Dancer service collection")]
 public class DancerServiceTests
 {
     private readonly PostgresDatabaseFixture _fixture;

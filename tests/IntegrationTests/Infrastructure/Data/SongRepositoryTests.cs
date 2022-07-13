@@ -7,7 +7,7 @@ using Xunit;
 
 namespace IntegrationTests.Infrastructure.Data;
 
-[Collection("Postgres database collection")]
+[Collection("Song repository collection")]
 public class SongRepositoryTests
 {
     private readonly PostgresDatabaseFixture _fixture;

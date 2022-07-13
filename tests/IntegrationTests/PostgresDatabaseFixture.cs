@@ -18,6 +18,7 @@ namespace IntegrationTests
         public void Dispose()
         {
             Setup.DropAllRows(_context);
+            Setup.Destroy(_context);
             _context.Database.CloseConnection();
         }
     }

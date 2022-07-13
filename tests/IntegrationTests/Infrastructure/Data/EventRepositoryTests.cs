@@ -8,7 +8,7 @@ using Xunit;
 
 namespace IntegrationTests.Infrastructure.Data;
 
-[Collection("Postgres database collection")]
+[Collection("Event repository collection")]
 public class EventRepositoryTests
 {
     private readonly PostgresDatabaseFixture _fixture;

@@ -1,7 +1,6 @@
 using System;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
 
 namespace IntegrationTests
 {
@@ -9,6 +8,7 @@ namespace IntegrationTests
     {
         public static EFDatabaseContext Connect()
         {
+            var slug = Guid.NewGuid();
             var connectionString =
                 "Username=admin;Password=password;Host=localhost;Port=1235;Database=IntegrationTests";
             var options = new DbContextOptionsBuilder<EFDatabaseContext>();
@@ -16,7 +16,19 @@ namespace IntegrationTests
                 .UseNpgsql(connectionString)
                 .EnableSensitiveDataLogging()
                 .EnableDetailedErrors();
-            return new EFDatabaseContext(options.Options);
+            var context = new EFDatabaseContext(options.Options);
+            context.Database.ExecuteSqlRaw($"CREATE DATABASE IntegrationTests{slug.ToString().Replace("-", "")}");
+            context.Database.SetConnectionString($"{connectionString}{slug.ToString().Replace("-", "")}");
+            return context;
+        }
+
+        public static void Destroy(EFDatabaseContext context)
+        {
+            if (!context.Database.GetDbConnection().Database.StartsWith("IntegrationTests"))
+            {
+                throw new ArgumentException("can only destroy IntegrationTests database");
+            }
+            context.Database.ExecuteSqlRaw($"DROP DATABASE {context.Database.GetDbConnection().Database}");
         }
         
         public static void Migrate(EFDatabaseContext context)
@@ -26,7 +38,7 @@ namespace IntegrationTests
         
         public static void DropAllRows(EFDatabaseContext context)
         {
-            if (context.Database.GetDbConnection().Database != "IntegrationTests")
+            if (!context.Database.GetDbConnection().Database.StartsWith("IntegrationTests"))
             {
                 throw new ArgumentException("can only drop all rows on IntegrationTests database");
             }

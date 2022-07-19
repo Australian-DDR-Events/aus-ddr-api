@@ -299,4 +299,53 @@ public class DancerTests
     }
 
     #endregion
+
+    #region Badges_Set
+
+    [Fact(DisplayName = "When success response, return Ok result")]
+    public async Task Badges_Set_Assigned_OkResponse()
+    {
+        var endpoint = new DancerEndpoints.Badges_Set(_dancerService.Object);
+        var request = new DancerEndpoints.AddBadgeToDancerByIdRequest()
+        {
+            BadgeId = Guid.NewGuid(),
+            DancerId = Guid.NewGuid()
+        };
+
+        _dancerService.Setup(ds =>
+            ds.AddBadgeToDancer(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<CancellationToken>())
+        ).ReturnsAsync(true);
+
+        var response = await endpoint.HandleAsync(request);
+        
+        Assert.IsType<OkResult>(response);
+        _dancerService.Verify(ds =>
+                ds.AddBadgeToDancer(
+                    It.Is<Guid>(value => value.Equals(request.DancerId)),
+                    It.Is<Guid>(value => value.Equals(request.BadgeId)),
+                    It.IsAny<CancellationToken>()
+                ), Times.Once
+        );
+    }
+
+    [Fact(DisplayName = "When error response, return BadRequest result")]
+    public async Task Badges_Set_Failed_BadRequestResponse()
+    {
+        var endpoint = new DancerEndpoints.Badges_Set(_dancerService.Object);
+        var request = new DancerEndpoints.AddBadgeToDancerByIdRequest()
+        {
+            BadgeId = Guid.NewGuid(),
+            DancerId = Guid.NewGuid()
+        };
+
+        _dancerService.Setup(ds =>
+            ds.AddBadgeToDancer(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<CancellationToken>())
+        ).ReturnsAsync(false);
+
+        var response = await endpoint.HandleAsync(request);
+        
+        Assert.IsType<BadRequestResult>(response);
+    }
+
+    #endregion
 }

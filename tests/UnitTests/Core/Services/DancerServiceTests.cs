@@ -376,103 +376,24 @@ namespace UnitTests.Core.Services
 
         #region AddBadgeToDancer Tests
 
-        [Fact(DisplayName = "When AddBadgeToDancer, if dancer and badge exists in source, then return success")]
+        [Fact(DisplayName = "When AddBadgeToDancer, delegates request to repository")]
         public async Task AddBadgeToDancer_Created()
         {
-            var badgeId = Guid.NewGuid();
-            var dancerId = Guid.NewGuid();
+            var dancerGuid = Guid.NewGuid();
+            var badgeGuid = Guid.NewGuid();
+            _dancerRepository2.Setup(r =>
+                r.AddBadgeToDancer(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<CancellationToken>())
+            ).ReturnsAsync(true);
 
-            var repositoryDancer = new Dancer
-            {
-                Id = dancerId,
-                Badges = new List<Badge>()
-            };
-            var repositoryBadge = new Badge
-            {
-                Id = badgeId
-            };
-
-            _dancerRepository.Setup(r =>
-                    r.GetBySpecAsync(
-                        It.IsAny<DancerBadgesSpec>(),
-                        It.IsAny<CancellationToken>()))
-                .ReturnsAsync(repositoryDancer);
-
-            _badgeRepository.Setup(r =>
-                    r.GetByIdAsync(
-                        It.IsAny<Guid>(),
-                        It.IsAny<CancellationToken>()))
-                .ReturnsAsync(repositoryBadge);
-
-            var result = await _dancerService.AddBadgeToDancer(dancerId, badgeId, CancellationToken.None);
-
-            _badgeRepository.Verify(repository => repository.GetByIdAsync(badgeId, It.IsAny<CancellationToken>()), Times.Once);
-            _dancerRepository.Verify(repository => repository.SaveChangesAsync(It.IsAny<CancellationToken>()),Times.Once);
-            
-            Assert.True(result.IsSuccess);
-        }
-
-        [Fact(DisplayName = "When AddBadgeToDancer, if dancer not found, then return not found")]
-        public async Task AddBadgeToDancer_NoDancerFound_NotFound()
-        {
-            var badgeId = Guid.NewGuid();
-            var dancerId = Guid.NewGuid();
-
-            var repositoryBadge = new Badge
-            {
-                Id = badgeId
-            };
-
-            _dancerRepository.Setup(r =>
-                    r.GetBySpecAsync(
-                        It.IsAny<DancerBadgesSpec>(),
-                        It.IsAny<CancellationToken>()))
-                .ReturnsAsync((Dancer) null);
-
-            _badgeRepository.Setup(r =>
-                    r.GetByIdAsync(
-                        It.IsAny<Guid>(),
-                        It.IsAny<CancellationToken>()))
-                .ReturnsAsync(repositoryBadge);
-
-            var result = await _dancerService.AddBadgeToDancer(dancerId, badgeId, CancellationToken.None);
-            
-            Assert.False(result.IsSuccess);
-            Assert.Equal(ResultStatus.NotFound, result.Status);
-
-            _badgeRepository.Verify(repository => repository.GetByIdAsync(badgeId, It.IsAny<CancellationToken>()), Times.Once);
-        }
-
-        [Fact(DisplayName = "When AddBadgeToDancer, if badge not found, then return not found")]
-        public async Task AddBadgeToDancer_NoBadgeFound_NotFound()
-        {
-            var badgeId = Guid.NewGuid();
-            var dancerId = Guid.NewGuid();
-
-            var repositoryDancer = new Dancer
-            {
-                Id = dancerId,
-                Badges = new List<Badge>()
-            };
-
-            _dancerRepository.Setup(r =>
-                    r.GetBySpecAsync(
-                        It.IsAny<DancerBadgesSpec>(),
-                        It.IsAny<CancellationToken>()))
-                .ReturnsAsync(repositoryDancer);
-
-            _badgeRepository.Setup(r =>
-                    r.GetByIdAsync(
-                        It.IsAny<Guid>(),
-                        It.IsAny<CancellationToken>()))
-                .ReturnsAsync((Badge) null);
-
-            var result = await _dancerService.AddBadgeToDancer(dancerId, badgeId, CancellationToken.None);
-            
-            Assert.False(result.IsSuccess);
-            Assert.Equal(ResultStatus.NotFound, result.Status);
-
-            _badgeRepository.Verify(repository => repository.GetByIdAsync(badgeId, It.IsAny<CancellationToken>()), Times.Once);
+            var result = await _dancerService.AddBadgeToDancer(dancerGuid, badgeGuid, CancellationToken.None);
+            Assert.True(result);
+            _dancerRepository2.Verify(r =>
+                r.AddBadgeToDancer(
+                    It.Is<Guid>(value => value.Equals(dancerGuid)),
+                    It.Is<Guid>(value => value.Equals(badgeGuid)),
+                    It.IsAny<CancellationToken>()
+                    ), Times.Once
+                );
         }
 
         #endregion

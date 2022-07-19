@@ -117,19 +117,9 @@ namespace Application.Core.Services
             return Result<IEnumerable<GetDancerBadgesResponseModel>>.Success(badges);
         }
 
-        public async Task<Result<bool>> AddBadgeToDancer(Guid dancerId, Guid badgeId, CancellationToken cancellationToken)
+        public async Task<bool> AddBadgeToDancer(Guid dancerId, Guid badgeId, CancellationToken cancellationToken)
         {
-            var dancerBadgesSpec = new DancerBadgesSpec(dancerId);
-            var dancer = await _repository.GetBySpecAsync(dancerBadgesSpec, cancellationToken);
-            var badge = await _badgeRepository.GetByIdAsync(badgeId, cancellationToken);
-            if (dancer == null || badge == null)
-            {
-                return Result<bool>.NotFound();
-            }
-
-            dancer.Badges.Add(badge);
-            await _repository.SaveChangesAsync(cancellationToken);
-            return Result<bool>.Success(true);
+            return await _dancerRepository.AddBadgeToDancer(dancerId, badgeId, cancellationToken);
         }
 
         public async Task<Result<bool>> RemoveBadgeFromDancer(Guid dancerId, Guid badgeId, CancellationToken cancellationToken)

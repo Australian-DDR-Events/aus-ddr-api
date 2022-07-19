@@ -7,6 +7,7 @@ using Application.Core.Entities;
 using Application.Core.Interfaces.Repositories;
 using Application.Core.Models.Dancer;
 using JetBrains.Annotations;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Data;
 
@@ -81,5 +82,21 @@ public class DancerRepository : IDancerRepository
                     EventName = b.EventId.HasValue ? b.Event!.Name : string.Empty
                 })
             ).FirstOrDefault() ?? new List<GetDancerBadgesResponseModel>();
+    }
+
+    public async Task<bool> AddBadgeToDancer(Guid dancerId, Guid badgeId, CancellationToken cancellationToken)
+    {
+        var dancer = _context
+            .Dancers
+            .Include(d => d.Badges)
+            .FirstOrDefault(d => d.Id.Equals(dancerId));
+        var badge = _context
+            .Badges
+            .FirstOrDefault(b => b.Id.Equals(badgeId));
+        if (dancer == null || badge == null) return false;
+        if (dancer.Badges.Any(b => b.Id.Equals(badge.Id))) return false;
+        dancer.Badges.Add(badge);
+        await _context.SaveChangesAsync(cancellationToken);
+        return true;
     }
 }

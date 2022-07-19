@@ -4,6 +4,11 @@ namespace IntegrationTests;
 
 public static class TestCollections
 {
+    [CollectionDefinition("Badge repository collection")]
+    public class BadgeRepositoryTestCollection : ICollectionFixture<PostgresDatabaseFixture>
+    {
+    }
+    
     [CollectionDefinition("Dancer repository collection")]
     public class DancerRepositoryTestCollection : ICollectionFixture<PostgresDatabaseFixture>
     {

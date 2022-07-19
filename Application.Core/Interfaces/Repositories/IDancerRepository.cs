@@ -15,4 +15,5 @@ public interface IDancerRepository
     Task CreateDancer(Dancer dancer, CancellationToken cancellationToken);
     Task UpdateDancer(Dancer dancer, CancellationToken cancellationToken);
     IEnumerable<GetDancerBadgesResponseModel> GetBadgesForDancer(Guid dancerId);
+    Task<bool> AddBadgeToDancer(Guid dancerId, Guid badgeId, CancellationToken cancellationToken);
 }

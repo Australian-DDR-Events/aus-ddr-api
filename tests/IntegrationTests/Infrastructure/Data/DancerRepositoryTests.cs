@@ -241,4 +241,92 @@ public class DancerRepositoryTests
     }
 
     #endregion
+
+    #region AddBadgeToDancer
+
+    [Fact(DisplayName = "When dancer exists, badge not assigned, then add badge to dancer")]
+    public async Task AddBadgeToDancer_DancerExists_BadgeNotAssigned_AssignBadge()
+    {
+        var badge = BadgeGenerator.CreateBadge();
+        var dancer = DancerGenerator.CreateDancer();
+        _fixture._context.Badges.Add(badge);
+        _fixture._context.Dancers.Add(dancer);
+        await _fixture._context.SaveChangesAsync();
+
+        await _dancerRepository.AddBadgeToDancer(dancer.Id, badge.Id, CancellationToken.None);
+        _fixture._context.ChangeTracker.Clear();
+
+        var dancerBadgeResult = _dancerRepository.GetBadgesForDancer(dancer.Id);
+        var badges = dancerBadgeResult.ToList();
+        Assert.Single(badges);
+        Assert.Equal(badges.First().Id, badge.Id);
+    }
+
+    [Fact(DisplayName = "When dancer exists, badge does not exist, then do not change dancer badges")]
+    public async Task AddBadgeToDancer_DancerExists_BadgeNotExists_NoChangeToDancer()
+    {
+        var badge = BadgeGenerator.CreateBadge();
+        var dancer = DancerGenerator.CreateDancer();
+        _fixture._context.Badges.Add(badge);
+        _fixture._context.Dancers.Add(dancer);
+        await _fixture._context.SaveChangesAsync();
+
+        await _dancerRepository.AddBadgeToDancer(dancer.Id, Guid.NewGuid(), CancellationToken.None);
+        _fixture._context.ChangeTracker.Clear();
+
+        var dancerBadgeResult = _dancerRepository.GetBadgesForDancer(dancer.Id);
+        var badges = dancerBadgeResult.ToList();
+        Assert.Empty(badges);
+    }
+
+    [Fact(DisplayName = "When dancer exists, add multiple badges, dancer has multiple badges")]
+    public async Task AddBadgeToDancer_DancerExists_AddMultipleBadges_AllBadgesAssigned()
+    {
+        var badges = new List<Badge>()
+            {BadgeGenerator.CreateBadge(), BadgeGenerator.CreateBadge(), BadgeGenerator.CreateBadge()};
+        var dancer = DancerGenerator.CreateDancer();
+        _fixture._context.Badges.AddRange(badges);
+        _fixture._context.Dancers.Add(dancer);
+        await _fixture._context.SaveChangesAsync();
+
+        foreach (var iteration in badges.Select((badge, i) => new { i, badge }))
+        {
+            await _dancerRepository.AddBadgeToDancer(dancer.Id, iteration.badge.Id, CancellationToken.None);
+            _fixture._context.ChangeTracker.Clear();
+            
+            var dancerBadgeResult = _dancerRepository.GetBadgesForDancer(dancer.Id).ToList();
+            Assert.Equal(iteration.i + 1, dancerBadgeResult.Count);
+            Assert.Contains(dancerBadgeResult, b => b.Id.Equals(iteration.badge.Id));
+        }
+    }
+
+    [Fact(DisplayName = "When dancer not found, do not throw exception")]
+    public async Task AddBadgeToDancer_DancerNotFound_NoException()
+    {
+        var badge = BadgeGenerator.CreateBadge();
+        _fixture._context.Badges.Add(badge);
+        await _fixture._context.SaveChangesAsync();
+
+        var exception = await Record.ExceptionAsync(async () =>
+            await _dancerRepository.AddBadgeToDancer(Guid.NewGuid(), badge.Id, CancellationToken.None)
+        );
+
+        Assert.Null(exception);
+    }
+
+    [Fact(DisplayName = "When dancer exists, badge not found, do not throw exception")]
+    public async Task AddBadgeToDancer_DancerFound_BadgeNotFound_NoException()
+    {
+        var dancer = DancerGenerator.CreateDancer();
+        _fixture._context.Dancers.Add(dancer);
+        await _fixture._context.SaveChangesAsync();
+
+        var exception = await Record.ExceptionAsync(async () =>
+            await _dancerRepository.AddBadgeToDancer(dancer.Id, Guid.NewGuid(), CancellationToken.None)
+        );
+
+        Assert.Null(exception);
+    }
+
+    #endregion
 }

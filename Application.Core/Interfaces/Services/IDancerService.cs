@@ -37,7 +37,7 @@ namespace Application.Core.Interfaces.Services
             
         Result<IEnumerable<GetDancerBadgesResponseModel>> GetDancerBadges(Guid id);
 
-        Task<Result<bool>> AddBadgeToDancer(Guid dancerId, Guid badgeId, CancellationToken cancellationToken);
+        Task<bool> AddBadgeToDancer(Guid dancerId, Guid badgeId, CancellationToken cancellationToken);
         Task<Result<bool>> RemoveBadgeFromDancer(Guid dancerId, Guid badgeId, CancellationToken cancellationToken);
 
         Task<Result<bool>> SetAvatarForDancerByAuthId(string authId, Stream fileStream, CancellationToken cancellationToken);

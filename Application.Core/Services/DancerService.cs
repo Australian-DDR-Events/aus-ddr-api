@@ -44,13 +44,6 @@ namespace Application.Core.Services
             return dancer != null ? Result<Dancer>.Success(dancer) : Result<Dancer>.NotFound();
         }
 
-        public async Task<Result<Dancer>> GetDancerByAuthId(string authId, CancellationToken cancellationToken)
-        {
-            var byAuthIdSpec = new ByAuthIdSpec(authId);
-            var dancer = await _repository.GetBySpecAsync(byAuthIdSpec, cancellationToken);
-            return dancer != null ? Result<Dancer>.Success(dancer) : Result<Dancer>.NotFound();
-        }
-
         public async Task<Result<Dancer>> MigrateDancer(MigrateDancerRequestModel requestModel,
             CancellationToken cancellationToken)
         {
@@ -118,19 +111,9 @@ namespace Application.Core.Services
             return await _dancerRepository.AddBadgeToDancer(dancerId, badgeId, cancellationToken);
         }
 
-        public async Task<Result<bool>> RemoveBadgeFromDancer(Guid dancerId, Guid badgeId, CancellationToken cancellationToken)
+        public async Task<bool> RemoveBadgeFromDancer(Guid dancerId, Guid badgeId, CancellationToken cancellationToken)
         {
-            var dancerBadgesSpec = new DancerBadgesSpec(dancerId);
-            var dancer = await _repository.GetBySpecAsync(dancerBadgesSpec, cancellationToken);
-            var badge = await _badgeRepository.GetByIdAsync(badgeId, cancellationToken);
-            if (dancer == null || badge == null)
-            {
-                return Result<bool>.NotFound();
-            }
-
-            var result = Result<bool>.Success(dancer.Badges.Remove(badge));
-            await _repository.SaveChangesAsync(cancellationToken);
-            return result;
+            return await _dancerRepository.RemoveBadgeFromDancer(dancerId, badgeId, cancellationToken);
         }
 
         public async Task<Result<bool>> SetAvatarForDancerByAuthId(string authId, Stream fileStream, CancellationToken cancellationToken)

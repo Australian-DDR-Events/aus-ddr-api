@@ -8,8 +8,6 @@ using Application.Core.Interfaces.Repositories;
 using Application.Core.Interfaces.Services;
 using Application.Core.Models.Dancer;
 using Application.Core.Services;
-using Application.Core.Specifications;
-using Application.Core.Specifications.DancerSpecs;
 using Ardalis.Result;
 using Moq;
 using Xunit;
@@ -402,78 +400,24 @@ namespace UnitTests.Core.Services
         
         #region RemoveBadgeFromDancer Tests
 
-        [Fact(DisplayName = "When RemoveBadgeFromDancer, if dancer and badge exists in source, and dancer has badge, then return success")]
-        public async Task RemoveBadgeFromDancer_Success()
+        [Fact(DisplayName = "When RemoveBadgeFromDancer, delegates request to repository")]
+        public async Task RemoveBadgeFromDancer_Created()
         {
-            var badgeId = Guid.NewGuid();
-            var dancerId = Guid.NewGuid();
+            var dancerGuid = Guid.NewGuid();
+            var badgeGuid = Guid.NewGuid();
+            _dancerRepository2.Setup(r =>
+                r.RemoveBadgeFromDancer(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<CancellationToken>())
+            ).ReturnsAsync(true);
 
-            var repositoryBadge = new Badge
-            {
-                Id = badgeId
-            };
-            var repositoryDancer = new Dancer
-            {
-                Id = dancerId,
-                Badges = new List<Badge>(){repositoryBadge}
-            };
-
-            _dancerRepository.Setup(r =>
-                    r.GetBySpecAsync(
-                        It.IsAny<DancerBadgesSpec>(),
-                        It.IsAny<CancellationToken>()))
-                .ReturnsAsync(repositoryDancer);
-
-            _badgeRepository.Setup(r =>
-                    r.GetByIdAsync(
-                        It.IsAny<Guid>(),
-                        It.IsAny<CancellationToken>()))
-                .ReturnsAsync(repositoryBadge);
-
-            var result = await _dancerService.RemoveBadgeFromDancer(dancerId, badgeId, CancellationToken.None);
-
-            _badgeRepository.Verify(repository => repository.GetByIdAsync(badgeId, It.IsAny<CancellationToken>()), Times.Once);
-            _dancerRepository.Verify(repository => repository.SaveChangesAsync(It.IsAny<CancellationToken>()),Times.Once);
-            
-            Assert.True(result.IsSuccess);
-            Assert.True(result.Value);
-        }
-
-        [Fact(DisplayName = "When RemoveBadgeFromDancer, if dancer and badge exists in source, and dancer does not have badge, then return success")]
-        public async Task RemoveBadgeFromDancer_Success_NoChange()
-        {
-            var badgeId = Guid.NewGuid();
-            var dancerId = Guid.NewGuid();
-
-            var repositoryBadge = new Badge
-            {
-                Id = badgeId
-            };
-            var repositoryDancer = new Dancer
-            {
-                Id = dancerId,
-                Badges = new List<Badge>()
-            };
-
-            _dancerRepository.Setup(r =>
-                    r.GetBySpecAsync(
-                        It.IsAny<DancerBadgesSpec>(),
-                        It.IsAny<CancellationToken>()))
-                .ReturnsAsync(repositoryDancer);
-
-            _badgeRepository.Setup(r =>
-                    r.GetByIdAsync(
-                        It.IsAny<Guid>(),
-                        It.IsAny<CancellationToken>()))
-                .ReturnsAsync(repositoryBadge);
-
-            var result = await _dancerService.RemoveBadgeFromDancer(dancerId, badgeId, CancellationToken.None);
-
-            _badgeRepository.Verify(repository => repository.GetByIdAsync(badgeId, It.IsAny<CancellationToken>()), Times.Once);
-            _dancerRepository.Verify(repository => repository.SaveChangesAsync(It.IsAny<CancellationToken>()),Times.Once);
-            
-            Assert.True(result.IsSuccess);
-            Assert.False(result.Value);
+            var result = await _dancerService.RemoveBadgeFromDancer(dancerGuid, badgeGuid, CancellationToken.None);
+            Assert.True(result);
+            _dancerRepository2.Verify(r =>
+                    r.RemoveBadgeFromDancer(
+                        It.Is<Guid>(value => value.Equals(dancerGuid)),
+                        It.Is<Guid>(value => value.Equals(badgeGuid)),
+                        It.IsAny<CancellationToken>()
+                    ), Times.Once
+            );
         }
         
         #endregion

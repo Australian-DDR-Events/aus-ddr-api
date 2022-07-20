@@ -99,4 +99,17 @@ public class DancerRepository : IDancerRepository
         await _context.SaveChangesAsync(cancellationToken);
         return true;
     }
+
+    public async Task<bool> RemoveBadgeFromDancer(Guid dancerId, Guid badgeId, CancellationToken cancellationToken)
+    {
+        var dancer = _context
+            .Dancers
+            .Include(d => d.Badges)
+            .FirstOrDefault(d => d.Id.Equals(dancerId));
+        var badge = dancer?.Badges.FirstOrDefault(b => b.Id.Equals(badgeId));
+        if (badge == null) return false;
+        dancer.Badges.Remove(badge);
+        await _context.SaveChangesAsync(cancellationToken);
+        return true;
+    }
 }

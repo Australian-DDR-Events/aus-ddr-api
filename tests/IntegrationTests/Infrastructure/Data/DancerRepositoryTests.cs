@@ -329,4 +329,56 @@ public class DancerRepositoryTests
     }
 
     #endregion
+
+    #region RemoveBadgeFromDancer
+
+    [Fact(DisplayName = "When dancer exists, has badge, remove badge from dancer")]
+    public async Task RemoveBadgeFromDancer_BadgeAssigned_BadgeIsRemoved()
+    {
+        var badge = BadgeGenerator.CreateBadge();
+        var dancer = DancerGenerator.CreateDancer();
+        _fixture._context.Badges.Add(badge);
+        dancer.Badges = new List<Badge>() {badge};
+        _fixture._context.Dancers.Add(dancer);
+        await _fixture._context.SaveChangesAsync();
+
+        var repositoryResult = await _dancerRepository.RemoveBadgeFromDancer(dancer.Id, badge.Id, CancellationToken.None);
+        _fixture._context.ChangeTracker.Clear();
+
+        var databaseResult = _dancerRepository.GetBadgesForDancer(dancer.Id);
+        
+        Assert.True(repositoryResult);
+        Assert.Empty(databaseResult);
+    }
+
+    [Fact(DisplayName = "When dancer does not exist, result is false")]
+    public async Task RemoveBadgeFromDancer_DancerNotExist_FalseResult()
+    {
+        var badge = BadgeGenerator.CreateBadge();
+        var dancer = DancerGenerator.CreateDancer();
+        _fixture._context.Badges.Add(badge);
+        dancer.Badges = new List<Badge>() {badge};
+        _fixture._context.Dancers.Add(dancer);
+        await _fixture._context.SaveChangesAsync();
+        
+        var repositoryResult = await _dancerRepository.RemoveBadgeFromDancer(Guid.NewGuid(), badge.Id, CancellationToken.None);
+        
+        Assert.False(repositoryResult);
+    }
+
+    [Fact(DisplayName = "When dancer exist, badge not found on dancer, result is false")]
+    public async Task RemoveBadgeFromDancer_DancerDoesNotHaveBadge_FalseResult()
+    {
+        var badge = BadgeGenerator.CreateBadge();
+        var dancer = DancerGenerator.CreateDancer();
+        _fixture._context.Badges.Add(badge);
+        _fixture._context.Dancers.Add(dancer);
+        await _fixture._context.SaveChangesAsync();
+        
+        var repositoryResult = await _dancerRepository.RemoveBadgeFromDancer(Guid.NewGuid(), badge.Id, CancellationToken.None);
+        
+        Assert.False(repositoryResult);
+    }
+
+    #endregion
 }

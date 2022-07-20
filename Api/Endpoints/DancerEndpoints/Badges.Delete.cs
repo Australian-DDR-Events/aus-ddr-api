@@ -9,7 +9,8 @@ using Swashbuckle.AspNetCore.Annotations;
 
 namespace AusDdrApi.Endpoints.DancerEndpoints;
 
-public class Badges_Delete : EndpointWithoutResponse<RevokeBadgeFromDancerByIdRequest>
+[ApiController]
+public class Badges_Delete : ControllerBase
 {
     private readonly IDancerService _dancerService;
 
@@ -18,18 +19,18 @@ public class Badges_Delete : EndpointWithoutResponse<RevokeBadgeFromDancerByIdRe
         _dancerService = dancerService;
     }
         
-    [HttpDelete(RevokeBadgeFromDancerByIdRequest.Route)]
+    [HttpDelete("/dancers/{DancerId:guid}/badges/{BadgeId:guid}")]
     [SwaggerOperation(
-        Summary = "Assign a badge to a dancer",
-        Description = "Assign an existing badge to the specified dancer",
-        OperationId = "Dancers.Badges.Add",
+        Summary = "Revokes a badge from a dancer",
+        Description = "Remove an existing badge from the specified dancer",
+        OperationId = "Dancers.Badges.Remove",
         Tags = new[] { "Dancers", "Badges" })
     ]
     [Authorize]
     [Admin]
-    public override async Task<ActionResult> HandleAsync([FromRoute] RevokeBadgeFromDancerByIdRequest request, CancellationToken cancellationToken = new CancellationToken())
+    public async Task<ActionResult> HandleAsync([FromRoute] RevokeBadgeFromDancerByIdRequest request, CancellationToken cancellationToken = new())
     {
         var result = await _dancerService.RemoveBadgeFromDancer(request.DancerId, request.BadgeId, cancellationToken);
-        return this.ConvertToActionResult(result);
+        return result ? Ok() : BadRequest();
     }
 }

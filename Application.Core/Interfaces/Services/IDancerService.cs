@@ -17,8 +17,6 @@ namespace Application.Core.Interfaces.Services
 
         Result<Dancer> GetDancerById(Guid id);
 
-        Task<Result<Dancer>> GetDancerByAuthId(string authId, CancellationToken cancellationToken);
-
         Task<Result<Dancer>> CreateDancerAsync(CreateDancerRequestModel requestModel,
             CancellationToken cancellationToken);
 
@@ -38,7 +36,7 @@ namespace Application.Core.Interfaces.Services
         Result<IEnumerable<GetDancerBadgesResponseModel>> GetDancerBadges(Guid id);
 
         Task<bool> AddBadgeToDancer(Guid dancerId, Guid badgeId, CancellationToken cancellationToken);
-        Task<Result<bool>> RemoveBadgeFromDancer(Guid dancerId, Guid badgeId, CancellationToken cancellationToken);
+        Task<bool> RemoveBadgeFromDancer(Guid dancerId, Guid badgeId, CancellationToken cancellationToken);
 
         Task<Result<bool>> SetAvatarForDancerByAuthId(string authId, Stream fileStream, CancellationToken cancellationToken);
     }

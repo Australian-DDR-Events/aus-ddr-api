@@ -358,7 +358,7 @@ namespace UnitTests.Core.Services
             Assert.Equal(badges, result.Value);
         }
 
-        [Fact(DisplayName = "When GetDancerBadges, if dancer has no badges in repository, return not found")]
+        [Fact(DisplayName = "When GetDancerBadges, if dancer has no badges in repository, return empty success result")]
         public void GetDancerBadges_DancerHasNoBadges_NotFound()
         {
             var id = Guid.NewGuid();
@@ -369,7 +369,8 @@ namespace UnitTests.Core.Services
 
             var result = _dancerService.GetDancerBadges(id);
             
-            Assert.Equal(ResultStatus.NotFound, result.Status);
+            Assert.Equal(ResultStatus.Ok, result.Status);
+            Assert.Empty(result.Value);
         }
 
         #endregion

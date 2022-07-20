@@ -110,10 +110,6 @@ namespace Application.Core.Services
         public Result<IEnumerable<GetDancerBadgesResponseModel>> GetDancerBadges(Guid id)
         {
             var badges = _dancerRepository.GetBadgesForDancer(id);
-            if (!badges.Any())
-            {
-                return Result<IEnumerable<GetDancerBadgesResponseModel>>.NotFound();
-            }
             return Result<IEnumerable<GetDancerBadgesResponseModel>>.Success(badges);
         }
 

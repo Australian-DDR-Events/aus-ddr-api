@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Core.Entities;
-using Application.Core.Interfaces;
 using Application.Core.Interfaces.Repositories;
 using Application.Core.Interfaces.Services;
 using Application.Core.Services;
@@ -14,15 +13,13 @@ namespace UnitTests.Core.Services;
 
 public class EventServiceTests
 {
-    private readonly Mock<IAsyncRepository<Event>> _eventRepository;
     private readonly Mock<IEventRepository> _repository;
     private readonly IEventService _eventService;
 
     public EventServiceTests()
     {
-        _eventRepository = new Mock<IAsyncRepository<Event>>();
         _repository = new Mock<IEventRepository>();
-        _eventService = new EventService(_eventRepository.Object, _repository.Object);
+        _eventService = new EventService(_repository.Object);
     }
 
     #region EventService GetEventsAsync

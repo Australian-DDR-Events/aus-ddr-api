@@ -11,14 +11,12 @@ using Ardalis.Result;
 
 namespace Application.Core.Services;
 
-public class EventService : CommonService<Event>, IEventService
+public class EventService : IEventService
 {
-    private readonly IAsyncRepository<Event> _eventRepository;
     private readonly IEventRepository _repository;
 
-    public EventService(IAsyncRepository<Event> eventRepository, IEventRepository repository) : base(eventRepository)
+    public EventService(IEventRepository repository)
     {
-        _eventRepository = eventRepository;
         _repository = repository;
     }
 

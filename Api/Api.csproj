@@ -98,14 +98,20 @@
       <Compile Update="Endpoints\EventEndpoints\List.ListEventResponse.cs">
         <DependentUpon>List.cs</DependentUpon>
       </Compile>
-      <Compile Update="Endpoints\SongEndpoints\GetById.GetSongWithTopScoresResponse.cs">
+      <Compile Update="Endpoints\SongEndpoints\GetById.GetSongByIdResponse.cs">
         <DependentUpon>GetById.cs</DependentUpon>
       </Compile>
-      <Compile Update="Endpoints\SongEndpoints\GetById.GetSongWithTopScoresRequest.cs">
+      <Compile Update="Endpoints\SongEndpoints\GetById.GetSongByIdRequest.cs">
           <DependentUpon>GetById.cs</DependentUpon>
       </Compile>
       <Compile Update="Endpoints\AdminEndpoints\ImageUploader.UploadImageRequest.cs">
           <DependentUpon>ImageUploader.cs</DependentUpon>
+      </Compile>
+      <Compile Update="Endpoints\SongEndpoints\List.GetAllSongsRequest.cs">
+        <DependentUpon>List.cs</DependentUpon>
+      </Compile>
+      <Compile Update="Endpoints\SongEndpoints\List.GetAllSongsResponse.cs">
+        <DependentUpon>List.cs</DependentUpon>
       </Compile>
     </ItemGroup>
 

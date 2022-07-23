@@ -10,18 +10,8 @@ namespace AusDdrApi.Extensions
         [NonAction]
         public abstract TResponse Convert(TEntity u);
     }
-    
-    public abstract class EndpointWithResponse<TResponse, TEntity> : BaseAsyncEndpoint.WithoutRequest.WithResponse<TResponse>
-    {
-        [NonAction]
-        public abstract TResponse Convert(TEntity u);
-    }
 
     public abstract class EndpointWithoutResponse<T> : BaseAsyncEndpoint.WithRequest<T>.WithoutResponse
-    {
-    }
-
-    public abstract class EndpointWithoutResponse : BaseAsyncEndpoint.WithoutRequest.WithoutResponse
     {
     }
 }

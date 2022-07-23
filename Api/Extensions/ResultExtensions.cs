@@ -7,64 +7,8 @@ namespace AusDdrApi.Extensions
 {
     public static class ResultExtensions
     {
-        public static ActionResult<TResponse> ConvertToActionResult<TRequest, TResponse, TEntity>(
-            this EndpointWithResponse<TRequest,TResponse,TEntity> controller, Result<TEntity> result)
-        {
-            return result.Status switch
-            {
-                ResultStatus.Ok => controller.Ok(controller.Convert(result)),
-                ResultStatus.Error => controller.Problem(string.Join(",", result.Errors)),
-                ResultStatus.Forbidden => controller.Forbid(),
-                ResultStatus.Invalid => controller.BadRequest(result.ValidationErrors.ToModelStateDictionary(controller)),
-                ResultStatus.NotFound => controller.NotFound(),
-                _ => controller.Problem("unhandled")
-            };
-        }
-        
-        public static ActionResult<TResponse> ConvertToActionResult<TResponse, TEntity>(
-            this EndpointWithResponse<TResponse,TEntity> controller, Result<TEntity> result) 
-        {
-            return result.Status switch
-            {
-                ResultStatus.Ok => controller.Ok(controller.Convert(result)),
-                ResultStatus.Error => controller.Problem(string.Join(",", result.Errors)),
-                ResultStatus.Forbidden => controller.Forbid(),
-                ResultStatus.Invalid => controller.BadRequest(result.ValidationErrors.ToModelStateDictionary(controller)),
-                ResultStatus.NotFound => controller.NotFound(),
-                _ => controller.Problem("unhandled")
-            };
-        }
-        
         public static ActionResult ConvertToActionResult<TRequest>(
             this EndpointWithoutResponse<TRequest> controller, IResult result) 
-        {
-            return result.Status switch
-            {
-                ResultStatus.Ok => controller.Ok(),
-                ResultStatus.Error => controller.Problem(string.Join(",", result.Errors)),
-                ResultStatus.Forbidden => controller.Forbid(),
-                ResultStatus.Invalid => controller.BadRequest(result.ValidationErrors.ToModelStateDictionary(controller)),
-                ResultStatus.NotFound => controller.NotFound(),
-                _ => controller.Problem("unhandled")
-            };
-        }
-        
-        public static ActionResult ConvertToActionResult<TRequest>(
-            this EndpointWithoutResponse<TRequest> controller, IResult result, ObjectResult okStatus) 
-        {
-            return result.Status switch
-            {
-                ResultStatus.Ok => okStatus,
-                ResultStatus.Error => controller.Problem(string.Join(",", result.Errors)),
-                ResultStatus.Forbidden => controller.Forbid(),
-                ResultStatus.Invalid => controller.BadRequest(result.ValidationErrors.ToModelStateDictionary(controller)),
-                ResultStatus.NotFound => controller.NotFound(),
-                _ => controller.Problem("unhandled")
-            };
-        }
-        
-        public static ActionResult ConvertToActionResult(
-            this EndpointWithoutResponse controller, IResult result)
         {
             return result.Status switch
             {

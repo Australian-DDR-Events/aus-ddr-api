@@ -6,7 +6,6 @@ using Application.Core.Interfaces;
 using Application.Core.Interfaces.Repositories;
 using Application.Core.Interfaces.Services;
 using Application.Core.Models.Badge;
-using Application.Core.Specifications;
 using Ardalis.Result;
 
 namespace Application.Core.Services

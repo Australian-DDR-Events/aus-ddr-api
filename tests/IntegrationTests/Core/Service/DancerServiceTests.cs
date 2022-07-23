@@ -19,15 +19,12 @@ public class DancerServiceTests
     private readonly DancerService _dancerService;
 
     private readonly Mock<IFileStorage> _fileStorage = new Mock<IFileStorage>();
-    private readonly Mock<IAsyncRepository<Badge>> _badgeRepository = new Mock<IAsyncRepository<Badge>>();
-    private readonly Mock<IAsyncRepository<Dancer>> _dancerRepository2 = new Mock<IAsyncRepository<Dancer>>();
 
     public DancerServiceTests(PostgresDatabaseFixture fixture)
     {
         _fixture = fixture;
         var repository = new DancerRepository(_fixture._context);
-        _dancerService = new DancerService(_dancerRepository2.Object, _badgeRepository.Object, repository,
-            _fileStorage.Object);
+        _dancerService = new DancerService(repository, _fileStorage.Object);
     }
 
     private void AddDancerToTable(Dancer d)

@@ -10,7 +10,8 @@ using Swashbuckle.AspNetCore.Annotations;
 
 namespace AusDdrApi.Endpoints.DancerEndpoints;
 
-public class Avatar_Set : EndpointWithoutResponse<SetAvatarForDancerByTokenRequest>
+[ApiController]
+public class Avatar_Set : ControllerBase
 {
     private readonly IDancerService _dancerService;
     private readonly IIdentity<string> _identity;
@@ -21,7 +22,7 @@ public class Avatar_Set : EndpointWithoutResponse<SetAvatarForDancerByTokenReque
         _identity = identity;
     }
 
-    [HttpPost(SetAvatarForDancerByTokenRequest.Route)]
+    [HttpPost("/dancers/avatar")]
     [SwaggerOperation(
         Summary = "Set an avatar for a dancer",
         Description = "Set the avatar for the currently logged in dancer",
@@ -29,15 +30,15 @@ public class Avatar_Set : EndpointWithoutResponse<SetAvatarForDancerByTokenReque
         Tags = new[] { "Dancers", "Avatar" })
     ]
     [Authorize]
-    public override async Task<ActionResult> HandleAsync([FromForm] SetAvatarForDancerByTokenRequest request,
+    public async Task<ActionResult> HandleAsync([FromForm] SetAvatarForDancerByTokenRequest request, [FromHeader] string authorization,
         CancellationToken cancellationToken = new CancellationToken())
     {
-        var userInfo = await _identity.GetUserInfo(HttpContext.Request.Headers["authorization"].First());
+        var userInfo = await _identity.GetUserInfo(authorization);
         if (request.Image == null)
         {
             return new BadRequestResult();
         }
         var result = await _dancerService.SetAvatarForDancerByAuthId(userInfo.UserId, request.Image.OpenReadStream(), cancellationToken);
-        return this.ConvertToActionResult(result);
+        return result ? Ok() : NotFound();
     }
 }

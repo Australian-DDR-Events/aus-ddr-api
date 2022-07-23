@@ -9,24 +9,19 @@ using Application.Core.Interfaces;
 using Application.Core.Interfaces.Repositories;
 using Application.Core.Interfaces.Services;
 using Application.Core.Models.Dancer;
-using Application.Core.Specifications.DancerSpecs;
 using Ardalis.Result;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
 
 namespace Application.Core.Services
 {
-    public class DancerService : CommonService<Dancer>, IDancerService
+    public class DancerService : IDancerService
     {
-        private readonly IAsyncRepository<Dancer> _repository;
-        private readonly IAsyncRepository<Badge> _badgeRepository;
         private readonly IDancerRepository _dancerRepository;
         private readonly IFileStorage _fileStorage;
 
-        public DancerService(IAsyncRepository<Dancer> repository, IAsyncRepository<Badge> badgeRepository, IDancerRepository dancerRepository, IFileStorage fileStorage) : base(repository)
+        public DancerService(IDancerRepository dancerRepository, IFileStorage fileStorage)
         {
-            _repository = repository;
-            _badgeRepository = badgeRepository;
             _dancerRepository = dancerRepository;
             _fileStorage = fileStorage;
         }
@@ -116,13 +111,12 @@ namespace Application.Core.Services
             return await _dancerRepository.RemoveBadgeFromDancer(dancerId, badgeId, cancellationToken);
         }
 
-        public async Task<Result<bool>> SetAvatarForDancerByAuthId(string authId, Stream fileStream, CancellationToken cancellationToken)
+        public async Task<bool> SetAvatarForDancerByAuthId(string authId, Stream fileStream, CancellationToken cancellationToken)
         {
-            var byAuthIdSpec = new ByAuthIdSpec(authId);
-            var dancer = await _repository.GetBySpecAsync(byAuthIdSpec, cancellationToken);
+            var dancer = _dancerRepository.GetDancerByAuthId(authId);
             if (dancer == null)
             {
-                return Result<bool>.NotFound();
+                return false;
             }
             var imageSizes = new List<int>() {128, 256};
             var baseImage = await Image.LoadAsync(fileStream, cancellationToken);
@@ -136,10 +130,10 @@ namespace Application.Core.Services
             });
             
             dancer.ProfilePictureTimestamp = DateTime.UtcNow;
-            await _repository.SaveChangesAsync(cancellationToken);
+            await _dancerRepository.UpdateDancer(dancer, cancellationToken);
 
             await Task.WhenAll(uploadProcess);
-            return Result<bool>.Success(true);
+            return true;
         }
     }
 }

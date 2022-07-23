@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Core.Entities;
@@ -9,26 +10,26 @@ using Application.Core.Interfaces.Services;
 using Application.Core.Models.Dancer;
 using Application.Core.Services;
 using Ardalis.Result;
+using Microsoft.AspNetCore.Http;
 using Moq;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats.Bmp;
+using SixLabors.ImageSharp.PixelFormats;
 using Xunit;
 
 namespace UnitTests.Core.Services
 {
     public class DancerServiceTests
     {
-        private readonly Mock<IAsyncRepository<Dancer>> _dancerRepository;
-        private readonly Mock<IAsyncRepository<Badge>> _badgeRepository;
         private readonly Mock<IDancerRepository> _dancerRepository2;
         private readonly Mock<IFileStorage> _fileStorage;
         private readonly IDancerService _dancerService;
         
         public DancerServiceTests()
         {
-            _dancerRepository = new Mock<IAsyncRepository<Dancer>>();
-            _badgeRepository = new Mock<IAsyncRepository<Badge>>();
             _dancerRepository2 = new Mock<IDancerRepository>();
             _fileStorage = new Mock<IFileStorage>();
-            _dancerService = new DancerService(_dancerRepository.Object, _badgeRepository.Object, _dancerRepository2.Object, _fileStorage.Object);
+            _dancerService = new DancerService(_dancerRepository2.Object, _fileStorage.Object);
         }
         
         #region GetDancerById Tests
@@ -396,8 +397,7 @@ namespace UnitTests.Core.Services
         }
 
         #endregion
-        
-        
+
         #region RemoveBadgeFromDancer Tests
 
         [Fact(DisplayName = "When RemoveBadgeFromDancer, delegates request to repository")]
@@ -421,5 +421,87 @@ namespace UnitTests.Core.Services
         }
         
         #endregion
+
+        #region SetAvatarForDancerByAuthId
+
+        [Fact(DisplayName = "When dancer not found, return not found result")]
+        public async Task SetAvatarForDancerByAuthId_DancerNotFound_NotFoundResult()
+        {
+            var authId = Guid.NewGuid().ToString();
+            _dancerRepository2.Setup(r =>
+                r.GetDancerByAuthId(It.IsAny<string>())
+            ).Returns(null as Dancer);
+
+            var result = await _dancerService.SetAvatarForDancerByAuthId(authId, Stream.Null, CancellationToken.None);
+            
+            Assert.False(result);
+            _dancerRepository2.Verify(r =>
+                r.GetDancerByAuthId(It.Is<string>(value => value.Equals(authId))),
+                Times.Once);
+        }
+
+        #endregion
+
+        [Fact(DisplayName = "When dancer found, and avatar updated, update timestamp")]
+        public async Task SetAvatarForDancerByAuthId_DancerFound_UpdateTimestamp()
+        {
+            var initialTimestamp = DateTime.UtcNow.AddDays(-1);
+            var dancer = new Dancer
+            {
+                Id = Guid.NewGuid(),
+                AuthenticationId = Guid.NewGuid().ToString(),
+                ProfilePictureTimestamp = initialTimestamp
+            };
+
+            var imageStream = new MemoryStream();
+            var image = new Image<Rgba32>(1, 1);
+            await image.SaveAsBmpAsync(imageStream);
+            var formFile = new FormFile(imageStream, 0, imageStream.Length, "name", "fileName");
+            
+            _dancerRepository2.Setup(r =>
+                r.GetDancerByAuthId(It.IsAny<string>())
+            ).Returns(dancer);
+
+            var result = await _dancerService.SetAvatarForDancerByAuthId(dancer.AuthenticationId, formFile.OpenReadStream(), CancellationToken.None);
+            Assert.True(result);
+            
+            _dancerRepository2.Verify(r =>
+                    r.UpdateDancer(It.Is<Dancer>(
+                            value => value.ProfilePictureTimestamp.Value.Ticks != initialTimestamp.Ticks),
+                        It.IsAny<CancellationToken>()),
+                Times.Once);
+        }
+
+        [Fact(DisplayName = "When dancer found, and avatar updated, calls upload image with all sizes")]
+        public async Task SetAvatarForDancerByAuthId_DancerFound_UploadAllImages()
+        {
+            var dancer = new Dancer
+            {
+                Id = Guid.NewGuid(),
+                AuthenticationId = Guid.NewGuid().ToString(),
+                ProfilePictureTimestamp = DateTime.Now
+            };
+            var expectedImageSizes = new List<int>{128, 256};
+
+            var imageStream = new MemoryStream();
+            var image = new Image<Rgba32>(1, 1);
+            await image.SaveAsBmpAsync(imageStream);
+            var formFile = new FormFile(imageStream, 0, imageStream.Length, "name", "fileName");
+            
+            _dancerRepository2.Setup(r =>
+                r.GetDancerByAuthId(It.IsAny<string>())
+            ).Returns(dancer);
+
+            var result = await _dancerService.SetAvatarForDancerByAuthId(dancer.AuthenticationId, formFile.OpenReadStream(), CancellationToken.None);
+            Assert.True(result);
+            
+            expectedImageSizes.ForEach(size =>
+            {
+                _fileStorage.Verify(r =>
+                    r.UploadFileFromStream(It.IsAny<Stream>(), It.Is<string>(value => value.Equals($"profile/avatar/{dancer.Id}.{size}.png"))),
+                    Times.Once
+                );
+            });
+        }
     }
 }

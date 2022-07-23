@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Core.Entities;
@@ -8,6 +9,7 @@ using Application.Core.Interfaces.Services;
 using Application.Core.Models;
 using Application.Core.Models.Dancer;
 using Ardalis.Result;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
@@ -393,6 +395,106 @@ public class DancerTests
 
         var response = await endpoint.HandleAsync(request);
         
+        Assert.IsType<BadRequestResult>(response);
+    }
+
+    #endregion
+
+    #region Avatar_Set
+
+    
+
+    [Fact(DisplayName = "When success response, return Ok result")]
+    public async Task Avatar_Set_Success_OkResponse()
+    {
+        var endpoint = new DancerEndpoints.Avatar_Set(_dancerService.Object, _identityService.Object);
+        var request = new DancerEndpoints.SetAvatarForDancerByTokenRequest
+        {
+            Image = new FormFile(new MemoryStream(), 0, 0, "name", "fileName")
+        };
+
+        var identityResponse = new UserInfo
+        {
+            LegacyId = Guid.NewGuid().ToString(),
+            UserId = Guid.NewGuid().ToString()
+        };
+        
+        _identityService.Setup(i =>
+            i.GetUserInfo(It.IsAny<string>())
+        ).ReturnsAsync(identityResponse);
+
+        _dancerService.Setup(ds =>
+            ds.SetAvatarForDancerByAuthId(It.IsAny<string>(), It.IsAny<Stream>(), It.IsAny<CancellationToken>())
+        ).ReturnsAsync(true);
+
+        var response = await endpoint.HandleAsync(request, "", CancellationToken.None);
+        
+        Assert.IsType<OkResult>(response);
+        _dancerService.Verify(ds =>
+                ds.SetAvatarForDancerByAuthId(
+                    It.Is<string>(value => value.Equals(identityResponse.UserId)),
+                    It.IsAny<Stream>(),
+                    It.IsAny<CancellationToken>()
+                ), Times.Once
+        );
+    }
+
+    [Fact(DisplayName = "When error response, return BadRequest result")]
+    public async Task Avatar_Set_Failure_NotFound()
+    {
+        var endpoint = new DancerEndpoints.Avatar_Set(_dancerService.Object, _identityService.Object);
+        var request = new DancerEndpoints.SetAvatarForDancerByTokenRequest
+        {
+            Image = new FormFile(new MemoryStream(), 0, 0, "name", "fileName")
+        };
+
+        var identityResponse = new UserInfo
+        {
+            LegacyId = Guid.NewGuid().ToString(),
+            UserId = Guid.NewGuid().ToString()
+        };
+        
+        _identityService.Setup(i =>
+            i.GetUserInfo(It.IsAny<string>())
+        ).ReturnsAsync(identityResponse);
+
+        _dancerService.Setup(ds =>
+            ds.SetAvatarForDancerByAuthId(It.IsAny<string>(), It.IsAny<Stream>(), It.IsAny<CancellationToken>())
+        ).ReturnsAsync(false);
+
+        var response = await endpoint.HandleAsync(request, "", CancellationToken.None);
+        
+        Assert.IsType<NotFoundResult>(response);
+        _dancerService.Verify(ds =>
+                ds.SetAvatarForDancerByAuthId(
+                    It.Is<string>(value => value.Equals(identityResponse.UserId)),
+                    It.IsAny<Stream>(),
+                    It.IsAny<CancellationToken>()
+                ), Times.Once
+        );
+    }
+
+    [Fact(DisplayName = "When image is null, return bad request")]
+    public async Task Avatar_Set_NullImage_BadRequest()
+    {
+        var endpoint = new DancerEndpoints.Avatar_Set(_dancerService.Object, _identityService.Object);
+        var request = new DancerEndpoints.SetAvatarForDancerByTokenRequest
+        {
+            Image = null
+        };
+
+        var identityResponse = new UserInfo
+        {
+            LegacyId = Guid.NewGuid().ToString(),
+            UserId = Guid.NewGuid().ToString()
+        };
+        
+        _identityService.Setup(i =>
+            i.GetUserInfo(It.IsAny<string>())
+        ).ReturnsAsync(identityResponse);
+        
+        var response = await endpoint.HandleAsync(request, "", CancellationToken.None);
+
         Assert.IsType<BadRequestResult>(response);
     }
 

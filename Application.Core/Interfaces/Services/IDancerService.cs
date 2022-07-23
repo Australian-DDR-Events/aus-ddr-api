@@ -38,6 +38,6 @@ namespace Application.Core.Interfaces.Services
         Task<bool> AddBadgeToDancer(Guid dancerId, Guid badgeId, CancellationToken cancellationToken);
         Task<bool> RemoveBadgeFromDancer(Guid dancerId, Guid badgeId, CancellationToken cancellationToken);
 
-        Task<Result<bool>> SetAvatarForDancerByAuthId(string authId, Stream fileStream, CancellationToken cancellationToken);
+        Task<bool> SetAvatarForDancerByAuthId(string authId, Stream fileStream, CancellationToken cancellationToken);
     }
 }

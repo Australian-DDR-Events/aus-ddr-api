@@ -16,7 +16,7 @@ public class SongRepository : ISongRepository
         _context = context;
     }
 
-    public Song GetSong(Guid songId, bool withTopScores)
+    public Song GetSong(Guid songId)
     {
         return _context
             .Songs
@@ -31,10 +31,7 @@ public class SongRepository : ISongRepository
                     Id = sd.Id,
                     Difficulty = sd.Difficulty,
                     Level = sd.Level,
-                    PlayMode = sd.PlayMode,
-                    Scores = withTopScores
-                        ? sd.Scores.OrderByDescending(score => score.Value).ThenByDescending(score => score.SubmissionTime).Take(3).ToList()
-                        : new List<Score>()
+                    PlayMode = sd.PlayMode
                 }).ToList()
             }).FirstOrDefault();
     }

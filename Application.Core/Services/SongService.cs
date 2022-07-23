@@ -6,17 +6,16 @@ using Application.Core.Entities;
 using Application.Core.Interfaces;
 using Application.Core.Interfaces.Repositories;
 using Application.Core.Interfaces.Services;
-using Application.Core.Specifications.SongSpecs;
 using Ardalis.Result;
 
 namespace Application.Core.Services
 {
-    public class SongService : CommonService<Song>, ISongService
+    public class SongService : ISongService
     {
         private readonly IAsyncRepository<Song> _repository;
         private readonly ISongRepository _songRepository;
 
-        public SongService(IAsyncRepository<Song> repository, ISongRepository songRepository) : base(repository)
+        public SongService(IAsyncRepository<Song> repository, ISongRepository songRepository)
         {
             _repository = repository;
             _songRepository = songRepository;
@@ -33,9 +32,9 @@ namespace Application.Core.Services
             return Result<Song>.Success(created);
         }
 
-        public Result<Song> GetSong(Guid songId, bool withTopScores)
+        public Result<Song> GetSong(Guid songId)
         {
-            var result = _songRepository.GetSong(songId, withTopScores);
+            var result = _songRepository.GetSong(songId);
             return result == null ? Result<Song>.NotFound() : Result<Song>.Success(result);
         }
     }

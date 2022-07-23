@@ -34,7 +34,7 @@ public class SongRepositoryTests
         var addedSong = _fixture._context.Songs.Add(song);
         _fixture._context.SaveChanges();
 
-        var result = _songRepository.GetSong(addedSong.Entity.Id, true);
+        var result = _songRepository.GetSong(addedSong.Entity.Id);
 
         Assert.NotNull(result);
         Assert.Equal(song.Name, result.Name);
@@ -62,7 +62,7 @@ public class SongRepositoryTests
         var addedSong = _fixture._context.Songs.Add(song);
         _fixture._context.SaveChanges();
 
-        var result = _songRepository.GetSong(addedSong.Entity.Id, true);
+        var result = _songRepository.GetSong(addedSong.Entity.Id);
 
         Assert.NotNull(result);
         Assert.Equal(song.Name, result.Name);
@@ -70,81 +70,13 @@ public class SongRepositoryTests
 
         Assert.Empty(result.SongDifficulties.First(d => d.Difficulty.Equals(Difficulty.BASIC)).Scores);
         Assert.Empty(result.SongDifficulties.First(d => d.Difficulty.Equals(Difficulty.CHALLENGE)).Scores);
-    }
-
-    [Fact(DisplayName = "When song has difficulties with scores, top 3 scores are returned")]
-    public void WhenSongHasDifficultiesWithScores_ThenProvideTop3Scores()
-    {
-        var dancer = new Dancer();
-        dancer = _fixture._context.Dancers.Add(dancer).Entity;
-        var songDifficulty1 = new SongDifficulty()
-        {
-            Difficulty = Difficulty.BASIC,
-            Scores = Enumerable.Range(0, 10).Select(num => new Score() {Value = num, DancerId = dancer.Id}).ToList()
-        };
-        var songDifficulty2 = new SongDifficulty()
-        {
-            Difficulty = Difficulty.CHALLENGE,
-            Scores = Enumerable.Range(0, 2).Select(num => new Score() {Value = num, DancerId = dancer.Id}).ToList()
-        };
-        var song = new Song()
-        {
-            Name = "sample-name",
-            SongDifficulties = new List<SongDifficulty>() {songDifficulty1, songDifficulty2}
-        };
-
-        var addedSong = _fixture._context.Songs.Add(song);
-        _fixture._context.SaveChanges();
-
-        var result = _songRepository.GetSong(addedSong.Entity.Id, true);
-        
-        Assert.NotNull(result);
-        Assert.Equal(song.Name, result.Name);
-        Assert.Equal(2, result.SongDifficulties.Count);
-        
-        Assert.Equal(3, result.SongDifficulties.First(d => d.Difficulty.Equals(Difficulty.BASIC)).Scores.Count);
-        Assert.Equal(2, result.SongDifficulties.First(d => d.Difficulty.Equals(Difficulty.CHALLENGE)).Scores.Count);
     }
 
     [Fact(DisplayName = "When song not found, return null")]
     public void WhenSongNotFound_ReturnNull()
     {
-        var result = _songRepository.GetSong(Guid.NewGuid(), true);
+        var result = _songRepository.GetSong(Guid.NewGuid());
         Assert.Null(result);
-    }
-
-    [Fact(DisplayName = "When getTopScores is disabled, then do not return top scores")]
-    public void WhenSongHasDifficultiesWithScores_AndTopScoresDisabled_ThenExcludeTopScores()
-    {
-        var dancer = new Dancer();
-        dancer = _fixture._context.Dancers.Add(dancer).Entity;
-        var songDifficulty1 = new SongDifficulty()
-        {
-            Difficulty = Difficulty.BASIC,
-            Scores = Enumerable.Range(0, 10).Select(num => new Score() {Value = num, DancerId = dancer.Id}).ToList()
-        };
-        var songDifficulty2 = new SongDifficulty()
-        {
-            Difficulty = Difficulty.CHALLENGE,
-            Scores = Enumerable.Range(0, 2).Select(num => new Score() {Value = num, DancerId = dancer.Id}).ToList()
-        };
-        var song = new Song()
-        {
-            Name = "sample-name",
-            SongDifficulties = new List<SongDifficulty>() {songDifficulty1, songDifficulty2}
-        };
-
-        var addedSong = _fixture._context.Songs.Add(song);
-        _fixture._context.SaveChanges();
-
-        var result = _songRepository.GetSong(addedSong.Entity.Id, false);
-        
-        Assert.NotNull(result);
-        Assert.Equal(song.Name, result.Name);
-        Assert.Equal(2, result.SongDifficulties.Count);
-
-        Assert.Empty(result.SongDifficulties.First(d => d.Difficulty.Equals(Difficulty.BASIC)).Scores);
-        Assert.Empty(result.SongDifficulties.First(d => d.Difficulty.Equals(Difficulty.CHALLENGE)).Scores);
     }
 
     #endregion

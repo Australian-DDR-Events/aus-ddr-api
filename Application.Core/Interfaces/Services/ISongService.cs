@@ -7,10 +7,10 @@ using Ardalis.Result;
 
 namespace Application.Core.Interfaces.Services
 {
-    public interface ISongService : ICommonService<Song>
+    public interface ISongService
     {
         IEnumerable<Song> GetSongs(int page, int limit);
         Task<Result<Song>> CreateSongAsync(Song song, CancellationToken cancellationToken);
-        Result<Song> GetSong(Guid songId, bool withTopScores);
+        Result<Song> GetSong(Guid songId);
     }
 }

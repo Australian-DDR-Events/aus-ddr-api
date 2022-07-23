@@ -6,6 +6,6 @@ namespace Application.Core.Interfaces.Repositories;
 
 public interface ISongRepository
 {
-    Song? GetSong(Guid songId, bool withTopScores);
+    Song? GetSong(Guid songId);
     IEnumerable<Song> GetSongs(int skip, int limit);
 }

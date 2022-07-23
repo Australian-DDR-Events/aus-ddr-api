@@ -1,105 +1,54 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using Application.Core.Entities;
+using Application.Core.Interfaces;
+using Application.Core.Interfaces.Repositories;
 using Application.Core.Services;
-using Infrastructure.Data;
 using Moq;
 using Xunit;
 
-namespace UnitTests.Core.Services
+namespace UnitTests.Core.Services;
+
+public class SongServiceTests
 {
-    [Collection("Postgres database collection")]
-    public class SongServiceTests
+    private readonly Mock<IAsyncRepository<Song>> _songRepository2;
+    private readonly Mock<ISongRepository> _songRepository;
+    private readonly SongService _songService;
+
+    public SongServiceTests()
     {
-        #region GetSongsAsync Tests
-        
-        [Fact(DisplayName = "If songs contain difficulties, returns songs with difficulties")]
-        public async Task GetSongsAsync_ReturnSongsWithDifficulties()
-        {
-            var repository = InMemoryDatabaseRepository<Song>.CreateRepository();
-            var songRepository = new Mock<SongRepository>();
-            var service = new SongService(repository, songRepository.Object);
-            var song1 = new Song
-            {
-                Id = Guid.NewGuid(),
-                SongDifficulties = new List<SongDifficulty> {
-                    new()
-                    {
-                        Id = Guid.NewGuid()
-                    },
-                    new()
-                    {
-                        Id = Guid.NewGuid()
-                    }
-                }
-            };
-            var song2 = new Song
-            {
-                Id = Guid.NewGuid(),
-                SongDifficulties = new List<SongDifficulty> {
-                    new()
-                    {
-                        Id = Guid.NewGuid()
-                    }
-                }
-            };
-
-            var songs = new List<Song>
-            {
-                song1,
-                song2
-            };
-            Task.WaitAll(songs.Select(s => repository.AddAsync(s)).ToArray());
-            await repository.SaveChangesAsync();
-
-            var songsFromDatabase = await service.GetSongsAsync(0, 2, CancellationToken.None);
-            
-            Assert.True(songsFromDatabase.IsSuccess);
-            Assert.Equal(songs.OrderBy(d => d.Id), songsFromDatabase.Value);
-        }
-        
-        [Fact(DisplayName = "If song count exceeds paging size, only take number of songs required")]
-        public async Task GetSongsAsync_OnlyTakeSongsWithinPageSize()
-        {
-            var repository = InMemoryDatabaseRepository<Song>.CreateRepository();
-            var songRepository = new Mock<SongRepository>();
-            var service = new SongService(repository, songRepository.Object);
-            var songs = new List<Song>
-            {
-                new()
-                {
-                    Id = Guid.NewGuid()
-                },
-                new()
-                {
-                    Id = Guid.NewGuid()
-                },
-                new()
-                {
-                    Id = Guid.NewGuid()
-                },
-                new()
-                {
-                    Id = Guid.NewGuid()
-                },
-                new()
-                {
-                    Id = Guid.NewGuid()
-                }
-            };
-            Task.WaitAll(songs.Select(s => repository.AddAsync(s)).ToArray());
-            await repository.SaveChangesAsync();
-
-            var songsFromDatabase = await service.GetSongsAsync(1, 2, CancellationToken.None);
-            
-            Assert.True(songsFromDatabase.IsSuccess);
-            Assert.Equal(2, songsFromDatabase.Value.Count);
-            Assert.Equal(songs.OrderBy(d => d.Id).Skip(2).Take(2), songsFromDatabase.Value);
-        }
-        
-        #endregion
+        _songRepository = new Mock<ISongRepository>();
+        _songRepository2 = new Mock<IAsyncRepository<Song>>();
+        _songService = new SongService(_songRepository2.Object, _songRepository.Object);
     }
+
+    #region GetSongs Tests
+
+    [Fact(DisplayName = "Returns repository result")]
+    public void GetSongs_RepositoryReturnsSongs_ReturnSongs()
+    {
+        var songs = new List<Song>
+        {
+            new Song
+            {
+                Id = Guid.NewGuid()
+            }
+        };
+
+        _songRepository.Setup(r =>
+            r.GetSongs(It.IsAny<int>(), It.IsAny<int>())
+        ).Returns(songs);
+
+        var result = _songService.GetSongs(3, 5);
+        
+        Assert.Single(result);
+        _songRepository.Verify(r =>
+            r.GetSongs(
+                It.Is<int>(value => value == 15),
+                It.Is<int>(value => value == 5)),
+            Times.Once);
+    }
+    
+    #endregion
 }

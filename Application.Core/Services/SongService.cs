@@ -21,12 +21,10 @@ namespace Application.Core.Services
             _repository = repository;
             _songRepository = songRepository;
         }
-        public async Task<Result<IList<Song>>> GetSongsAsync(int page, int limit, CancellationToken cancellationToken)
+        public IEnumerable<Song> GetSongs(int page, int limit)
         {
             var skip = page * limit;
-            var songsSpec = new List(skip, limit);
-            var songs = await _repository.ListAsync(songsSpec, cancellationToken);
-            return Result<IList<Song>>.Success(songs);
+            return _songRepository.GetSongs(skip, limit);
         }
 
         public async Task<Result<Song>> CreateSongAsync(Song song, CancellationToken cancellationToken)
@@ -35,7 +33,7 @@ namespace Application.Core.Services
             return Result<Song>.Success(created);
         }
 
-        public async Task<Result<Song>> GetSong(Guid songId, bool withTopScores, CancellationToken cancellationToken)
+        public Result<Song> GetSong(Guid songId, bool withTopScores)
         {
             var result = _songRepository.GetSong(songId, withTopScores);
             return result == null ? Result<Song>.NotFound() : Result<Song>.Success(result);

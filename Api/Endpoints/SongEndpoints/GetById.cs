@@ -28,7 +28,7 @@ public class GetById : EndpointWithResponse<GetSongWithTopScoresRequest, GetSong
     ]
     public override async Task<ActionResult<GetSongWithTopScoresResponse>> HandleAsync([FromRoute] [FromQuery] GetSongWithTopScoresRequest request, CancellationToken cancellationToken = new CancellationToken())
     {
-        var result = await _songService.GetSong(request.Id, request.WithTopScores, cancellationToken);
+        var result = _songService.GetSong(request.Id, request.WithTopScores);
 
         return this.ConvertToActionResult(result);
     }

@@ -5,8 +5,6 @@ namespace AusDdrApi.Endpoints.SongEndpoints
 {
     public class GetAllSongsRequest
     {
-        public const string Route = "/songs";
-
         [FromQuery]
         public int Page { get; set; } = 0;
         

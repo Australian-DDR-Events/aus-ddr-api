@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Application.Core.Entities;
 using Infrastructure.Data;
+using IntegrationTests.Helpers.DataGenerators;
 using Xunit;
 
 namespace IntegrationTests.Infrastructure.Data;
@@ -144,6 +145,34 @@ public class SongRepositoryTests
 
         Assert.Empty(result.SongDifficulties.First(d => d.Difficulty.Equals(Difficulty.BASIC)).Scores);
         Assert.Empty(result.SongDifficulties.First(d => d.Difficulty.Equals(Difficulty.CHALLENGE)).Scores);
+    }
+
+    #endregion
+
+    #region GetSongs
+
+    [Fact(DisplayName = "When limit, only fetch limit")]
+    public void GetSongs_SongsFound_LimitToN()
+    {
+        var songs = new List<Song> {SongGenerator.CreateSong(), SongGenerator.CreateSong(), SongGenerator.CreateSong()};
+        _fixture._context.Songs.AddRange(songs);
+        _fixture._context.SaveChanges();
+
+        var result = _songRepository.GetSongs(0, 2);
+        
+        Assert.Equal(2, result.Count());
+    }
+
+    [Fact(DisplayName = "When skip, only fetch up to end of songs")]
+    public void GetSongs_SongsFound_SkipN()
+    {
+        var songs = new List<Song> {SongGenerator.CreateSong(), SongGenerator.CreateSong(), SongGenerator.CreateSong(), SongGenerator.CreateSong()};
+        _fixture._context.Songs.AddRange(songs);
+        _fixture._context.SaveChanges();
+
+        var result = _songRepository.GetSongs(2, 4);
+        
+        Assert.Equal(2, result.Count());
     }
 
     #endregion

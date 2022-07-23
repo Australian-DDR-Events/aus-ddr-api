@@ -33,9 +33,25 @@ public class SongRepository : ISongRepository
                     Level = sd.Level,
                     PlayMode = sd.PlayMode,
                     Scores = withTopScores
-                        ? sd.Scores.OrderByDescending(score => score.Value).Take(3).ToList()
+                        ? sd.Scores.OrderByDescending(score => score.Value).ThenByDescending(score => score.SubmissionTime).Take(3).ToList()
                         : new List<Score>()
                 }).ToList()
             }).FirstOrDefault();
+    }
+    
+    public IEnumerable<Song> GetSongs(int skip, int limit)
+    {
+        return _context
+            .Songs
+            .OrderBy(s => s.Name)
+            .Skip(skip)
+            .Take(limit)
+            .Select(s => new Song
+            {
+                Id = s.Id,
+                Name = s.Name,
+                Artist = s.Artist
+            })
+            .ToList();
     }
 }

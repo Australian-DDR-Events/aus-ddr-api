@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Application.Core.Entities;
 using Application.Core.Interfaces.Repositories;
-using JetBrains.Annotations;
 
 namespace Infrastructure.Data;
 
@@ -50,5 +51,13 @@ public class SongRepository : ISongRepository
                 Artist = s.Artist
             })
             .ToList();
+    }
+
+    public async Task CreateSong(Song song, CancellationToken cancellationToken)
+    {
+        _context
+            .Songs
+            .Add(song);
+        await _context.SaveChangesAsync(cancellationToken);
     }
 }

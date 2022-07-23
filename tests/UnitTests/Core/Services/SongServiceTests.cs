@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using Application.Core.Entities;
-using Application.Core.Interfaces;
 using Application.Core.Interfaces.Repositories;
+using Application.Core.Models.Song;
 using Application.Core.Services;
 using Ardalis.Result;
 using Moq;
@@ -12,15 +14,13 @@ namespace UnitTests.Core.Services;
 
 public class SongServiceTests
 {
-    private readonly Mock<IAsyncRepository<Song>> _songRepository2;
     private readonly Mock<ISongRepository> _songRepository;
     private readonly SongService _songService;
 
     public SongServiceTests()
     {
         _songRepository = new Mock<ISongRepository>();
-        _songRepository2 = new Mock<IAsyncRepository<Song>>();
-        _songService = new SongService(_songRepository2.Object, _songRepository.Object);
+        _songService = new SongService(_songRepository.Object);
     }
 
     #region GetSongs Tests
@@ -85,6 +85,27 @@ public class SongServiceTests
         var result = _songService.GetSong(Guid.NewGuid());
         
         Assert.Equal(ResultStatus.NotFound, result.Status);
+    }
+
+    #endregion
+
+    #region CreateSong
+
+    [Fact(DisplayName = "When create song, request model is converted to song")]
+    public async Task CreateSong_SongIsSentToRepository()
+    {
+        var request = new CreateSongRequestModel
+        {
+            Name = "Name"
+        };
+
+        await _songService.CreateSongAsync(request, CancellationToken.None);
+        
+        _songRepository.Verify(r =>
+            r.CreateSong(
+                It.Is<Song>(value => value.Name.Equals(request.Name) && value.Id != null),
+                It.IsAny<CancellationToken>()),
+            Times.Once());
     }
 
     #endregion

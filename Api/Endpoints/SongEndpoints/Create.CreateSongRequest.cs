@@ -4,5 +4,6 @@ namespace AusDdrApi.Endpoints.SongEndpoints
     {
         public string Name { get; set; } = string.Empty;
         public string Artist { get; set; } = string.Empty;
+        public string KonamiId { get; set; } = string.Empty;
     }
 }

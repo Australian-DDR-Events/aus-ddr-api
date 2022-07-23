@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 using Application.Core.Entities;
 using Application.Core.Interfaces.Services;
+using Application.Core.Models.Song;
 using Ardalis.Result;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
@@ -103,5 +105,33 @@ public class SongTests
         Assert.IsType<NotFoundResult>(response.Result);
     }
     
+    #endregion
+
+    #region Create
+
+    [Fact(DisplayName = "When create, service is called with model")]
+    public async Task Create_SongIsCreated()
+    {
+        var request = new SongEndpoints.CreateSongRequest
+        {
+            Name = "Name",
+            Artist = "Artist",
+            KonamiId = "abc"
+        };
+
+        var response = await new SongEndpoints.Create(_songService.Object).HandleAsync(request, CancellationToken.None);
+
+        Assert.IsType<AcceptedResult>(response);
+        
+        _songService.Verify(s =>
+            s.CreateSongAsync(
+                It.Is<CreateSongRequestModel>(value => 
+                    value.Name.Equals(request.Name) &&
+                    value.Artist.Equals(request.Artist) &&
+                    value.KonamiId.Equals(request.KonamiId)),
+                CancellationToken.None),
+            Times.Once);
+    }
+
     #endregion
 }

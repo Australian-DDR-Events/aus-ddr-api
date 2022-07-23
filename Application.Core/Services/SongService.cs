@@ -3,21 +3,19 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Core.Entities;
-using Application.Core.Interfaces;
 using Application.Core.Interfaces.Repositories;
 using Application.Core.Interfaces.Services;
+using Application.Core.Models.Song;
 using Ardalis.Result;
 
 namespace Application.Core.Services
 {
     public class SongService : ISongService
     {
-        private readonly IAsyncRepository<Song> _repository;
         private readonly ISongRepository _songRepository;
 
-        public SongService(IAsyncRepository<Song> repository, ISongRepository songRepository)
+        public SongService(ISongRepository songRepository)
         {
-            _repository = repository;
             _songRepository = songRepository;
         }
         public IEnumerable<Song> GetSongs(int page, int limit)
@@ -26,10 +24,16 @@ namespace Application.Core.Services
             return _songRepository.GetSongs(skip, limit);
         }
 
-        public async Task<Result<Song>> CreateSongAsync(Song song, CancellationToken cancellationToken)
+        public async Task CreateSongAsync(CreateSongRequestModel songRequestModel, CancellationToken cancellationToken)
         {
-            var created = await _repository.AddAsync(song, cancellationToken);
-            return Result<Song>.Success(created);
+            var song = new Song
+            {
+                Id = Guid.NewGuid(),
+                Name = songRequestModel.Name,
+                Artist = songRequestModel.Artist,
+                KonamiId = songRequestModel.KonamiId
+            };
+            await _songRepository.CreateSong(song, cancellationToken);
         }
 
         public Result<Song> GetSong(Guid songId)

@@ -3,6 +3,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Application.Core.Entities;
 using Application.Core.Interfaces.Services;
+using Application.Core.Models.Song;
+using AusDdrApi.Attributes;
 using AusDdrApi.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -10,9 +12,9 @@ using Swashbuckle.AspNetCore.Annotations;
 
 namespace AusDdrApi.Endpoints.SongEndpoints
 {
-    public class Create : EndpointWithResponse<CreateSongRequest, CreateSongResponse, Song>
+    [ApiController]
+    public class Create : ControllerBase
     {
-        private const string Route = "/songs";
         private readonly ISongService _songService;
 
         public Create(ISongService songService)
@@ -20,7 +22,7 @@ namespace AusDdrApi.Endpoints.SongEndpoints
             _songService = songService;
         }
 
-        [HttpPost(Route)]
+        [HttpPost("/songs")]
         [SwaggerOperation(
             Summary = "Add a new song",
             Description = "",
@@ -28,24 +30,17 @@ namespace AusDdrApi.Endpoints.SongEndpoints
             Tags = new[] { "Song" })
         ]
         [Authorize]
-        public override async Task<ActionResult<CreateSongResponse>> HandleAsync(CreateSongRequest request, CancellationToken cancellationToken = new CancellationToken())
+        [Admin]
+        public async Task<ActionResult> HandleAsync(CreateSongRequest request, CancellationToken cancellationToken = new CancellationToken())
         {
-            var created = await _songService.CreateSongAsync(new Song
+            var requestModel = new CreateSongRequestModel
             {
+                Name = request.Name,
                 Artist = request.Artist,
-                Name = request.Name
-            }, cancellationToken);
-            return Created(new Uri("/"), Convert(created.Value));
-        }
-
-        public override CreateSongResponse Convert(Song u)
-        {
-            return new CreateSongResponse
-            {
-                Name = u.Name,
-                Artist = u.Artist,
-                Id = u.Id
+                KonamiId = request.KonamiId
             };
+            await _songService.CreateSongAsync(requestModel, cancellationToken);
+            return Accepted();
         }
     }
 }

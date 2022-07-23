@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Application.Core.Entities;
 using Infrastructure.Data;
 using IntegrationTests.Helpers.DataGenerators;
@@ -105,6 +107,22 @@ public class SongRepositoryTests
         var result = _songRepository.GetSongs(2, 4);
         
         Assert.Equal(2, result.Count());
+    }
+
+    #endregion
+
+    #region CreateSong
+
+    [Fact(DisplayName = "When create, can fetch song from table")]
+    public async Task CreateSong_SongIsCreated()
+    {
+        var song = SongGenerator.CreateSong();
+
+        await _songRepository.CreateSong(song, CancellationToken.None);
+
+        var songResult = _fixture._context.Songs.First(s => s.Id.Equals(song.Id));
+        
+        Assert.NotNull(songResult);
     }
 
     #endregion

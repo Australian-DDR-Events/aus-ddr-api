@@ -4,9 +4,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using Application.Core.Entities;
 using Application.Core.Interfaces;
+using Application.Core.Interfaces.Repositories;
 using Application.Core.Interfaces.Services;
+using Application.Core.Models.Badge;
 using Application.Core.Services;
-using Application.Core.Specifications;
 using Moq;
 using Xunit;
 
@@ -14,31 +15,33 @@ namespace UnitTests.Core.Services;
 
 public class BadgeServiceTests
 {
+    private readonly Mock<IBadgeRepository> _badgeRepository2;
     private readonly Mock<IAsyncRepository<Badge>> _badgeRepository;
     private readonly IBadgeService _badgeService;
 
     public BadgeServiceTests()
     {
+        _badgeRepository2 = new Mock<IBadgeRepository>();
         _badgeRepository = new Mock<IAsyncRepository<Badge>>();
-        _badgeService = new BadgeService(_badgeRepository.Object);
+        _badgeService = new BadgeService(_badgeRepository2.Object, _badgeRepository.Object);
     }
 
-    #region GetBadgesAsync
+    #region GetBadges
 
-    [Fact(DisplayName = "When GetBadgesAsync, repository is called with paging spec")]
-    public async Task When_GetBadgesAsync_Then_PagedRequestToRepository()
+    [Fact(DisplayName = "When GetBadges, repository is called with skip and take")]
+    public void When_GetBadgesAsync_Then_PagedRequestToRepository()
     {
-        _badgeRepository.Setup(r =>
-            r.ListAsync(
-                It.IsAny<PageableSpec<Badge>>(), 
-                It.IsAny<CancellationToken>())
-            ).ReturnsAsync(new List<Badge>());
+        _badgeRepository2.Setup(r =>
+            r.GetBadges(
+                It.IsAny<int>(), It.IsAny<int>())
+            ).Returns(new List<GetBadgesResponseModel>(){new GetBadgesResponseModel()});
 
-        var result = await _badgeService.GetBadgesAsync(2, 10, CancellationToken.None);
+        var result = _badgeService.GetBadges(2, 10);
         
-        // TODO: validate spec with paging details
+        Assert.Single(result);
         
-        Assert.True(result.IsSuccess);
+        _badgeRepository2.Verify(r =>
+            r.GetBadges(It.Is<int>(value => value == 20), It.Is<int>(value => value == 10)), Times.Once);
     }
 
     #endregion

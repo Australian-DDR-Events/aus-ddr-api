@@ -8,33 +8,28 @@ using AusDdrApi.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
-namespace AusDdrApi.Endpoints.BadgeEndpoints
+namespace AusDdrApi.Endpoints.BadgeEndpoints;
+
+[ApiController]
+public class List : ControllerBase
 {
-    public class List : EndpointWithResponse<GetBadgesRequest, IEnumerable<GetBadgesResponse>, IList<Badge>>
+    private readonly IBadgeService _badgeService;
+
+    public List(IBadgeService badgeService)
     {
-        private readonly IBadgeService _badgeService;
-
-        public List(IBadgeService badgeService)
-        {
-            _badgeService = badgeService;
-        }
-        
-        [HttpGet(GetBadgesRequest.Route)]
-        [SwaggerOperation(
-            Summary = "Gets a collection of Badges",
-            Description = "Gets a collection of badges based on paging request",
-            OperationId = "Badges.List",
-            Tags = new[] { "Badges" })
-        ]
-        public override async Task<ActionResult<IEnumerable<GetBadgesResponse>>> HandleAsync([FromQuery] GetBadgesRequest request, CancellationToken cancellationToken = new CancellationToken())
-        {
-            var badgesResult = await _badgeService.GetBadgesAsync(request.Page.GetValueOrDefault(0), request.Limit.GetValueOrDefault(20), cancellationToken);
-            return this.ConvertToActionResult(badgesResult);
-        }
-
-        public override IEnumerable<GetBadgesResponse> Convert(IList<Badge> u)
-        {
-            return u.Select(b => new GetBadgesResponse(b.Id, b.Name));
-        }
+        _badgeService = badgeService;
+    }
+    
+    [HttpGet("/badges")]
+    [SwaggerOperation(
+        Summary = "Gets a collection of Badges",
+        Description = "Gets a collection of badges based on paging request",
+        OperationId = "Badges.List",
+        Tags = new[] { "Badges" })
+    ]
+    public ActionResult<IEnumerable<GetBadgesResponse>> HandleAsync([FromQuery] GetBadgesRequest request, CancellationToken cancellationToken = new CancellationToken())
+    {
+        var badgesResult = _badgeService.GetBadges(request.Page.GetValueOrDefault(0), request.Limit.GetValueOrDefault(20));
+        return Ok(badgesResult.Select(GetBadgesResponse.Convert));
     }
 }

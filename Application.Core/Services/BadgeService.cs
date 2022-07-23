@@ -3,7 +3,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Application.Core.Entities;
 using Application.Core.Interfaces;
+using Application.Core.Interfaces.Repositories;
 using Application.Core.Interfaces.Services;
+using Application.Core.Models.Badge;
 using Application.Core.Specifications;
 using Ardalis.Result;
 
@@ -11,19 +13,19 @@ namespace Application.Core.Services
 {
     public class BadgeService : IBadgeService
     {
+        private readonly IBadgeRepository _badgeRepository;
         private readonly IAsyncRepository<Badge> _repository;
 
-        public BadgeService(IAsyncRepository<Badge> repository)
+        public BadgeService(IBadgeRepository badgeRepository, IAsyncRepository<Badge> repository)
         {
+            _badgeRepository = badgeRepository;
             _repository = repository;
         }
         
-        public async Task<Result<IList<Badge>>> GetBadgesAsync(int page, int limit, CancellationToken cancellationToken)
+        public IEnumerable<GetBadgesResponseModel> GetBadges(int page, int limit)
         {
             var skip = page * limit;
-            var badgesSpec = new PageableSpec<Badge>(skip, limit);
-            var badges = await _repository.ListAsync(badgesSpec, cancellationToken);
-            return Result<IList<Badge>>.Success(badges);
+            return _badgeRepository.GetBadges(skip, limit);
         }
 
         public async Task<Result<Badge>> CreateBadgeAsync(Badge newBadge, CancellationToken cancellationToken)

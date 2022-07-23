@@ -2,13 +2,14 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Core.Entities;
+using Application.Core.Models.Badge;
 using Ardalis.Result;
 
 namespace Application.Core.Interfaces.Services
 {
     public interface IBadgeService
     {
-        Task<Result<IList<Badge>>> GetBadgesAsync(int page, int limit, CancellationToken cancellationToken);
+        IEnumerable<GetBadgesResponseModel> GetBadges(int page, int limit);
         Task<Result<Badge>> CreateBadgeAsync(Badge badge, CancellationToken cancellationToken);
     }
 }

@@ -42,7 +42,7 @@ public class SongRepositoryTests
         Assert.Equal(song.Name, result.Name);
     }
 
-    [Fact(DisplayName = "When song has difficulties with no scores, return difficulties")]
+    [Fact(DisplayName = "When song has difficulties, return difficulties")]
     public void WhenSongHasDifficulties_ReturnWithDifficulties()
     {
         var song = new Song
@@ -69,9 +69,6 @@ public class SongRepositoryTests
         Assert.NotNull(result);
         Assert.Equal(song.Name, result.Name);
         Assert.Equal(2, result.SongDifficulties.Count);
-
-        Assert.Empty(result.SongDifficulties.First(d => d.Difficulty.Equals(Difficulty.BASIC)).Scores);
-        Assert.Empty(result.SongDifficulties.First(d => d.Difficulty.Equals(Difficulty.CHALLENGE)).Scores);
     }
 
     [Fact(DisplayName = "When song not found, return null")]

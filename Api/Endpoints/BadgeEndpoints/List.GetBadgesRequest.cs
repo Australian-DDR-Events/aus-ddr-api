@@ -5,8 +5,6 @@ namespace AusDdrApi.Endpoints.BadgeEndpoints
 {
     public class GetBadgesRequest
     {
-        public const string Route = "/badges";
-        
         [FromQuery]
         public int? Page { get; set; } = 0;
         

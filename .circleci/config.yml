@@ -62,7 +62,7 @@ workflows:
         - staging
         filters:
           branches:
-            only: clean-architecture
+            only: master
     - deploy:
         name: deploy-staging
         context:
@@ -71,6 +71,6 @@ workflows:
         - jira/notify
         filters:
           branches:
-            only: clean-architecture
+            only: master
         requires:
         - build-staging

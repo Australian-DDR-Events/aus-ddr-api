@@ -2,13 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Application.Core.Interfaces;
 using Application.Core.Interfaces.Repositories;
 using Application.Core.Models.Strategies;
 
 namespace Application.Core.Services.RewardStrategies;
 
-public class SongScoreStrategy : IRewardStrategy<SongScoreStrategyModel>
+public class SongScoreStrategy
 {
     private readonly IRewardQualityRepository _rewardQualityRepository;
     

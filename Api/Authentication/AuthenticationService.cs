@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 
 namespace AusDdrApi.Authentication
 {
@@ -20,19 +21,18 @@ namespace AusDdrApi.Authentication
             }
             else
             {
+                Console.WriteLine($"Enabling bearer auth for issuer {configuration["oauth2identity:Issuer"]} and userinfo from {configuration["oauth2identity:UserInfoEndpoint"]}");
                 services
                     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                     .AddJwtBearer(options =>
                     {
-                        options.Authority = configuration["Firebase:Url"];
-                        options.Audience = configuration["Firebase:Audience"];
+                        options.Authority = configuration["oauth2identity:Issuer"];
+                        options.TokenValidationParameters = new TokenValidationParameters
+                        {
+                            ValidateAudience = false,
+                        };
                     });
             }
-            services
-                .AddAuthorization(options =>
-                {
-                    options.AddPolicy("Admin", policy => policy.RequireClaim(UserContext.AdminClaimType));
-                });
         }
     }
 }

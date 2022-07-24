@@ -1,12 +1,12 @@
-using Amazon;
-using Amazon.Runtime;
-using Amazon.S3;
+using System;
+using System.Collections.Generic;
+using Application.Core;
+using AusDdrApi.Attributes;
 using AusDdrApi.Authentication;
-using AusDdrApi.Context;
 using AusDdrApi.Extensions;
 using AusDdrApi.Middleware;
-using AusDdrApi.Persistence;
-using AusDdrApi.Services.FileStorage;
+using Infrastructure;
+using Infrastructure.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -14,6 +14,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Net.Http.Headers;
+using Microsoft.OpenApi.Models;
+using Newtonsoft.Json;
 
 namespace AusDdrApi
 {
@@ -29,14 +31,50 @@ namespace AusDdrApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddPooledDbContextFactory<DatabaseContext>(
-                options => options.UseNpgsql(Configuration.GetConnectionString("DatabaseContext")));
-
+            services.AddPooledDbContextFactory<EFDatabaseContext>(
+                options => options.UseNpgsql(Configuration.GetConnectionString("DatabaseContext")).LogTo(Console.WriteLine));
+            services.AddScoped(
+                sp => sp.GetRequiredService<IDbContextFactory<EFDatabaseContext>>().CreateDbContext());
+            
             services.AddControllers()
-                .AddJsonOptions(options =>
+                .AddNewtonsoftJson(c => c.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
+            services.AddSwaggerGen(c => {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Australian DDR Events API", Version = "v1" });
+                c.EnableAnnotations();
+
+                var scheme = Configuration["AuthScheme"] == "local" ? "Basic" : "Bearer";
+                
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
-                    options.JsonSerializerOptions.IgnoreNullValues = true;
+                    Description = @"JWT Authorization header using the Bearer scheme. \r\n\r\n 
+                      Enter 'Bearer' [space] and then your token in the text input below.
+                      \r\n\r\nExample: 'Bearer 12345abcdef'",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = scheme
                 });
+                
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement()
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = scheme
+                            },
+                            Scheme = "oauth2",
+                            Name = scheme,
+                            In = ParameterLocation.Header,
+
+                        },
+                        new List<string>()
+                    }
+                });
+            });
+            
             services.AddJwtAuthentication(Configuration);
             services.AddRouting(options => options.LowercaseUrls = true);
             services.AddCors(options =>
@@ -46,47 +84,25 @@ namespace AusDdrApi
                     {
                         builder.WithOrigins(
                                 "http://localhost:1234",
-                                "https://ausddrevents-e18b1--ausddrevents-staging-homst7uj.web.app",
-                                "https://ausddrevents-e18b1--ausddrevents-development-di3otvtf.web.app",
+                                "https://stg.ausddrevents.com",
                                 "https://ausddrevents.com")
-                            .WithHeaders(HeaderNames.Authorization);
+                            .WithHeaders(HeaderNames.Authorization)
+                            .AllowAnyMethod();
                     });
             });
 
-            switch (Configuration["FileStorage"])
-            {
-                case "filesystem":
-                {
-                    var basePath = Configuration["FilesystemConfig:BasePath"];
-                    if (string.IsNullOrEmpty(basePath))
-                    {
-                        basePath = AppDomain.CurrentDomain.BaseDirectory + "/filestorage";
-                    }
-
-                    services.AddSingleton<IFileStorage>(new LocalFileStorage(basePath));
-                    break;
-                }
-                default:
-                {
-                    var credentials = new BasicAWSCredentials(Configuration["AwsAccessKey"], Configuration["AwsSecretKey"]);
-                    var region = RegionEndpoint.GetBySystemName(Configuration["AwsConfiguration:Region"]);
-                    var client = new AmazonS3Client(credentials, region);
-                    var awsConfiguration = Configuration.GetSection("AwsConfiguration").Get<AwsConfiguration>();
+            Console.WriteLine(JsonConvert.SerializeObject(Configuration));
             
-                    services.AddSingleton<IFileStorage>(new S3FileStorage(client, awsConfiguration));
-                    break;
-                }
-                        
-            }
+            services.LoadDefaultApplicationCoreModule();
+            services.LoadDefaultInfrastructureModule(Configuration);
 
             services.AddHttpContextAuthorizationServices();
-            services.AddGraphQLConfiguration();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
+            if (env.IsDevelopment() || env.IsEnvironment("Local"))
             {
                 app.UseDeveloperExceptionPage();
             }
@@ -100,17 +116,23 @@ namespace AusDdrApi
             app.UseCors("CorsPolicy");
             
             app.UseAuthorization();
+            
+            // Enable middleware to serve generated Swagger as a JSON endpoint.
+            app.UseSwagger();
+
+            // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.), specifying the Swagger JSON endpoint.
+            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1"));
 
             app.Use(UserContext.UseUserContext);
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapGraphQL();
+                endpoints.MapControllers();
             });
 
-            using var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope();
-            var context = serviceScope.ServiceProvider.GetService<IDbContextFactory<DatabaseContext>>();
-            context?.CreateDbContext().Database.Migrate();
+            using var serviceScope =
+                app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope();
+            serviceScope.ServiceProvider.GetRequiredService<EFDatabaseContext>().Database.Migrate();
         }
     }
 }

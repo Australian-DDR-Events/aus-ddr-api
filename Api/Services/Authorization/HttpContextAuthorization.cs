@@ -19,6 +19,13 @@ namespace AusDdrApi.Services.Authorization
 
             return userId;
         }
+        
+        public string? GetLegacyId()
+        {
+            var userId = _context.HttpContext?.Items[UserContext.UserIdClaimType]?.ToString();
+
+            return userId;
+        }
 
         public void EnforceAdmin()
         {

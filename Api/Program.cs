@@ -1,3 +1,4 @@
+using System;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
@@ -16,6 +17,15 @@ namespace AusDdrApi
                 .ConfigureHostConfiguration(options =>
                 {
                     options.AddEnvironmentVariables();
+                })
+                .ConfigureAppConfiguration((hostBuilder, config) =>
+                {
+                    Console.WriteLine($"Loading environment for {hostBuilder.HostingEnvironment.EnvironmentName}");
+                    var env = hostBuilder.HostingEnvironment;
+                    if (!env.EnvironmentName.Equals("Local"))
+                    {
+                        config.AddSystemsManager($"/{hostBuilder.HostingEnvironment.EnvironmentName}/api-config/");
+                    }
                 })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {

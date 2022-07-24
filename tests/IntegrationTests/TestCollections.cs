@@ -28,4 +28,9 @@ public static class TestCollections
     public class SongRepositoryTestCollection : ICollectionFixture<PostgresDatabaseFixture>
     {
     }
+
+    [CollectionDefinition("Reward repository collection")]
+    public class RewardRepositoryTestCollection : ICollectionFixture<PostgresDatabaseFixture>
+    {
+    }
 }

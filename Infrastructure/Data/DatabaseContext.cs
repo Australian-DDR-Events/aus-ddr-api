@@ -31,7 +31,10 @@ namespace Infrastructure.Data
         public DbSet<Course> Courses { get; set; } = default!;
         public DbSet<Event> Events { get; set; } = default!;
         public DbSet<Badge> Badges { get; set; } = default!;
-        
+
+        public DbSet<Reward> Rewards { get; set; } = default!;
+        public DbSet<RewardTrigger> RewardTriggers { get; set; } = default!;
+
         public DbSet<Ingredient> Ingredients { get; set; } = default!;
         public DbSet<GradedIngredient> GradedIngredients { get; set; } = default!;
         public DbSet<Dish> Dishes { get; set; } = default!;

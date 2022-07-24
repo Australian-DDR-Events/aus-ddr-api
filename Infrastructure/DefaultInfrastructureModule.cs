@@ -27,6 +27,7 @@ namespace Infrastructure
                 .AddScoped<IEventRepository, EventRepository>()
                 .AddScoped<IDancerRepository, DancerRepository>()
                 .AddScoped<IBadgeRepository, BadgeRepository>()
+                .AddScoped<IRewardRepository, RewardRepository>()
                 .AddFileStorage(configuration);
         }
 

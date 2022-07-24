@@ -9,4 +9,5 @@ public interface IRewardQualityRepository
     public Task AddRewardToDancer(Guid rewardId, Guid dancerId);
     public Task RemoveRewardFromDancer(Guid rewardId, Guid dancerId);
     public RewardQuality? GetRewardQualityForDancer(Guid rewardId, Guid dancerId);
+    public Task CreateRewardQuality(RewardQuality rewardQuality);
 }

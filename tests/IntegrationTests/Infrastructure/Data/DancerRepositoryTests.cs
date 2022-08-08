@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Application.Core.Entities;
 using Infrastructure.Data;
 using IntegrationTests.Helpers.DataGenerators;
+using Microsoft.EntityFrameworkCore;
 using Xunit;
 
 namespace IntegrationTests.Infrastructure.Data;
@@ -26,6 +27,13 @@ public class DancerRepositoryTests
     private void AddDancerToTable(Dancer d)
     {
         _fixture._context.Dancers.Add(d);
+        _fixture._context.SaveChanges();
+        _fixture._context.ChangeTracker.Clear();
+    }
+
+    private void AddRewardQuality(RewardQuality rewardQuality)
+    {
+        _fixture._context.RewardQualities.Add(rewardQuality);
         _fixture._context.SaveChanges();
         _fixture._context.ChangeTracker.Clear();
     }
@@ -376,6 +384,62 @@ public class DancerRepositoryTests
         await _fixture._context.SaveChangesAsync();
         
         var repositoryResult = await _dancerRepository.RemoveBadgeFromDancer(Guid.NewGuid(), badge.Id, CancellationToken.None);
+        
+        Assert.False(repositoryResult);
+    }
+
+    #endregion
+
+    #region RemoveRewardFromDancer
+
+    [Fact(DisplayName = "When dancer exists, has reward, remove reward from dancer")]
+    public async Task RemoveRewardFromDancer_RewardAssigned_RewardIsRemoved()
+    {
+        var reward = RewardGenerator.CreateReward();
+        var rewardQuality = RewardQualityGenerator.CreateRewardQuality(reward);
+        var dancer = DancerGenerator.CreateDancer();
+        _fixture._context.Rewards.Add(reward);
+        _fixture._context.RewardQualities.Add(rewardQuality);
+        dancer.RewardQualities = new List<RewardQuality>() {rewardQuality};
+        AddDancerToTable(dancer);
+
+        var repositoryResult = await _dancerRepository.RemoveRewardFromDancer(rewardQuality.Id, dancer.Id, CancellationToken.None);
+        _fixture._context.ChangeTracker.Clear();
+
+        var databaseResult = _fixture._context.Dancers.Include(d => d.RewardQualities)
+            .First(d => d.Id.Equals(dancer.Id));
+        
+        Assert.True(repositoryResult);
+        Assert.Empty(databaseResult.RewardQualities);
+    }
+    //
+    [Fact(DisplayName = "When dancer does not exist, result is false")]
+    public async Task RemoveRewardFromDancer_DancerNotExist_FalseResult()
+    {
+        var reward = RewardGenerator.CreateReward();
+        var rewardQuality = RewardQualityGenerator.CreateRewardQuality(reward);
+        var dancer = DancerGenerator.CreateDancer();
+        _fixture._context.Rewards.Add(reward);
+        _fixture._context.RewardQualities.Add(rewardQuality);
+        dancer.RewardQualities = new List<RewardQuality>() {rewardQuality};
+        AddDancerToTable(dancer);
+        
+        var repositoryResult = await _dancerRepository.RemoveRewardFromDancer(Guid.NewGuid(), rewardQuality.Id, CancellationToken.None);
+        
+        Assert.False(repositoryResult);
+    }
+    //
+    [Fact(DisplayName = "When dancer exist, reward not found on dancer, result is false")]
+    public async Task RemoveRewardFromDancer_DancerDoesNotHaveReward_FalseResult()
+    {
+        var reward = RewardGenerator.CreateReward();
+        var rewardQuality = RewardQualityGenerator.CreateRewardQuality(reward);
+        var dancer = DancerGenerator.CreateDancer();
+        _fixture._context.Rewards.Add(reward);
+        _fixture._context.RewardQualities.Add(rewardQuality);
+        AddDancerToTable(dancer);
+        
+        var repositoryResult = await _dancerRepository.RemoveRewardFromDancer(Guid.NewGuid(), dancer.Id, CancellationToken.None);
         
         Assert.False(repositoryResult);
     }

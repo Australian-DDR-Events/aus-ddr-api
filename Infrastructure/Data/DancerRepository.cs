@@ -112,4 +112,17 @@ public class DancerRepository : IDancerRepository
         await _context.SaveChangesAsync(cancellationToken);
         return true;
     }
+
+    public async Task<bool> RemoveRewardFromDancer(Guid rewardId, Guid dancerId, CancellationToken cancellationToken)
+    {
+        var dancer = _context
+            .Dancers
+            .Include(d => d.RewardQualities)
+            .FirstOrDefault(d => d.Id.Equals(dancerId));
+        var reward = dancer?.RewardQualities.FirstOrDefault(b => b.Id.Equals(rewardId));
+        if (reward == null) return false;
+        dancer.RewardQualities.Remove(reward);
+        await _context.SaveChangesAsync(cancellationToken);
+        return true;
+    }
 }

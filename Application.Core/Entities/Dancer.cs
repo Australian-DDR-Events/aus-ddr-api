@@ -16,5 +16,6 @@ namespace Application.Core.Entities
         
         public virtual ICollection<Badge> Badges { get; set; } = default!;
         public ICollection<Score> Scores { get; set; } = default!;
+        public ICollection<RewardQuality> RewardQualities { get; set; } = default!;
     }
 }

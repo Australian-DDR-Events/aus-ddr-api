@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Application.Core.Entities;
 using Application.Core.Interfaces.Repositories;
@@ -68,7 +69,7 @@ public class SongScoreStrategyTests
 
         var expectedReward = THRESHOLDS.First(r => r.MinExScore.Equals(50));
 
-        await _songScoreStrategy.Execute(reward, strategyModel);
+        await _songScoreStrategy.Execute(reward, strategyModel, CancellationToken.None);
 
         _rewardQualityRepository.Verify(r =>
                 r.GetRewardQualityForDancer(
@@ -76,7 +77,7 @@ public class SongScoreStrategyTests
                     It.Is<Guid>(value => value.Equals(score.DancerId))),
             Times.Once());
         _rewardQualityRepository.Verify(r =>
-                r.RemoveRewardFromDancer(It.IsAny<Guid>(), It.IsAny<Guid>()),
+                r.RemoveRewardFromDancer(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<CancellationToken>()),
             Times.Never);
         _rewardQualityRepository.Verify(r =>
             r.AddRewardToDancer(
@@ -114,7 +115,7 @@ public class SongScoreStrategyTests
             r.GetRewardQualityForDancer(It.IsAny<Guid>(), It.IsAny<Guid>())
         ).Returns(currentReward);
 
-        await _songScoreStrategy.Execute(reward, strategyModel);
+        await _songScoreStrategy.Execute(reward, strategyModel, CancellationToken.None);
 
         _rewardQualityRepository.Verify(r =>
                 r.GetRewardQualityForDancer(
@@ -122,7 +123,7 @@ public class SongScoreStrategyTests
                     It.Is<Guid>(value => value.Equals(score.DancerId))),
             Times.Once());
         _rewardQualityRepository.Verify(r =>
-                r.RemoveRewardFromDancer(It.IsAny<Guid>(), It.IsAny<Guid>()),
+                r.RemoveRewardFromDancer(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<CancellationToken>()),
             Times.Never);
         _rewardQualityRepository.Verify(r =>
                 r.AddRewardToDancer(It.IsAny<Guid>(), It.IsAny<Guid>()),
@@ -160,7 +161,7 @@ public class SongScoreStrategyTests
 
         var expectedReward = THRESHOLDS.First(r => r.MinExScore.Equals(50));
 
-        await _songScoreStrategy.Execute(reward, strategyModel);
+        await _songScoreStrategy.Execute(reward, strategyModel, CancellationToken.None);
 
         _rewardQualityRepository.Verify(r =>
                 r.GetRewardQualityForDancer(
@@ -170,7 +171,8 @@ public class SongScoreStrategyTests
         _rewardQualityRepository.Verify(r =>
                 r.RemoveRewardFromDancer(
                     It.Is<Guid>(value => value.Equals(currentReward.Id)),
-                    It.Is<Guid>(value => value.Equals(score.DancerId))),
+                    It.Is<Guid>(value => value.Equals(score.DancerId)),
+                    It.IsAny<CancellationToken>()),
             Times.Once);
         _rewardQualityRepository.Verify(r =>
                 r.AddRewardToDancer(
@@ -208,7 +210,7 @@ public class SongScoreStrategyTests
             r.GetRewardQualityForDancer(It.IsAny<Guid>(), It.IsAny<Guid>())
         ).Returns(currentReward);
 
-        await _songScoreStrategy.Execute(reward, strategyModel);
+        await _songScoreStrategy.Execute(reward, strategyModel, CancellationToken.None);
 
         _rewardQualityRepository.Verify(r =>
                 r.GetRewardQualityForDancer(
@@ -216,7 +218,7 @@ public class SongScoreStrategyTests
                     It.Is<Guid>(value => value.Equals(score.DancerId))),
             Times.Once());
         _rewardQualityRepository.Verify(r =>
-                r.RemoveRewardFromDancer(It.IsAny<Guid>(), It.IsAny<Guid>()),
+                r.RemoveRewardFromDancer(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<CancellationToken>()),
             Times.Never);
         _rewardQualityRepository.Verify(r =>
                 r.AddRewardToDancer(It.IsAny<Guid>(), It.IsAny<Guid>()),

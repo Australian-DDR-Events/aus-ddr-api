@@ -33,4 +33,9 @@ public static class TestCollections
     public class RewardRepositoryTestCollection : ICollectionFixture<PostgresDatabaseFixture>
     {
     }
+
+    [CollectionDefinition("Reward quality repository collection")]
+    public class RewardQualityRepositoryTestCollection : ICollectionFixture<PostgresDatabaseFixture>
+    {
+    }
 }

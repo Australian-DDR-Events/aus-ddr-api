@@ -33,6 +33,7 @@ namespace Infrastructure.Data
         public DbSet<Badge> Badges { get; set; } = default!;
 
         public DbSet<Reward> Rewards { get; set; } = default!;
+        public DbSet<RewardQuality> RewardQualities { get; set; } = default!;
         public DbSet<RewardTrigger> RewardTriggers { get; set; } = default!;
 
         public DbSet<Ingredient> Ingredients { get; set; } = default!;

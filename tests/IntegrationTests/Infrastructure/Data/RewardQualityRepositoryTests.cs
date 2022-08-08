@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Application.Core.Entities;
 using Infrastructure.Data;
@@ -70,5 +71,76 @@ public class RewardQualityRepositoryTests
         Assert.Null(exception);
     }
 
+    #endregion
+
+    #region GetRewardQualityForDancer
+
+    [Fact(DisplayName = "When dancer exists, dancer has a reward quality, return corresponding reward quality")]
+    public void GetRewardQualityForDancer_DancerExists_HasReward_ReturnRewardQuality()
+    {
+        var reward = RewardGenerator.CreateReward();
+        var dancer = DancerGenerator.CreateDancer();
+        var rewardQuality = RewardQualityGenerator.CreateRewardQuality(reward);
+        rewardQuality.Dancers = new List<Dancer> {dancer};
+        _fixture._context.Rewards.Add(reward);
+        _fixture._context.Dancers.Add(dancer);
+        AddRewardQuality(rewardQuality);
+
+        var result = _rewardRepository.GetRewardQualityForDancer(reward.Id, dancer.Id);
+        
+        Assert.NotNull(result);
+        Assert.Equal(rewardQuality.Id, result.Id);
+    }
+
+    [Fact(DisplayName = "When dancer exists, dancer does not have reward quality, return null")]
+    public void GetRewardQualityForDancer_DancerExists_DoesNotHaveReward_ReturnNull()
+    {
+        var reward = RewardGenerator.CreateReward();
+        var dancer = DancerGenerator.CreateDancer();
+        var rewardQuality = RewardQualityGenerator.CreateRewardQuality(reward);
+        _fixture._context.Rewards.Add(reward);
+        _fixture._context.Dancers.Add(dancer);
+        AddRewardQuality(rewardQuality);
+
+        var result = _rewardRepository.GetRewardQualityForDancer(reward.Id, dancer.Id);
+        
+        Assert.Null(result);
+    }
+
+    #endregion
+
+    #region CreateRewardQuality
+
+    [Fact(DisplayName = "When reward exists, save reward quality")]
+    public async Task RewardExists_SaveRewardQuality()
+    {
+        var reward = RewardGenerator.CreateReward();
+        _fixture._context.Rewards.Add(reward);
+        await _fixture._context.SaveChangesAsync();
+
+        var rewardQuality = RewardQualityGenerator.CreateRewardQuality(reward);
+
+        var result = await _rewardRepository.CreateRewardQuality(reward.Id, rewardQuality, CancellationToken.None);
+        var databaseValue = _fixture._context.RewardQualities.FirstOrDefault(r => r.Id.Equals(rewardQuality.Id));
+        
+        Assert.True(result);
+        
+        Assert.NotNull(databaseValue);
+        Assert.Equal(rewardQuality.Id, databaseValue.Id);
+        Assert.Equal(reward.Id, databaseValue.RewardId);
+    }
+
+    [Fact(DisplayName = "When reward does not exist, return false")]
+    public async Task RewardDoesNotExist_DoNotSave()
+    {
+        var reward = RewardGenerator.CreateReward();
+
+        var rewardQuality = RewardQualityGenerator.CreateRewardQuality(reward);
+
+        var result = await _rewardRepository.CreateRewardQuality(reward.Id, rewardQuality, CancellationToken.None);
+
+        Assert.False(result);
+    }
+    
     #endregion
 }

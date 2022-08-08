@@ -1,8 +1,10 @@
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Application.Core.Entities;
 using Application.Core.Interfaces.Repositories;
+using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Data;
@@ -28,18 +30,29 @@ public class RewardQualityRepository : IRewardQualityRepository
         await _context.SaveChangesAsync();
     }
 
-    public Task RemoveRewardFromDancer(Guid rewardId, Guid dancerId)
+    public Task<bool> RemoveRewardFromDancer(Guid rewardId, Guid dancerId, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        return _dancerRepository.RemoveRewardFromDancer(rewardId, dancerId, cancellationToken);
     }
 
+    [CanBeNull]
     public RewardQuality GetRewardQualityForDancer(Guid rewardId, Guid dancerId)
     {
-        throw new NotImplementedException();
+        return _context
+            .RewardQualities
+            .FirstOrDefault(r => 
+                r.RewardId.Equals(rewardId) && 
+                r.Dancers.Any(d => d.Id.Equals(dancerId))
+        );
     }
 
-    public Task CreateRewardQuality(RewardQuality rewardQuality)
+    public async Task<bool> CreateRewardQuality(Guid rewardId, RewardQuality rewardQuality, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var reward = _context.Rewards.FirstOrDefault(r => r.Id.Equals(rewardId));
+        if (reward == null) return false;
+        rewardQuality.RewardId = rewardId;
+        _context.RewardQualities.Add(rewardQuality);
+        await _context.SaveChangesAsync(cancellationToken);
+        return true;
     }
 }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Application.Core.Interfaces.Repositories;
 using Application.Core.Models.Strategies;
@@ -16,7 +17,7 @@ public class SongScoreStrategy
         _rewardQualityRepository = rewardQualityRepository;
     }
     
-    public async Task Execute(Guid rewardId, SongScoreStrategyModel strategyData)
+    public async Task Execute(Guid rewardId, SongScoreStrategyModel strategyData, CancellationToken cancellationToken)
     {
         var currentUserReward =
             _rewardQualityRepository.GetRewardQualityForDancer(rewardId, strategyData.Score.DancerId);
@@ -29,7 +30,7 @@ public class SongScoreStrategy
                 r.MinExScore == null || r.MinExScore <= strategyData.Score.ExScore
             ).MaxBy(r => r.MinExScore);
         if (currentUserReward != null)
-            await _rewardQualityRepository.RemoveRewardFromDancer(currentUserReward.Id, strategyData.Score.DancerId);
+            await _rewardQualityRepository.RemoveRewardFromDancer(currentUserReward.Id, strategyData.Score.DancerId, cancellationToken);
         if (rewardToAssign != null)
             await _rewardQualityRepository.AddRewardToDancer(rewardToAssign.RewardItemId, strategyData.Score.DancerId);
     }

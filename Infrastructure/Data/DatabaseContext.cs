@@ -36,6 +36,8 @@ namespace Infrastructure.Data
         public DbSet<RewardQuality> RewardQualities { get; set; } = default!;
         public DbSet<RewardTrigger> RewardTriggers { get; set; } = default!;
 
+        public DbSet<Connection> Connections { get; set; } = default!;
+
         public DbSet<Ingredient> Ingredients { get; set; } = default!;
         public DbSet<GradedIngredient> GradedIngredients { get; set; } = default!;
         public DbSet<Dish> Dishes { get; set; } = default!;

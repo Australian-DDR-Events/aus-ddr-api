@@ -24,8 +24,18 @@ public static class TestCollections
     {
     }
 
+    [CollectionDefinition("Score repository collection")]
+    public class ScoreRepositoryTestCollection : ICollectionFixture<PostgresDatabaseFixture>
+    {
+    }
+
     [CollectionDefinition("Song repository collection")]
     public class SongRepositoryTestCollection : ICollectionFixture<PostgresDatabaseFixture>
+    {
+    }
+
+    [CollectionDefinition("Song difficulty repository collection")]
+    public class SongDifficultyRepositoryTestCollection : ICollectionFixture<PostgresDatabaseFixture>
     {
     }
 

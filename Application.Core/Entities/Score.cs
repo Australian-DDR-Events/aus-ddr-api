@@ -12,5 +12,8 @@ namespace Application.Core.Entities
         
         public Guid SongDifficultyId { get; set; }
         public SongDifficulty SongDifficulty { get; set; } = default!;
+        
+        public Guid? EventId { get; set; } = null;
+        public Event? Event { get; set; } = null;
     }
 }

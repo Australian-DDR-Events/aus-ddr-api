@@ -29,6 +29,7 @@ namespace Infrastructure
                 .AddScoped<IBadgeRepository, BadgeRepository>()
                 .AddScoped<IRewardRepository, RewardRepository>()
                 .AddScoped<ISongDifficultyRepository, SongDifficultyRepository>()
+                .AddScoped<IConnectionRepository, ConnectionRepository>()
                 .AddFileStorage(configuration);
         }
 

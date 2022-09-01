@@ -1,4 +1,5 @@
 using Application.Core.Interfaces;
+using Application.Core.Interfaces.Repositories;
 using Application.Core.Interfaces.Services;
 using Application.Core.Services;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,7 +16,8 @@ namespace Application.Core
                 .AddScoped<IEventService, EventService>()
                 .AddScoped<IBadgeService, BadgeService>()
                 .AddScoped<IAdminService, AdminService>()
-                .AddScoped<ISongService, SongService>();
+                .AddScoped<ISongService, SongService>()
+                .AddScoped<ISongDifficultyService, SongDifficultyService>();
         }
     }
 }

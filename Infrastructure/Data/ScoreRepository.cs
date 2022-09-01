@@ -21,7 +21,7 @@ public class ScoreRepository : IScoreRepository
             Id = score.Id,
             ExScore = score.ExScore,
             Value = score.Value,
-            SubmissionTime = DateTime.Now,
+            SubmissionTime = DateTime.UtcNow,
             SongDifficultyId = songDifficultyId,
             EventId = eventId,
             DancerId = dancerId

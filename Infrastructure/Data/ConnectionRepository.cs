@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Core.Entities;
@@ -20,5 +23,13 @@ public class ConnectionRepository : IConnectionRepository
             .Connections
             .AddAsync(connection, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);
+    }
+
+    public IList<Connection> GetConnection(Guid userId, Connection.ConnectionType connectionType)
+    {
+        return _context
+            .Connections
+            .Where(c => c.DancerId.Equals(userId) && c.Type.Equals(connectionType))
+            .ToList();
     }
 }

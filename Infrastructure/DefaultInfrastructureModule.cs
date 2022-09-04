@@ -3,12 +3,14 @@ using Amazon;
 using Amazon.Runtime;
 using Amazon.S3;
 using Application.Core.Interfaces;
+using Application.Core.Interfaces.ExternalServices;
 using Application.Core.Interfaces.Repositories;
 using AusDdrApi.Context;
 using AusDdrApi.Services.FileStorage;
 using Infrastructure.Cache;
 using Infrastructure.Data;
 using Infrastructure.Identity;
+using Infrastructure.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -30,7 +32,9 @@ namespace Infrastructure
                 .AddScoped<IRewardRepository, RewardRepository>()
                 .AddScoped<ISongDifficultyRepository, SongDifficultyRepository>()
                 .AddScoped<IConnectionRepository, ConnectionRepository>()
-                .AddFileStorage(configuration);
+                .AddHttpClient()
+                .AddFileStorage(configuration)
+                .AddDiscordApi(configuration);
         }
 
         private static IServiceCollection AddFileStorage(this IServiceCollection services, IConfiguration configuration)
@@ -77,6 +81,15 @@ namespace Infrastructure
                 .AddSingleton(oauth2IdentityConfig)
                 .AddSingleton(typeof(IIdentity<string>), typeof(OAuth2Identity));
         }
-        
+
+        private static IServiceCollection AddDiscordApi(this IServiceCollection services, IConfiguration configuration)
+        {
+            var discordApiConfig = new DiscordApiConfiguration();
+            configuration.GetSection("discordapi")
+                .Bind(discordApiConfig, c => c.BindNonPublicProperties = true);
+            return services
+                .AddSingleton(discordApiConfig)
+                .AddScoped<IDiscordApiService, DiscordApiService>();
+        }
     }
 }

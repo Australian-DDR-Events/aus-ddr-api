@@ -12,9 +12,16 @@ namespace Infrastructure.Identity
             return source.Equals("admin", StringComparison.OrdinalIgnoreCase);
         }
 
-        public Task<UserInfo> GetUserInfo(string source)
+        public async Task<UserInfo> GetUserInfo(string source)
         {
-            throw new NotImplementedException();
+            var rand = new Random(source.GetHashCode());
+            var guid = new byte[16];
+            rand.NextBytes(guid);
+            return new UserInfo
+            {
+                UserId = new Guid(guid).ToString(),
+                Name = source
+            };
         }
     }
 }

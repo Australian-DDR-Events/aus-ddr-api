@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Application.Core.Interfaces;
+using Application.Core.Interfaces.Identity;
 using Application.Core.Models;
 
 namespace Infrastructure.Identity
@@ -22,6 +23,18 @@ namespace Infrastructure.Identity
                 UserId = new Guid(guid).ToString(),
                 Name = source
             };
+        }
+
+        public TokenType GetTokenType(string source)
+        {
+            return source.Contains("service")
+                ? TokenType.SERVICE
+                : TokenType.USER;
+        }
+
+        public bool HasScope(string source, string scope)
+        {
+            return true;
         }
     }
 }

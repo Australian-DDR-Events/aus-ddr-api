@@ -7,6 +7,7 @@ using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Application.Core.Interfaces;
+using Application.Core.Interfaces.Identity;
 using Application.Core.Models;
 
 namespace Infrastructure.Identity
@@ -28,7 +29,7 @@ namespace Infrastructure.Identity
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var jsonToken = tokenHandler.ReadToken(source) as JwtSecurityToken;
-            var groupsClaim = jsonToken.Claims.FirstOrDefault(c => c.Type.Equals("cognito:groups", StringComparison.OrdinalIgnoreCase));
+            var groupsClaim = jsonToken?.Claims.FirstOrDefault(c => c.Type.Equals("cognito:groups", StringComparison.OrdinalIgnoreCase));
             if (groupsClaim == null) return false;
             var groupsArray = groupsClaim.Value.Split(" ");
             return groupsArray.Contains("administrators", StringComparer.OrdinalIgnoreCase);
@@ -47,6 +48,27 @@ namespace Infrastructure.Identity
             var body = await response.Content.ReadAsStringAsync();
             Console.WriteLine(body);
             return JsonSerializer.Deserialize<UserInfo>(body);
+        }
+
+        public TokenType GetTokenType(string source)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var jsonToken = tokenHandler.ReadToken(source) as JwtSecurityToken;
+            var sub = jsonToken?.Subject;
+            var client =
+                jsonToken?.Claims.FirstOrDefault(c => c.Type.Equals("client_id", StringComparison.OrdinalIgnoreCase));
+            if (sub == null || client == null) return TokenType.INVALID;
+            return sub.Equals(client.Value)
+                ? TokenType.SERVICE
+                : TokenType.USER;
+        }
+
+        public bool HasScope(string source, string scope)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var jsonToken = tokenHandler.ReadToken(source) as JwtSecurityToken;
+            var scopes = jsonToken?.Claims.FirstOrDefault(c => c.Type.Equals("scope", StringComparison.OrdinalIgnoreCase));
+            return scopes != null && scopes.Value.Split(" ").Any($"AusDdrEventsApi/{scope}".Equals);
         }
     }
 }

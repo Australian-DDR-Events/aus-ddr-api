@@ -7,6 +7,7 @@ namespace Application.Core.Interfaces.Repositories;
 
 public interface ISessionRepository
 {
+    public Task CreateSession(Session session);
     public Session? GetSessionByCookie(string cookie);
     public IList<Session> GetSessionsForUser(Guid userId);
 

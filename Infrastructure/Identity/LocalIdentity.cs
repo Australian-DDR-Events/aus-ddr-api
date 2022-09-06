@@ -36,5 +36,20 @@ namespace Infrastructure.Identity
         {
             return true;
         }
+
+        public bool IsSessionActive(string cookie)
+        {
+            return true;
+        }
+
+        public Task<string> CreateSession(string code)
+        {
+            return Task.FromResult("session-cookie");
+        }
+
+        public Task<string> RefreshSession(string cookie)
+        {
+            return Task.FromResult("refresh-cookie");
+        }
     }
 }

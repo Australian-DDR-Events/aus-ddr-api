@@ -16,6 +16,12 @@ public class SessionRepository : ISessionRepository
         _context = context;
     }
 
+    public async Task CreateSession(Session session)
+    {
+        _context.Sessions.Add(session);
+        await _context.SaveChangesAsync();
+    }
+
     public Session GetSessionByCookie(string cookie)
     {
         return _context
@@ -50,7 +56,7 @@ public class SessionRepository : ISessionRepository
     {
         var sessions = _context
             .Sessions
-            .Where(s => DateTime.Compare(s.Expiry, DateTime.Now) < 0)
+            .Where(s => DateTime.Compare(s.Expiry, DateTime.Now.ToUniversalTime()) < 0)
             .Take(100)
             .ToList();
         _context.Sessions.RemoveRange(sessions);

@@ -36,7 +36,8 @@ namespace Infrastructure
                 .AddScoped<ISessionRepository, SessionRepository>()
                 .AddHttpClient()
                 .AddFileStorage(configuration)
-                .AddDiscordApi(configuration);
+                .AddDiscordApi(configuration)
+                .AddSingleton<ILogger, ConsoleLogger>();
         }
 
         private static IServiceCollection AddFileStorage(this IServiceCollection services, IConfiguration configuration)

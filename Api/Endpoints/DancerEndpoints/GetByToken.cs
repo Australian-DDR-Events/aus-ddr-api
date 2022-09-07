@@ -1,13 +1,10 @@
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Core.Entities;
 using Application.Core.Interfaces;
 using Application.Core.Interfaces.Services;
 using Application.Core.Models.Dancer;
 using Ardalis.Result;
-using AusDdrApi.Extensions;
-using Microsoft.AspNetCore.Authorization;
+using AusDdrApi.Attributes;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -25,11 +22,13 @@ public class GetByToken : ControllerBase
         _identity = identity;
     }
 
-    [Authorize]
+    [UserAuth]
     [HttpGet("/dancers/me")]
-    public async Task<ActionResult<GetDancerByTokenResponse>> HandleAsync([FromHeader] string authorization, CancellationToken cancellationToken = new())
+    public async Task<ActionResult<GetDancerByTokenResponse>> HandleAsync(CancellationToken cancellationToken = new())
     {
-        var userInfo = await _identity.GetUserInfo(authorization);
+        var cookie = HttpContext.Items["cookie"] as string;
+        if (cookie == null) return Unauthorized();
+        var userInfo = await _identity.GetUserInfo(cookie);
         var dancerResult = await _dancerService.MigrateDancer(new MigrateDancerRequestModel
         {
             AuthId = userInfo.UserId,

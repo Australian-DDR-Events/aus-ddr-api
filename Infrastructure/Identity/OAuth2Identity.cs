@@ -36,20 +36,21 @@ namespace Infrastructure.Identity
             _logger = logger;
         }
         
-        public bool IsAdmin(string source)
+        public bool IsAdmin(string cookie)
         {
+            var token = _cache.Fetch<string>(cookie);
+            if (token == null) return false;
             var tokenHandler = new JwtSecurityTokenHandler();
-            var jsonToken = tokenHandler.ReadToken(source) as JwtSecurityToken;
+            var jsonToken = tokenHandler.ReadToken(token) as JwtSecurityToken;
             var groupsClaim = jsonToken?.Claims.FirstOrDefault(c => c.Type.Equals("cognito:groups", StringComparison.OrdinalIgnoreCase));
             if (groupsClaim == null) return false;
             var groupsArray = groupsClaim.Value.Split(" ");
             return groupsArray.Contains("administrators", StringComparer.OrdinalIgnoreCase);
         }
 
-        public async Task<UserInfo> GetUserInfo(string source)
+        public async Task<UserInfo> GetUserInfo(string cookie)
         {
-            if (!source.StartsWith("bearer ", StringComparison.OrdinalIgnoreCase)) return new UserInfo();
-            var token = source.Split(" ")[1];
+            var token = _cache.Fetch<string>(cookie);
             using var requestMessage =
                 new HttpRequestMessage(HttpMethod.Post, _config.UserinfoEndpoint);
             requestMessage.Headers.Authorization =
@@ -139,17 +140,13 @@ namespace Infrastructure.Identity
 
         public async Task<string> RefreshSession(string cookie)
         {
-            var token = _cache.Fetch<string>(cookie);
-            if (token == null || !token.Any()) return string.Empty;
-
             var session = _sessionRepository.GetSessionByCookie(cookie);
             if (session == null) return string.Empty;
 
             var formData = new List<KeyValuePair<string, string>>
             {
-                new("grant_type", "authorization_code"),
-                new("refresh_token", session.RefreshToken),
-                new("client_id", _config.ClientId)
+                new("grant_type", "refresh_token"),
+                new("refresh_token", session.RefreshToken)
             };
             var tokenData = await GetTokens(formData);
             if (tokenData == null)

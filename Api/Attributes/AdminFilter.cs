@@ -8,6 +8,8 @@ namespace AusDdrApi.Attributes
 {
     public class AdminFilter : IActionFilter
     {
+        private const string USER_COOKIE = "x-auth-cookie";
+
         private readonly IIdentity<string> _identity;
         
         public AdminFilter(IIdentity<string> identity)
@@ -17,20 +19,13 @@ namespace AusDdrApi.Attributes
         
         public void OnActionExecuting(ActionExecutingContext context)
         {
-            var authHeader = context.HttpContext.Request.Headers["Authorization"].FirstOrDefault();
-            if (authHeader == null || !authHeader.Contains(" "))
+            context.HttpContext.Request.Cookies.TryGetValue(USER_COOKIE, out var cookie);
+            if (cookie == null || !cookie.Any())
             {
-                context.Result = new ForbidResult();
+                context.Result = new UnauthorizedResult();
                 return;
             }
-            var splitHeader = authHeader.Split(" ");
-            if (!splitHeader[0].Equals("bearer", StringComparison.OrdinalIgnoreCase))
-            {
-                context.Result = new ForbidResult();
-                return;
-            }
-            var token = authHeader.Split(" ")[1];
-            if (!_identity.IsAdmin(token))
+            if (!_identity.IsAdmin(cookie))
             {
                 context.Result = new ForbidResult();
             }

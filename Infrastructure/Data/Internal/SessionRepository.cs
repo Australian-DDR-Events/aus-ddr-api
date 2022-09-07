@@ -26,7 +26,7 @@ public class SessionRepository : ISessionRepository
     {
         return _context
             .Sessions
-            .FirstOrDefault(cookie.Equals);
+            .FirstOrDefault(s => s.Cookie.Equals(cookie));
     }
 
     public IList<Session> GetSessionsForUser(Guid userId)

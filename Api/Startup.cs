@@ -87,6 +87,7 @@ namespace AusDdrApi
                                 "https://stg.ausddrevents.com",
                                 "https://ausddrevents.com")
                             .WithHeaders(HeaderNames.Authorization)
+                            .AllowCredentials()
                             .AllowAnyMethod();
                     });
             });

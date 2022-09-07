@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Threading.Tasks;
 using Application.Core.Interfaces;
 using Microsoft.AspNetCore.Http;
@@ -21,33 +22,27 @@ public class UserAuthFilter : IAsyncActionFilter
         ActionExecutionDelegate next)
     {
         context.HttpContext.Request.Cookies.TryGetValue(USER_COOKIE, out var cookie);
-        if (cookie == null)
+        if (cookie == null || !cookie.Any())
         {
             context.Result = new UnauthorizedResult();
             return;
         }
         if (!_identity.IsSessionActive(cookie))
         {
-            var newSession = await _identity.RefreshSession(cookie);
-            if (newSession == null)
+            cookie = await _identity.RefreshSession(cookie);
+            if (!cookie.Any())
             {
                 context.Result = new UnauthorizedResult();
                 return;
             }
-            context.HttpContext.Response.Cookies.Append(USER_COOKIE, newSession, new CookieOptions()
+            context.HttpContext.Response.Cookies.Append(USER_COOKIE, cookie, new CookieOptions()
             {
                 Secure = true,
                 SameSite = SameSiteMode.Strict,
                 HttpOnly = true
             });
         }
-
+        context.HttpContext.Items.Add("cookie", cookie);
         await next();
-    }
-    
-
-    public void OnActionExecuted(ActionExecutedContext context)
-    {
-        throw new System.NotImplementedException();
     }
 }

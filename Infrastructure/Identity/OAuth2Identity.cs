@@ -170,6 +170,12 @@ namespace Infrastructure.Identity
             return newSession.Cookie;
         }
 
+        public async Task ClearSession(string cookie)
+        {
+            _cache.Delete(cookie);
+            await _sessionRepository.DeleteSessionByCookie(cookie);
+        }
+
         [ItemCanBeNull]
         private async Task<TokenEndpointResponse> GetTokens(List<KeyValuePair<string, string>> formData)
         {

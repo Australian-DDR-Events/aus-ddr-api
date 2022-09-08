@@ -18,5 +18,7 @@ namespace Application.Core.Interfaces
         public Task<string> CreateSession(string code);
 
         public Task<string> RefreshSession(string cookie);
+
+        public Task ClearSession(string cookie);
     }
 }

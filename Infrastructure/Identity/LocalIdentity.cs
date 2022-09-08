@@ -51,5 +51,10 @@ namespace Infrastructure.Identity
         {
             return Task.FromResult("refresh-cookie");
         }
+
+        public async Task ClearSession(string cookie)
+        {
+            
+        }
     }
 }

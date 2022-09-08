@@ -34,7 +34,12 @@ public class GetByToken : ControllerBase
             AuthId = userInfo.UserId,
             LegacyId = userInfo.LegacyId,
         }, cancellationToken);
-        if (dancerResult.IsSuccess) return Ok(GetDancerByTokenResponse.Convert(dancerResult.Value));
+        if (dancerResult.IsSuccess)
+        {
+            var dancer = GetDancerByTokenResponse.Convert(dancerResult.Value);
+            if (_identity.IsAdmin(cookie)) dancer.UserRoles.Add(GetDancerByTokenResponse.Roles.ADMIN);
+            return Ok(dancer);
+        }
         if (dancerResult.Status == ResultStatus.NotFound) return NotFound();
         return new StatusCodeResult(StatusCodes.Status500InternalServerError);
     }

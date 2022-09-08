@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -30,7 +31,8 @@ public class Login : ControllerBase
         {
             Secure = true,
             SameSite = SameSiteMode.Strict,
-            HttpOnly = true
+            HttpOnly = true,
+            Expires = DateTimeOffset.UtcNow.AddDays(30)
         });
         return Ok();
     }

@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Application.Core.Interfaces;
@@ -39,7 +40,8 @@ public class UserAuthFilter : IAsyncActionFilter
             {
                 Secure = true,
                 SameSite = SameSiteMode.Strict,
-                HttpOnly = true
+                HttpOnly = true,
+                Expires = DateTimeOffset.UtcNow.AddDays(30)
             });
         }
         context.HttpContext.Items.Add("cookie", cookie);

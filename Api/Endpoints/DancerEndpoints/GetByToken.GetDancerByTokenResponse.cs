@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Text.Json.Serialization;
 using Application.Core.Entities;
 
 namespace AusDdrApi.Endpoints.DancerEndpoints;
@@ -25,6 +27,8 @@ public class GetDancerByTokenResponse
 
     public string ProfilePictureUrl { get; set; }
 
+    public ICollection<Roles> UserRoles { get; set; } = new List<Roles>();
+
     public static GetDancerByTokenResponse Convert(Dancer d) =>
         new GetDancerByTokenResponse(
             d.Id,
@@ -34,4 +38,9 @@ public class GetDancerByTokenResponse
             d.State, 
             $"/profile/picture/{d.Id}.png?time={d.ProfilePictureTimestamp?.GetHashCode()}"
         );
+
+    public enum Roles
+    {
+        ADMIN
+    }
 }

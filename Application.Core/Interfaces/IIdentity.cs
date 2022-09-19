@@ -13,5 +13,12 @@ namespace Application.Core.Interfaces
         public TokenType GetTokenType(string source);
 
         public bool HasScope(string source, string scope);
+
+        public bool IsSessionActive(string cookie);
+        public Task<string> CreateSession(string code);
+
+        public Task<string> RefreshSession(string cookie);
+
+        public Task ClearSession(string cookie);
     }
 }

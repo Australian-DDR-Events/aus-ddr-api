@@ -80,7 +80,15 @@ public class DancerTests
     [Fact(DisplayName = "When dancer is returned from service, return ok result")]
     public async Task GetByToken_WhenDancerReturned_ResponseIsOk()
     {
-        var endpoint = new DancerEndpoints.GetByToken(_dancerService.Object, _identityService.Object);
+        var endpoint = new DancerEndpoints.GetByToken(_dancerService.Object, _identityService.Object)
+         {
+             ControllerContext =
+             {
+                 HttpContext = new DefaultHttpContext()
+             }
+         };
+        endpoint.ControllerContext.HttpContext.Items = new Dictionary<object, object>();
+        endpoint.ControllerContext.HttpContext.Items.Add("cookie", "cookie");
 
         var identityResponse = new UserInfo
         {
@@ -104,7 +112,7 @@ public class DancerTests
             ), It.IsAny<CancellationToken>())
         ).ReturnsAsync(Result<Dancer>.Success(dancer));
 
-        var response = await endpoint.HandleAsync("", CancellationToken.None);
+        var response = await endpoint.HandleAsync(CancellationToken.None);
         
         Assert.IsType<OkObjectResult>(response.Result);
         var convertedResult = response.Result as OkObjectResult;
@@ -117,8 +125,16 @@ public class DancerTests
     [Fact(DisplayName = "When dancer is not found, return NotFound result")]
     public async Task GetByToken_DancerNotFound_ResponseIsNotFound()
     {
-        var endpoint = new DancerEndpoints.GetByToken(_dancerService.Object, _identityService.Object);
-        
+        var endpoint = new DancerEndpoints.GetByToken(_dancerService.Object, _identityService.Object)
+        {
+            ControllerContext =
+            {
+                HttpContext = new DefaultHttpContext()
+            }
+        };
+        endpoint.ControllerContext.HttpContext.Items = new Dictionary<object, object>();
+        endpoint.ControllerContext.HttpContext.Items.Add("cookie", "cookie");
+
         var identityResponse = new UserInfo
         {
             LegacyId = Guid.NewGuid().ToString(),
@@ -133,7 +149,7 @@ public class DancerTests
             ds.MigrateDancer(It.IsAny<MigrateDancerRequestModel>(), It.IsAny<CancellationToken>())
         ).ReturnsAsync(Result<Dancer>.NotFound());
 
-        var response = await endpoint.HandleAsync("", CancellationToken.None);
+        var response = await endpoint.HandleAsync(CancellationToken.None);
 
         Assert.IsType<NotFoundResult>(response.Result);
     }

@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Core.Entities;
+using Application.Core.Entities.Internal;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Data
@@ -38,14 +39,8 @@ namespace Infrastructure.Data
 
         public DbSet<Connection> Connections { get; set; } = default!;
 
-        public DbSet<Ingredient> Ingredients { get; set; } = default!;
-        public DbSet<GradedIngredient> GradedIngredients { get; set; } = default!;
-        public DbSet<Dish> Dishes { get; set; } = default!;
-        public DbSet<DishSong> DishSongs { get; set; } = default!;
-        public DbSet<GradedDancerIngredient> GradedDancerIngredients { get; set; } = default!;
-        public DbSet<GradedDish> GradedDishes { get; set; } = default!;
-        public DbSet<GradedDancerDish> GradedDancerDishes { get; set; } = default!;
-        
+        public DbSet<Session> Sessions { get; set; } = default!;
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Dancer>()

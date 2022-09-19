@@ -86,7 +86,8 @@ namespace AusDdrApi
                                 "http://localhost:1234",
                                 "https://stg.ausddrevents.com",
                                 "https://ausddrevents.com")
-                            .WithHeaders(HeaderNames.Authorization)
+                            .WithHeaders(HeaderNames.Authorization, HeaderNames.Cookie)
+                            .AllowCredentials()
                             .AllowAnyMethod();
                     });
             });

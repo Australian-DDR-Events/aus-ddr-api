@@ -19,6 +19,7 @@ public class ScoreRepositoryTests
         _fixture = fixture;
         _scoreRepository = new ScoreRepository(_fixture._context);
         Setup.DropAllRows(_fixture._context);
+        _fixture._context.ChangeTracker.Clear();
     }
 
     private void AddSongDiffToTable(SongDifficulty s)

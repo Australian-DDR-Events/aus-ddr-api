@@ -1,3 +1,4 @@
+using System;
 using Application.Core.Interfaces;
 using Microsoft.Extensions.Caching.Memory;
 
@@ -17,6 +18,11 @@ namespace Infrastructure.Cache
             _cache.Set(key, value);
         }
 
+        public void Add(string key, object value, DateTime expiration)
+        {
+            _cache.Set(key, value, expiration);
+        }
+
         public bool Contains(string key)
         {
             return _cache.TryGetValue(key, out _);
@@ -26,6 +32,12 @@ namespace Infrastructure.Cache
         {
             _cache.TryGetValue(key, out var value);
             return value;
+        }
+
+        public T Fetch<T>(string key) where T : class
+        {
+            _cache.TryGetValue(key, out var value);
+            return value as T;
         }
 
         public void Delete(string key)

@@ -9,6 +9,7 @@ using AusDdrApi.Context;
 using AusDdrApi.Services.FileStorage;
 using Infrastructure.Cache;
 using Infrastructure.Data;
+using Infrastructure.Data.Internal;
 using Infrastructure.Identity;
 using Infrastructure.Services;
 using Microsoft.Extensions.Configuration;
@@ -32,9 +33,11 @@ namespace Infrastructure
                 .AddScoped<IRewardRepository, RewardRepository>()
                 .AddScoped<ISongDifficultyRepository, SongDifficultyRepository>()
                 .AddScoped<IConnectionRepository, ConnectionRepository>()
+                .AddScoped<ISessionRepository, SessionRepository>()
                 .AddHttpClient()
                 .AddFileStorage(configuration)
-                .AddDiscordApi(configuration);
+                .AddDiscordApi(configuration)
+                .AddSingleton<ILogger, ConsoleLogger>();
         }
 
         private static IServiceCollection AddFileStorage(this IServiceCollection services, IConfiguration configuration)

@@ -113,6 +113,12 @@
       <Compile Update="Endpoints\SongEndpoints\List.GetAllSongsResponse.cs">
         <DependentUpon>List.cs</DependentUpon>
       </Compile>
+      <Compile Update="Endpoints\Service\ConnectionEndpoints\GetByUserId.GetRequest.cs">
+        <DependentUpon>GetByUserId.cs</DependentUpon>
+      </Compile>
+      <Compile Update="Endpoints\SongDifficultyEndpoints\Create.CreateSongDifficultyRequest.cs">
+        <DependentUpon>Create.cs</DependentUpon>
+      </Compile>
     </ItemGroup>
 
     <ItemGroup>

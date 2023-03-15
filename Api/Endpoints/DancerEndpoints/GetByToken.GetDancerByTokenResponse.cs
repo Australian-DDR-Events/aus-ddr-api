@@ -9,14 +9,14 @@ namespace AusDdrApi.Endpoints.DancerEndpoints;
 
 public class GetDancerByTokenResponse
 {
-    private GetDancerByTokenResponse(Guid id, string name, string code, string primaryLocation, string state, string profilePictureUrl)
+    private GetDancerByTokenResponse(Guid id, string name, string code, string primaryLocation, string state, IDictionary<string, string> profilePictureUrls)
     {
         Id = id;
         Name = name;
         Code = code;
         PrimaryLocation = primaryLocation;
         State = state;
-        ProfilePictureUrl = profilePictureUrl;
+        ProfilePictureUrls = profilePictureUrls;
     }
     public Guid Id { get; set; }
     public string Name { get; set; }
@@ -27,7 +27,7 @@ public class GetDancerByTokenResponse
 
     public string State { get; set; }
 
-    public string ProfilePictureUrl { get; set; }
+    public IDictionary<string, string> ProfilePictureUrls { get; set; }
 
     [JsonConverter(typeof(RolesConverter))]
     public ICollection<Roles> UserRoles { get; set; } = new List<Roles>();
@@ -38,9 +38,11 @@ public class GetDancerByTokenResponse
             d.DdrName,
             d.DdrCode,
             d.PrimaryMachineLocation,
-            d.State, 
-            $"/profile/picture/{d.Id}.png?time={d.ProfilePictureTimestamp?.GetHashCode()}"
+            d.State,
+            ProfilePictureTypes.ToDictionary(type => type, type => $"/profile/avatar/{d.Id}.{type}.png?time={d.ProfilePictureTimestamp?.GetHashCode()}")
         );
+
+    private static readonly IEnumerable<string> ProfilePictureTypes = new List<string>() {"128", "256"};
 
     public enum Roles
     {
@@ -62,6 +64,19 @@ public class GetDancerByTokenResponse
         public override void Write(Utf8JsonWriter writer, Roles value, JsonSerializerOptions options)
         {
             writer.WriteStringValue(RoleNames.FirstOrDefault(r => r.Key == value).Value);
+        }
+    }
+    
+    private class RolesCollectionConverter : JsonConverter<ICollection<Roles>>
+    {
+        public override ICollection<Roles>? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void Write(Utf8JsonWriter writer, ICollection<Roles> value, JsonSerializerOptions options)
+        {
+            writer.WriteStringValue(JsonSerializer.SerializeToUtf8Bytes(value.Select(r => RoleNames.FirstOrDefault(r2 => r2.Key == r).Value)));
         }
     }
     

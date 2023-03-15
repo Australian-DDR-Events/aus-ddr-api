@@ -1,25 +1,29 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Application.Core.Entities;
 
 namespace AusDdrApi.Endpoints.DancerEndpoints;
 
 public class GetDancersResponse
 {
-    private GetDancersResponse(Guid id, string ddrName, string profilePictureUrl)
+    private GetDancersResponse(Guid id, string ddrName, IDictionary<string, string> profilePictureUrls)
     {
         Id = id;
         DdrName = ddrName;
-        ProfilePictureUrl = profilePictureUrl;
+        ProfilePictureUrls = profilePictureUrls;
     }
     
     public Guid Id { get; }
     public string DdrName { get; }
-    public string ProfilePictureUrl { get; }
+    public IDictionary<string, string> ProfilePictureUrls { get; }
 
     public static GetDancersResponse Convert(Dancer d) =>
         new(
             d.Id,
             d.DdrName,
-            $"/profile/picture/{d.Id}.png?time={d.ProfilePictureTimestamp?.GetHashCode()}"
+            ProfilePictureTypes.ToDictionary(type => type, type => $"/profile/avatar/{d.Id}.{type}.png?time={d.ProfilePictureTimestamp?.GetHashCode()}")
         );
+
+    private static readonly IEnumerable<string> ProfilePictureTypes = new List<string>() {"128", "256"};
 }

@@ -45,18 +45,18 @@ public class EventRepository : IEventRepository
                 {
                     Name = course.Name,
                     Description = course.Description,
-                    SongDifficulties = course.SongDifficulties.Select(songDifficulty => new SongDifficulty
+                    Charts = course.Charts.Select(chart => new Chart
                     {
                         Song = new Song
                         {
-                            Name = songDifficulty.Song.Name,
-                            Artist = songDifficulty.Song.Artist
+                            Name = chart.Song.Name,
+                            Artist = chart.Song.Artist
                         },
-                        Id = songDifficulty.Id,
-                        Level = songDifficulty.Level,
-                        Difficulty = songDifficulty.Difficulty,
-                        PlayMode = songDifficulty.PlayMode,
-                        // Scores = songDifficulty.Scores.OrderByDescending(s => new { s.ExScore, s.SubmissionTime }).Take(3).Select(score => new Score
+                        Id = chart.Id,
+                        Level = chart.Level,
+                        Difficulty = chart.Difficulty,
+                        PlayMode = chart.PlayMode,
+                        // Scores = chart.Scores.OrderByDescending(s => new { s.ExScore, s.SubmissionTime }).Take(3).Select(score => new Score
                         // {
                         //     ExScore = score.ExScore,
                         //     Dancer = new Dancer
@@ -68,18 +68,18 @@ public class EventRepository : IEventRepository
                         // }).ToList()
                     }).ToList()
                 }).ToList(),
-                SongDifficulties = e.SongDifficulties.Select(songDifficulty => new SongDifficulty
+                Charts = e.Charts.Select(chart => new Chart
                 {
                     Song = new Song
                     {
-                        Name = songDifficulty.Song.Name,
-                        Artist = songDifficulty.Song.Artist
+                        Name = chart.Song.Name,
+                        Artist = chart.Song.Artist
                     },
-                    Id = songDifficulty.Id,
-                    Level = songDifficulty.Level,
-                    Difficulty = songDifficulty.Difficulty,
-                    PlayMode = songDifficulty.PlayMode,
-                    // Scores = songDifficulty.Scores.OrderByDescending(s => new { s.ExScore, s.SubmissionTime }).Take(3).Select(score => new Score
+                    Id = chart.Id,
+                    Level = chart.Level,
+                    Difficulty = chart.Difficulty,
+                    PlayMode = chart.PlayMode,
+                    // Scores = chart.Scores.OrderByDescending(s => new { s.ExScore, s.SubmissionTime }).Take(3).Select(score => new Score
                     // {
                     //     ExScore = score.ExScore,
                     //     Dancer = new Dancer
@@ -107,12 +107,12 @@ public class EventRepository : IEventRepository
             .FirstOrDefault() ?? new List<Course>();
     }
 
-    public IEnumerable<SongDifficulty> GetEventSongs(Guid eventId)
+    public IEnumerable<Chart> GetEventSongs(Guid eventId)
     {
         return _context
             .Events
             .Where(e => e.Id.Equals(eventId))
-            .Select(e => e.SongDifficulties.Select(sd => new SongDifficulty {
+            .Select(e => e.Charts.Select(sd => new Chart {
                 Id = sd.Id,
                 PlayMode = sd.PlayMode,
                 Difficulty = sd.Difficulty,
@@ -124,6 +124,6 @@ public class EventRepository : IEventRepository
                     Artist = sd.Song.Artist
                 }
             }).ToList())
-            .FirstOrDefault() ?? new List<SongDifficulty>();
+            .FirstOrDefault() ?? new List<Chart>();
     }
 }

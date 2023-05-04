@@ -1,9 +1,9 @@
 using System;
 using Application.Core.Entities;
 
-namespace Application.Core.Models.SongDifficulties;
+namespace Application.Core.Models.Charts;
 
-public class CreateSongDifficultyRequestModel
+public class CreateChartRequestModel
 {
     public Guid SongId { get; set; }
     public Difficulty Difficulty { get; set; }

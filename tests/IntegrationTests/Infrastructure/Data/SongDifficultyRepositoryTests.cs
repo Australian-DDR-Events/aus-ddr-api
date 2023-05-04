@@ -8,38 +8,38 @@ using Xunit;
 
 namespace IntegrationTests.Infrastructure.Data;
 
-[Collection("Song difficulty repository collection")]
-public class SongDifficultyRepositoryTests
+[Collection("Chart repository collection")]
+public class ChartRepositoryTests
 {
     private readonly PostgresDatabaseFixture _fixture;
-    private readonly SongDifficultyRepository _songDifficultyRepository;
+    private readonly ChartRepository _chartRepository;
 
-    public SongDifficultyRepositoryTests(PostgresDatabaseFixture fixture)
+    public ChartRepositoryTests(PostgresDatabaseFixture fixture)
     {
         _fixture = fixture;
-        _songDifficultyRepository = new SongDifficultyRepository(_fixture._context);
+        _chartRepository = new ChartRepository(_fixture._context);
         Setup.DropAllRows(_fixture._context);
     }
 
-    #region CreateSongDifficulty
+    #region CreateChart
 
-    [Fact(DisplayName = "When song exists, difficulty is created")]
-    public async Task WhenSongCreated_DifficultyCreated()
+    [Fact(DisplayName = "When song exists, chart is created")]
+    public async Task WhenSongCreated_ChartCreated()
     {
         var song = SongGenerator.CreateSong();
         _fixture._context.Songs.Add(song);
         await _fixture._context.SaveChangesAsync();
         
-        var songDifficulty = SongDifficultyGenerator.CreateSongDifficulty(song);
+        var chart = ChartGenerator.CreateChart(song);
         
-        var result = await _songDifficultyRepository.CreateSongDifficulty(song.Id, songDifficulty, CancellationToken.None);
+        var result = await _chartRepository.CreateChart(song.Id, chart, CancellationToken.None);
 
-        var databaseResult = _fixture._context.SongDifficulties.FirstOrDefault(s => s.Id.Equals(songDifficulty.Id));
+        var databaseResult = _fixture._context.Charts.FirstOrDefault(s => s.Id.Equals(chart.Id));
         
         Assert.True(result);
 
         Assert.NotNull(databaseResult);
-        Assert.Equal(songDifficulty.Id, databaseResult.Id);
+        Assert.Equal(chart.Id, databaseResult.Id);
         Assert.Equal(song.Id, databaseResult.SongId);
     }
 
@@ -47,11 +47,11 @@ public class SongDifficultyRepositoryTests
     public async Task WhenSongNotExist_False()
     {
         var song = SongGenerator.CreateSong();
-        var songDifficulty = SongDifficultyGenerator.CreateSongDifficulty(song);
+        var chart = ChartGenerator.CreateChart(song);
         
-        var result = await _songDifficultyRepository.CreateSongDifficulty(Guid.NewGuid(), songDifficulty, CancellationToken.None);
+        var result = await _chartRepository.CreateChart(Guid.NewGuid(), chart, CancellationToken.None);
 
-        var databaseResult = _fixture._context.SongDifficulties.FirstOrDefault(s => s.Id.Equals(songDifficulty.Id));
+        var databaseResult = _fixture._context.Charts.FirstOrDefault(s => s.Id.Equals(chart.Id));
         
         Assert.False(result);
         Assert.Null(databaseResult);

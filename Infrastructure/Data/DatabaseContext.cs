@@ -28,7 +28,7 @@ namespace Infrastructure.Data
         public DbSet<Dancer> Dancers { get; set; } = default!;
         public DbSet<Score> Scores { get; set; } = default!;
         public DbSet<Song> Songs { get; set; } = default!;
-        public DbSet<SongDifficulty> SongDifficulties { get; set; } = default!;
+        public DbSet<Chart> Charts { get; set; } = default!;
         public DbSet<Course> Courses { get; set; } = default!;
         public DbSet<Event> Events { get; set; } = default!;
         public DbSet<Badge> Badges { get; set; } = default!;
@@ -52,14 +52,14 @@ namespace Infrastructure.Data
                 .HasDefaultValue(DateTime.UtcNow);
             
             modelBuilder
-                .Entity<SongDifficulty>()
+                .Entity<Chart>()
                 .Property(i => i.PlayMode)
                 .HasConversion(
                     ig => ig.ToString(),
                     ig => (PlayMode) Enum.Parse(typeof(PlayMode), ig));
             
             modelBuilder
-                .Entity<SongDifficulty>()
+                .Entity<Chart>()
                 .Property(i => i.Difficulty)
                 .HasConversion(
                     ig => ig.ToString(),

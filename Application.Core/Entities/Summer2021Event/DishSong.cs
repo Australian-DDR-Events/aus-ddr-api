@@ -10,7 +10,7 @@ namespace Application.Core.Entities
         public Guid DishId { get; set; }
         public Dish? Dish { get; set; }
         
-        public Guid SongDifficultyId { get; set; }
-        public SongDifficulty? SongDifficulty { get; set; }
+        public Guid ChartId { get; set; }
+        public Chart? Chart { get; set; }
     }
 }

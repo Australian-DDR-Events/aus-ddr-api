@@ -7,8 +7,8 @@ namespace Application.Core.Entities
     {
         public string Name { get; set; } = string.Empty;
         
-        public Guid SongDifficultyId { get; set; }
-        public SongDifficulty? SongDifficulty { get; set; }
+        public Guid ChartId { get; set; }
+        public Chart? Chart { get; set; }
         
         public virtual ICollection<Dish> Dishes { get; set; } = default!;
     }

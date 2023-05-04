@@ -31,7 +31,7 @@ namespace Infrastructure
                 .AddScoped<IDancerRepository, DancerRepository>()
                 .AddScoped<IBadgeRepository, BadgeRepository>()
                 .AddScoped<IRewardRepository, RewardRepository>()
-                .AddScoped<ISongDifficultyRepository, SongDifficultyRepository>()
+                .AddScoped<IChartRepository, ChartRepository>()
                 .AddScoped<IConnectionRepository, ConnectionRepository>()
                 .AddScoped<ISessionRepository, SessionRepository>()
                 .AddHttpClient()

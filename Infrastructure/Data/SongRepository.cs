@@ -27,7 +27,7 @@ public class SongRepository : ISongRepository
                 Id = s.Id,
                 Name = s.Name,
                 Artist = s.Artist,
-                SongDifficulties = s.SongDifficulties.Select(sd => new SongDifficulty
+                Charts = s.Charts.Select(sd => new Chart
                 {
                     Id = sd.Id,
                     Difficulty = sd.Difficulty,

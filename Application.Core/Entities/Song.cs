@@ -11,6 +11,6 @@ namespace Application.Core.Entities
 
         public string KonamiId { get; set; } = string.Empty;
         
-        public ICollection<SongDifficulty> SongDifficulties { get; set; } = default!;
+        public ICollection<Chart> Charts { get; set; } = default!;
     }
 }

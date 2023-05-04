@@ -11,9 +11,9 @@ public static class CourseGenerator
         Id = Guid.NewGuid()
     };
 
-    public static Course CreateCourse(ICollection<SongDifficulty> songDifficulties) => new Course
+    public static Course CreateCourse(ICollection<Chart> charts) => new Course
     {
         Id = Guid.NewGuid(),
-        SongDifficulties = songDifficulties
+        Charts = charts
     };
 }

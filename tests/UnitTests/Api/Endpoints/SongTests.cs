@@ -67,7 +67,7 @@ public class SongTests
             Id = request.Id,
             Name = "Name",
             Artist = "Artist",
-            SongDifficulties = new List<SongDifficulty>()
+            Charts = new List<Chart>()
         };
 
         _songService.Setup(s =>

@@ -7,23 +7,23 @@ using Application.Core.Interfaces.Repositories;
 
 namespace Infrastructure.Data;
 
-public class SongDifficultyRepository : ISongDifficultyRepository
+public class ChartRepository : IChartRepository
 {
     private readonly EFDatabaseContext _context;
     
-    public SongDifficultyRepository(EFDatabaseContext context)
+    public ChartRepository(EFDatabaseContext context)
     {
         _context = context;
     }
 
-    public async Task<bool> CreateSongDifficulty(Guid songId, SongDifficulty songDifficulty, CancellationToken cancellationToken)
+    public async Task<bool> CreateChart(Guid songId, Chart chart, CancellationToken cancellationToken)
     {
         var song = _context.Songs.FirstOrDefault(s => s.Id.Equals(songId));
         if (song == null) return false;
-        songDifficulty.SongId = songId;
+        chart.SongId = songId;
         await _context
-            .SongDifficulties
-            .AddAsync(songDifficulty, cancellationToken);
+            .Charts
+            .AddAsync(chart, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);
         return true;
     }

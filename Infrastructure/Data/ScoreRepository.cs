@@ -14,7 +14,7 @@ public class ScoreRepository : IScoreRepository
         _context = context;
     }
 
-    public async Task<bool> CreateScore(Guid songDifficultyId, Guid dancerId, Score score, Guid? eventId)
+    public async Task<bool> CreateScore(Guid chartId, Guid dancerId, Score score, Guid? eventId)
     {
         var databaseEntry = new Score
         {
@@ -22,7 +22,7 @@ public class ScoreRepository : IScoreRepository
             ExScore = score.ExScore,
             Value = score.Value,
             SubmissionTime = DateTime.UtcNow,
-            SongDifficultyId = songDifficultyId,
+            ChartId = chartId,
             EventId = eventId,
             DancerId = dancerId
         };

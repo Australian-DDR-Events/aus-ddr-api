@@ -94,16 +94,16 @@ public class EventRepositoryTests
     [Fact(DisplayName = "When event found, with songs, then return songs")]
     public void WhenEventFound_HasSongs_ReturnSongs()
     {
-        var song1 = SongDifficultyGenerator.CreateSongDifficulty(SongGenerator.CreateSong());
-        var song2 = SongDifficultyGenerator.CreateSongDifficulty(SongGenerator.CreateSong());
+        var song1 = ChartGenerator.CreateChart(SongGenerator.CreateSong());
+        var song2 = ChartGenerator.CreateChart(SongGenerator.CreateSong());
         
         var e = EventGenerator.CreateEvent();
-        e.SongDifficulties = new List<SongDifficulty> {song1, song2};
+        e.Charts = new List<Chart> {song1, song2};
         _fixture._context.Events.Add(e);
         _fixture._context.SaveChanges();
         
         var result = _eventRepository.GetEventSongs(e.Id);
-        Assert.Equal(e.SongDifficulties.Select(sd => sd.Id).OrderBy(id => id), result.Select(sd => sd.Id).OrderBy(id => id));
+        Assert.Equal(e.Charts.Select(sd => sd.Id).OrderBy(id => id), result.Select(sd => sd.Id).OrderBy(id => id));
     }
 
     #endregion

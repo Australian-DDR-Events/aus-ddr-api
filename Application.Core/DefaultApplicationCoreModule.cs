@@ -19,7 +19,7 @@ namespace Application.Core
                 .AddScoped<IBadgeService, BadgeService>()
                 .AddScoped<IAdminService, AdminService>()
                 .AddScoped<ISongService, SongService>()
-                .AddScoped<ISongDifficultyService, SongDifficultyService>()
+                .AddScoped<IChartService, ChartService>()
                 .AddScoped<IConnectionService<DiscordConnectionRequestModel>, DiscordConnection>();
         }
     }

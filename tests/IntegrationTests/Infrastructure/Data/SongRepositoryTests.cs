@@ -25,8 +25,8 @@ public class SongRepositoryTests
 
     #region GetSongWithTopScores
 
-    [Fact(DisplayName = "When song has no difficulties, return just song")]
-    public void WhenSongHasNoDifficulties_ReturnSong()
+    [Fact(DisplayName = "When song has no charts, return just song")]
+    public void WhenSongHasNoCharts_ReturnSong()
     {
         var song = new Song
         {
@@ -42,19 +42,19 @@ public class SongRepositoryTests
         Assert.Equal(song.Name, result.Name);
     }
 
-    [Fact(DisplayName = "When song has difficulties, return difficulties")]
-    public void WhenSongHasDifficulties_ReturnWithDifficulties()
+    [Fact(DisplayName = "When song has charts, return charts")]
+    public void WhenSongHasCharts_ReturnWithCharts()
     {
         var song = new Song
         {
             Name = "sample-name",
-            SongDifficulties = new List<SongDifficulty>()
+            Charts = new List<Chart>()
             {
-                new SongDifficulty()
+                new Chart()
                 {
                     Difficulty = Difficulty.BASIC
                 },
-                new SongDifficulty()
+                new Chart()
                 {
                     Difficulty = Difficulty.CHALLENGE
                 }
@@ -68,7 +68,7 @@ public class SongRepositoryTests
 
         Assert.NotNull(result);
         Assert.Equal(song.Name, result.Name);
-        Assert.Equal(2, result.SongDifficulties.Count);
+        Assert.Equal(2, result.Charts.Count);
     }
 
     [Fact(DisplayName = "When song not found, return null")]

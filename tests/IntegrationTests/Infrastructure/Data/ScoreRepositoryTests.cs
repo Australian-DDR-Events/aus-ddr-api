@@ -22,9 +22,9 @@ public class ScoreRepositoryTests
         _fixture._context.ChangeTracker.Clear();
     }
 
-    private void AddSongDiffToTable(SongDifficulty s)
+    private void AddSongDiffToTable(Chart s)
     {
-        _fixture._context.SongDifficulties.Add(s);
+        _fixture._context.Charts.Add(s);
         _fixture._context.SaveChanges();
         _fixture._context.ChangeTracker.Clear();
     }
@@ -40,7 +40,7 @@ public class ScoreRepositoryTests
         var dancer = DancerGenerator.CreateDancer();
         _fixture._context.Dancers.Add(dancer);
         
-        var songDiff = SongDifficultyGenerator.CreateSongDifficulty(song);
+        var songDiff = ChartGenerator.CreateChart(song);
         AddSongDiffToTable(songDiff);
         
         var score = new Score() {Id = Guid.NewGuid()};
@@ -65,7 +65,7 @@ public class ScoreRepositoryTests
         var e = EventGenerator.CreateEvent();
         _fixture._context.Events.Add(e);
         
-        var songDiff = SongDifficultyGenerator.CreateSongDifficulty(song);
+        var songDiff = ChartGenerator.CreateChart(song);
         AddSongDiffToTable(songDiff);
         
         var score = new Score() {Id = Guid.NewGuid()};
@@ -87,7 +87,7 @@ public class ScoreRepositoryTests
         var dancer = DancerGenerator.CreateDancer();
         _fixture._context.Dancers.Add(dancer);
 
-        var songDiff = SongDifficultyGenerator.CreateSongDifficulty(song);
+        var songDiff = ChartGenerator.CreateChart(song);
         AddSongDiffToTable(songDiff);
         
         var score = new Score() {Id = Guid.NewGuid()};

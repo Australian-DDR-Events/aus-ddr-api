@@ -4,22 +4,22 @@ using System.Threading.Tasks;
 using Application.Core.Entities;
 using Application.Core.Interfaces.Repositories;
 using Application.Core.Interfaces.Services;
-using Application.Core.Models.SongDifficulties;
+using Application.Core.Models.Charts;
 
 namespace Application.Core.Services;
 
-public class SongDifficultyService : ISongDifficultyService
+public class ChartService : IChartService
 {
-    private readonly ISongDifficultyRepository _songDifficultyRepository;
+    private readonly IChartRepository _chartRepository;
 
-    public SongDifficultyService(ISongDifficultyRepository songDifficultyRepository)
+    public ChartService(IChartRepository chartRepository)
     {
-        _songDifficultyRepository = songDifficultyRepository;
+        _chartRepository = chartRepository;
     }
     
-    public Task<bool> CreateSongDifficulty(CreateSongDifficultyRequestModel request, CancellationToken cancellationToken)
+    public Task<bool> CreateChart(CreateChartRequestModel request, CancellationToken cancellationToken)
     {
-        var songDifficulty = new SongDifficulty
+        var chart = new Chart
         {
             Id = Guid.NewGuid(),
             Difficulty = request.Difficulty,
@@ -28,6 +28,6 @@ public class SongDifficultyService : ISongDifficultyService
             MaxScore = request.MaxScore
         };
 
-        return _songDifficultyRepository.CreateSongDifficulty(request.SongId, songDifficulty, cancellationToken);
+        return _chartRepository.CreateChart(request.SongId, chart, cancellationToken);
     }
 }

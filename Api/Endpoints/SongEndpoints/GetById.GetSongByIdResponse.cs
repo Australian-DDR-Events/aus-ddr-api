@@ -7,23 +7,23 @@ namespace AusDdrApi.Endpoints.SongEndpoints;
 
 public class GetSongByIdResponse
 {
-    private GetSongByIdResponse(Guid id, string name, string artist, IEnumerable<SongDifficulty> songDifficulties)
+    private GetSongByIdResponse(Guid id, string name, string artist, IEnumerable<Chart> charts)
     {
         Id = id;
         Name = name;
         Artist = artist;
-        Difficulties = songDifficulties.Select(SongDifficultyFragment.Convert);
+        Charts = charts.Select(ChartFragment.Convert);
     }
     
     public Guid Id { get; }
     public string Name { get; }
     public string Artist { get; }
     
-    public IEnumerable<SongDifficultyFragment> Difficulties { get; }
+    public IEnumerable<ChartFragment> Charts { get; }
 
-    public class SongDifficultyFragment
+    public class ChartFragment
     {
-        private SongDifficultyFragment(Guid id, PlayMode mode, Difficulty difficulty, int level)
+        private ChartFragment(Guid id, PlayMode mode, Difficulty difficulty, int level)
         {
             Id = id;
             Mode = mode;
@@ -36,11 +36,11 @@ public class GetSongByIdResponse
         public Difficulty Difficulty { get; }
         public int Level { get; }
 
-        public static SongDifficultyFragment Convert(SongDifficulty songDifficulty) =>
-            new(songDifficulty.Id, songDifficulty.PlayMode, songDifficulty.Difficulty,
-                songDifficulty.Level);
+        public static ChartFragment Convert(Chart chart) =>
+            new(chart.Id, chart.PlayMode, chart.Difficulty,
+                chart.Level);
     }
 
     public static GetSongByIdResponse Convert(Song song) =>
-        new(song.Id, song.Name, song.Artist, song.SongDifficulties);
+        new(song.Id, song.Name, song.Artist, song.Charts);
 }

@@ -1,9 +1,9 @@
 using System;
 using Microsoft.AspNetCore.Mvc;
 
-namespace AusDdrApi.Endpoints.SongDifficultyEndpoints
+namespace AusDdrApi.Endpoints.ChartEndpoints
 {
-    public class CreateSongDifficultyRequest
+    public class CreateChartRequest
     {
         [FromRoute]
         public Guid SongId { get; set; }

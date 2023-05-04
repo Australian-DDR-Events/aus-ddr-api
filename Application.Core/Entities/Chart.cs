@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Application.Core.Entities
 {
-    public class SongDifficulty : BaseEntity
+    public class Chart : BaseEntity
     {
         public PlayMode PlayMode { get; set; }
         public Difficulty Difficulty { get; set; }

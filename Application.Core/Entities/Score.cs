@@ -10,8 +10,8 @@ namespace Application.Core.Entities
         public Guid DancerId { get; set; }
         public Dancer Dancer { get; set; } = default!;
         
-        public Guid SongDifficultyId { get; set; }
-        public SongDifficulty SongDifficulty { get; set; } = default!;
+        public Guid ChartId { get; set; }
+        public Chart Chart { get; set; } = default!;
         
         public Guid? EventId { get; set; } = null;
         public Event? Event { get; set; } = null;

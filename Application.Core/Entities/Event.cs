@@ -12,7 +12,7 @@ namespace Application.Core.Entities
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
 
-        public virtual ICollection<SongDifficulty> SongDifficulties { get; set; } = default!;
+        public virtual ICollection<Chart> Charts { get; set; } = default!;
         public virtual ICollection<Course> Courses { get; set; } = default!;
     }
 }

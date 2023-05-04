@@ -3,9 +3,9 @@ using Application.Core.Entities;
 
 namespace IntegrationTests.Helpers.DataGenerators;
 
-public static class SongDifficultyGenerator
+public static class ChartGenerator
 {
-    public static SongDifficulty CreateSongDifficulty(Song song) => new SongDifficulty
+    public static Chart CreateChart(Song song) => new Chart
     {
         Id = Guid.NewGuid(),
         Song = song,

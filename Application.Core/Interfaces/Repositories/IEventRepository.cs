@@ -9,5 +9,5 @@ public interface IEventRepository
     Event? GetEventWithTopScore(Guid eventId);
     IEnumerable<Event> GetEvents();
     IEnumerable<Course> GetEventCourses(Guid eventId);
-    IEnumerable<SongDifficulty> GetEventSongs(Guid eventId);
+    IEnumerable<Chart> GetEventSongs(Guid eventId);
 }

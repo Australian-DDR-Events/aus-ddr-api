@@ -19,7 +19,7 @@ public class GetById : ControllerBase
     [HttpGet("/songs/{Id:guid}")]
     [SwaggerOperation(
         Summary = "Gets a Song",
-        Description = "Gets a single Song with all associated difficulties",
+        Description = "Gets a single Song with all associated charts",
         OperationId = "Songs.GetById",
         Tags = new[] { "Songs" })
     ]

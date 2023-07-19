@@ -176,7 +176,6 @@ namespace Infrastructure.Identity
             await _sessionRepository.DeleteSessionByCookie(cookie);
         }
 
-        [ItemCanBeNull]
         private async Task<TokenEndpointResponse> GetTokens(List<KeyValuePair<string, string>> formData)
         {
             var authBytes = Encoding.UTF8.GetBytes($"{_config.ClientId}:{_config.ClientSecret}");

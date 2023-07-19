@@ -3,17 +3,17 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Core.Interfaces.Services;
-using Ardalis.Result;
+using Application.Core.Models;
 using AusDdrApi.Attributes;
-using AusDdrApi.Endpoints.DancerEndpoints;
-using AusDdrApi.Extensions;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace AusDdrApi.Endpoints.AdminEndpoints;
 
-public class ImageUploader : EndpointWithoutResponse<UploadImageRequest>
+[ApiController]
+public class ImageUploader : ControllerBase
 {
     private readonly IAdminService _adminService;
     
@@ -31,7 +31,7 @@ public class ImageUploader : EndpointWithoutResponse<UploadImageRequest>
     ]
     [Authorize]
     [Admin]
-    public override async Task<ActionResult> HandleAsync([FromForm] UploadImageRequest request,
+    public async Task<ActionResult> HandleAsync([FromForm] UploadImageRequest request,
         CancellationToken cancellationToken = new CancellationToken())
     {
         if (request.Image == null)
@@ -47,6 +47,11 @@ public class ImageUploader : EndpointWithoutResponse<UploadImageRequest>
         var joinedSizes = request.FileSizesX.Zip(request.FileSizesY).Select(tuple => new Tuple<int, int>(tuple.First, tuple.Second)).ToList();
 
         var result = await _adminService.UploadImage(request.FileName, request.Image.OpenReadStream(), joinedSizes, cancellationToken);
-        return this.ConvertToActionResult(result);
+        return result.ResultCode switch
+        {
+            ResultCode.Ok => Accepted(),
+            ResultCode.BadRequest => BadRequest(),
+            _ => StatusCode(StatusCodes.Status500InternalServerError)
+        };
     }
 }

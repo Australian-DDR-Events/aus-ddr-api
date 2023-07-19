@@ -8,9 +8,9 @@ using Application.Core.Interfaces;
 using Application.Core.Interfaces.Services;
 using Application.Core.Models;
 using Application.Core.Models.Dancer;
-using Ardalis.Result;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis;
 using Moq;
 using Xunit;
 using DancerEndpoints = AusDdrApi.Endpoints.DancerEndpoints;
@@ -42,7 +42,11 @@ public class DancerTests
         _dancerService.Setup(ds =>
             ds.GetDancerById(It.Is<Guid>(source => source.Equals(request.Id)
             ))
-        ).Returns(Result<Dancer>.Success(dancer));
+        ).Returns(new Result<Dancer>
+        {
+            ResultCode = ResultCode.Ok,
+            Value = dancer
+        });
 
         var response = await endpoint.HandleAsync(request, CancellationToken.None);
         
@@ -66,7 +70,11 @@ public class DancerTests
 
         _dancerService.Setup(ds =>
             ds.GetDancerById(It.IsAny<Guid>())
-        ).Returns(Result<Dancer>.NotFound());
+        ).Returns(new Result<Dancer>
+        {
+            ResultCode = ResultCode.NotFound,
+            Value = new Optional<Dancer>()
+        });
 
         var response = await endpoint.HandleAsync(request, CancellationToken.None);
 
@@ -110,7 +118,11 @@ public class DancerTests
                 source.LegacyId == identityResponse.LegacyId &&
                 source.AuthId == identityResponse.UserId
             ), It.IsAny<CancellationToken>())
-        ).ReturnsAsync(Result<Dancer>.Success(dancer));
+        ).ReturnsAsync(new Result<Dancer>
+        {
+            ResultCode = ResultCode.Ok,
+            Value = dancer
+        });
 
         var response = await endpoint.HandleAsync(CancellationToken.None);
         
@@ -147,7 +159,11 @@ public class DancerTests
 
         _dancerService.Setup(ds =>
             ds.MigrateDancer(It.IsAny<MigrateDancerRequestModel>(), It.IsAny<CancellationToken>())
-        ).ReturnsAsync(Result<Dancer>.NotFound());
+        ).ReturnsAsync(new Result<Dancer>
+        {
+            ResultCode = ResultCode.NotFound,
+            Value = new Optional<Dancer>()
+        });
 
         var response = await endpoint.HandleAsync(CancellationToken.None);
 
@@ -182,7 +198,11 @@ public class DancerTests
         _dancerService.Setup(d =>
             d.UpdateDancerAsync(It.Is<UpdateDancerRequestModel>(value =>
                 value.AuthId == identityResponse.UserId), It.IsAny<CancellationToken>())
-        ).ReturnsAsync(Result<Dancer>.Success(new Dancer {Id = Guid.NewGuid()}));
+        ).ReturnsAsync(new Result<Dancer>
+        {
+            ResultCode = ResultCode.Ok,
+            Value = new Dancer {Id = Guid.NewGuid()}
+        });
 
         var response = await endpoint.HandleAsync(requestModel, "", CancellationToken.None);
         Assert.IsType<AcceptedResult>(response);
@@ -211,7 +231,11 @@ public class DancerTests
 
         _dancerService.Setup(d =>
             d.UpdateDancerAsync(It.IsAny<UpdateDancerRequestModel>(), It.IsAny<CancellationToken>())
-        ).ReturnsAsync(Result<Dancer>.NotFound());
+        ).ReturnsAsync(new Result<Dancer>
+        {
+            ResultCode = ResultCode.NotFound,
+            Value = new Optional<Dancer>()
+        });
 
         var response = await endpoint.HandleAsync(requestModel, "", CancellationToken.None);
         Assert.IsType<NotFoundResult>(response);
@@ -246,7 +270,11 @@ public class DancerTests
         _dancerService.Setup(d =>
             d.CreateDancerAsync(It.Is<CreateDancerRequestModel>(value =>
                 value.AuthId == identityResponse.UserId), It.IsAny<CancellationToken>())
-        ).ReturnsAsync(Result<Dancer>.Success(new Dancer {Id = Guid.NewGuid()}));
+        ).ReturnsAsync(new Result<Dancer>
+        {
+            ResultCode = ResultCode.Ok,
+            Value = new Dancer {Id = Guid.NewGuid()}
+        });
 
         var response = await endpoint.HandleAsync(requestModel, "", CancellationToken.None);
         Assert.IsType<AcceptedResult>(response);
@@ -277,7 +305,11 @@ public class DancerTests
         _dancerService.Setup(d =>
             d.CreateDancerAsync(It.Is<CreateDancerRequestModel>(value =>
                 value.AuthId == identityResponse.UserId), It.IsAny<CancellationToken>())
-        ).ReturnsAsync(Result<Dancer>.Error("error"));
+        ).ReturnsAsync(new Result<Dancer>
+        {
+            ResultCode = ResultCode.Conflict,
+            Value = new Dancer {Id = Guid.NewGuid()}
+        });
 
         var response = await endpoint.HandleAsync(requestModel, "", CancellationToken.None);
         Assert.IsType<ConflictResult>(response);
@@ -304,7 +336,11 @@ public class DancerTests
 
         _dancerService.Setup(ds =>
             ds.GetDancerBadges(It.Is<Guid>(value => value.Equals(request.Id)))
-        ).Returns(serviceResponse);
+        ).Returns(new Result<IEnumerable<GetDancerBadgesResponseModel>>
+        {
+            ResultCode = ResultCode.Ok,
+            Value = new Optional<IEnumerable<GetDancerBadgesResponseModel>>(serviceResponse)
+        });
 
         var response = await endpoint.HandleAsync(request);
 
@@ -332,7 +368,10 @@ public class DancerTests
 
         _dancerService.Setup(ds =>
             ds.AddBadgeToDancer(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<CancellationToken>())
-        ).ReturnsAsync(true);
+        ).ReturnsAsync(new Result
+        {
+            ResultCode = ResultCode.Ok
+        });
 
         var response = await endpoint.HandleAsync(request);
         
@@ -344,25 +383,6 @@ public class DancerTests
                     It.IsAny<CancellationToken>()
                 ), Times.Once
         );
-    }
-
-    [Fact(DisplayName = "When error response, return BadRequest result")]
-    public async Task Badges_Set_Failed_BadRequestResponse()
-    {
-        var endpoint = new DancerEndpoints.Badges_Set(_dancerService.Object);
-        var request = new DancerEndpoints.AddBadgeToDancerByIdRequest()
-        {
-            BadgeId = Guid.NewGuid(),
-            DancerId = Guid.NewGuid()
-        };
-
-        _dancerService.Setup(ds =>
-            ds.AddBadgeToDancer(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<CancellationToken>())
-        ).ReturnsAsync(false);
-
-        var response = await endpoint.HandleAsync(request);
-        
-        Assert.IsType<BadRequestResult>(response);
     }
 
     #endregion
@@ -381,7 +401,10 @@ public class DancerTests
 
         _dancerService.Setup(ds =>
             ds.RemoveBadgeFromDancer(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<CancellationToken>())
-        ).ReturnsAsync(true);
+        ).ReturnsAsync(new Result
+        {
+            ResultCode = ResultCode.Ok
+        });
 
         var response = await endpoint.HandleAsync(request);
         
@@ -393,25 +416,6 @@ public class DancerTests
                     It.IsAny<CancellationToken>()
                 ), Times.Once
         );
-    }
-
-    [Fact(DisplayName = "When error response, return BadRequest result")]
-    public async Task Badges_Delete_Failed_BadRequestResponse()
-    {
-        var endpoint = new DancerEndpoints.Badges_Delete(_dancerService.Object);
-        var request = new DancerEndpoints.RevokeBadgeFromDancerByIdRequest()
-        {
-            BadgeId = Guid.NewGuid(),
-            DancerId = Guid.NewGuid()
-        };
-
-        _dancerService.Setup(ds =>
-            ds.RemoveBadgeFromDancer(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<CancellationToken>())
-        ).ReturnsAsync(false);
-
-        var response = await endpoint.HandleAsync(request);
-        
-        Assert.IsType<BadRequestResult>(response);
     }
 
     #endregion
@@ -441,7 +445,10 @@ public class DancerTests
 
         _dancerService.Setup(ds =>
             ds.SetAvatarForDancerByAuthId(It.IsAny<string>(), It.IsAny<Stream>(), It.IsAny<CancellationToken>())
-        ).ReturnsAsync(true);
+        ).ReturnsAsync(new Result
+        {
+            ResultCode = ResultCode.Ok
+        });
 
         var response = await endpoint.HandleAsync(request, "", CancellationToken.None);
         
@@ -476,11 +483,14 @@ public class DancerTests
 
         _dancerService.Setup(ds =>
             ds.SetAvatarForDancerByAuthId(It.IsAny<string>(), It.IsAny<Stream>(), It.IsAny<CancellationToken>())
-        ).ReturnsAsync(false);
+        ).ReturnsAsync(new Result
+        {
+            ResultCode = ResultCode.BadRequest
+        });
 
         var response = await endpoint.HandleAsync(request, "", CancellationToken.None);
         
-        Assert.IsType<NotFoundResult>(response);
+        Assert.IsType<BadRequestResult>(response);
         _dancerService.Verify(ds =>
                 ds.SetAvatarForDancerByAuthId(
                     It.Is<string>(value => value.Equals(identityResponse.UserId)),

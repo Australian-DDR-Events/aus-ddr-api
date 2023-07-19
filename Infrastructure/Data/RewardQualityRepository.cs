@@ -35,7 +35,6 @@ public class RewardQualityRepository : IRewardQualityRepository
         return _dancerRepository.RemoveRewardFromDancer(rewardId, dancerId, cancellationToken);
     }
 
-    [CanBeNull]
     public RewardQuality GetRewardQualityForDancer(Guid rewardId, Guid dancerId)
     {
         return _context

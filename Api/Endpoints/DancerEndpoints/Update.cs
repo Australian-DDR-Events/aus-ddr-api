@@ -2,8 +2,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Application.Core.Interfaces;
 using Application.Core.Interfaces.Services;
+using Application.Core.Models;
 using Application.Core.Models.Dancer;
-using Ardalis.Result;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -48,9 +48,12 @@ namespace AusDdrApi.Endpoints.DancerEndpoints
             };
 
             var dancerResult = await _dancerService.UpdateDancerAsync(requestModel, cancellationToken);
-            if (dancerResult.IsSuccess) return Accepted();
-            if (dancerResult.Status == ResultStatus.NotFound) return NotFound();
-            return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+            return dancerResult.ResultCode switch
+            {
+                ResultCode.Ok => Accepted(),
+                ResultCode.NotFound => NotFound(),
+                _ => StatusCode(StatusCodes.Status500InternalServerError),
+            };
         }
     }
 }

@@ -1,7 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Core.Interfaces.Services;
-using Ardalis.Result;
+using Application.Core.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -28,9 +28,12 @@ namespace AusDdrApi.Endpoints.DancerEndpoints
         public async Task<ActionResult<GetDancerByIdResponse>> HandleAsync([FromRoute] GetDancerByIdRequest request, CancellationToken cancellationToken = new())
         {
             var dancerResult = _dancerService.GetDancerById(request.Id);
-            if (dancerResult.IsSuccess) return Ok(GetDancerByIdResponse.Convert(dancerResult.Value));
-            if (dancerResult.Status == ResultStatus.NotFound) return NotFound();
-            return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+            return dancerResult.ResultCode switch
+            {
+                ResultCode.Ok => Ok(GetDancerByIdResponse.Convert(dancerResult.Value.Value)),
+                ResultCode.NotFound => NotFound(),
+                _ => StatusCode(StatusCodes.Status500InternalServerError),
+            };
         }
     }
 }

@@ -15,5 +15,7 @@ namespace Application.Core.Entities
         
         public Guid? EventId { get; set; } = null;
         public Event? Event { get; set; } = null;
+
+        public bool Validated { get; set; } = false;
     }
 }

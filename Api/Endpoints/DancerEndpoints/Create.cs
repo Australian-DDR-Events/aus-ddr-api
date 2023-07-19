@@ -2,8 +2,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Application.Core.Interfaces;
 using Application.Core.Interfaces.Services;
+using Application.Core.Models;
 using Application.Core.Models.Dancer;
-using Ardalis.Result;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -16,7 +16,6 @@ public class Create : ControllerBase
 {
     private readonly IDancerService _dancerService;
     private readonly IIdentity<string> _identity;
-
     public Create(IDancerService dancerService, IIdentity<string> identity)
     {
         _dancerService = dancerService;
@@ -49,8 +48,12 @@ public class Create : ControllerBase
         };
 
         var dancerResult = await _dancerService.CreateDancerAsync(requestModel, cancellationToken);
-        if (dancerResult.IsSuccess) return Accepted();
-        if (dancerResult.Status == ResultStatus.Error) return Conflict();
-        return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+
+        return dancerResult.ResultCode switch
+        {
+            ResultCode.Ok => Accepted(),
+            ResultCode.Conflict => Conflict(),
+            _ => StatusCode(StatusCodes.Status500InternalServerError),
+        };
     }
 }

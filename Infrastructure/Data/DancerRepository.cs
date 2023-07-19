@@ -36,7 +36,6 @@ public class DancerRepository : IDancerRepository
             .ToList();
     }
 
-    [CanBeNull]
     public Dancer GetDancerById(Guid id)
     {
         return _context
@@ -44,7 +43,6 @@ public class DancerRepository : IDancerRepository
             .FirstOrDefault(d => d.Id.Equals(id));
     }
 
-    [CanBeNull]
     public Dancer GetDancerByAuthId(string id)
     {
         return _context

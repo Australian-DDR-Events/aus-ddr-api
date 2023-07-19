@@ -1,55 +1,57 @@
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Core.Entities;
 using Application.Core.Interfaces.Services;
 using AusDdrApi.Attributes;
-using AusDdrApi.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
-namespace AusDdrApi.Endpoints.BadgeEndpoints
+namespace AusDdrApi.Endpoints.BadgeEndpoints;
+
+[ApiController]
+public class Create : ControllerBase
 {
-    public class Create : EndpointWithResponse<CreateBadgeRequest, CreateBadgeResponse, Badge>
+    private readonly IBadgeService _badgeService;
+
+    public Create(IBadgeService badgeService)
     {
-        private readonly IBadgeService _badgeService;
+        _badgeService = badgeService;
+    }
 
-        public Create(IBadgeService badgeService)
+    [HttpPost(CreateBadgeRequest.Route)]
+    [SwaggerOperation(
+        Summary = "Add a badge song",
+        Description = "",
+        OperationId = "",
+        Tags = new[] { "Song" })
+    ]
+    [Authorize]
+    [Admin]
+    public async Task<ActionResult<CreateBadgeResponse>> HandleAsync(CreateBadgeRequest request, CancellationToken cancellationToken = new CancellationToken())
+    {
+        var entity = new Badge
         {
-            _badgeService = badgeService;
-        }
+            Name = request.Name,
+            Description = request.Description,
+            Threshold = request.Threshold,
+            EventId = request.EventId
+        };
+        var createdBadge = await _badgeService.CreateBadgeAsync(entity, cancellationToken);
+        return createdBadge.Value.HasValue switch
+        {
+            true => Created("", Convert(createdBadge.Value.Value)),
+            false => BadRequest()
+        };
+    }
 
-        [HttpPost(CreateBadgeRequest.Route)]
-        [SwaggerOperation(
-            Summary = "Add a badge song",
-            Description = "",
-            OperationId = "",
-            Tags = new[] { "Song" })
-        ]
-        [Authorize]
-        [Admin]
-        public override async Task<ActionResult<CreateBadgeResponse>> HandleAsync(CreateBadgeRequest request, CancellationToken cancellationToken = new CancellationToken())
+    private CreateBadgeResponse Convert(Badge u)
+    {
+        return new CreateBadgeResponse
         {
-            var entity = new Badge
-            {
-                Name = request.Name,
-                Description = request.Description,
-                Threshold = request.Threshold,
-                EventId = request.EventId
-            };
-            var createdBadge = await _badgeService.CreateBadgeAsync(entity, cancellationToken);
-            return Created(new Uri(""), Convert(createdBadge.Value));
-        }
-
-        public override CreateBadgeResponse Convert(Badge u)
-        {
-            return new CreateBadgeResponse
-            {
-                Id = u.Id,
-                Name = u.Name,
-                Description = u.Description
-            };
-        }
+            Id = u.Id,
+            Name = u.Name,
+            Description = u.Description
+        };
     }
 }

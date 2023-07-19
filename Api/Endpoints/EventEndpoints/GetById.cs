@@ -1,6 +1,8 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Core.Interfaces.Services;
+using Application.Core.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -26,7 +28,11 @@ public class GetById : ControllerBase
     public async Task<ActionResult<GetEventByIdResponse>> HandleAsync([FromRoute] GetEventByIdRequest request, CancellationToken cancellationToken = new())
     {
         var result = await _eventService.GetEventAsync(request.Id, cancellationToken);
-        if (result.IsSuccess) return Ok(GetEventByIdResponse.Convert(result.Value));
-        return NotFound();
+        return result.ResultCode switch
+        {
+            ResultCode.Ok => GetEventByIdResponse.Convert(result.Value.Value),
+            ResultCode.NotFound => NotFound(),
+            _ => StatusCode(StatusCodes.Status500InternalServerError)
+        };
     }
 }

@@ -12,8 +12,9 @@ public class TokenEndpointResponse
     public string AccessToken { get; set; }
     
     [JsonPropertyName("refresh_token")]
-    [CanBeNull]
-    public string RefreshToken { get; set; }
+    #nullable enable
+    public string? RefreshToken { get; set; }
+    #nullable disable
     
     [JsonPropertyName("token_type")]
     public string TokenType { get; set; }

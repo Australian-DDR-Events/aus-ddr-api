@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Core.Entities;
-using Ardalis.Result;
+using Application.Core.Models;
 
 namespace Application.Core.Interfaces.Services;
 

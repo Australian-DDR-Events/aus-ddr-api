@@ -8,4 +8,6 @@ namespace Application.Core.Interfaces.Repositories;
 public interface IChartRepository
 {
     Task<bool> CreateChart(Guid songId, Chart chart, CancellationToken cancellationToken);
+
+    Chart? GetChartById(Guid chartId);
 }

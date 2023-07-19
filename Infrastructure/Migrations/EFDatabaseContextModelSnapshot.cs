@@ -403,7 +403,10 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime>("SubmissionTime")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2023, 5, 4, 14, 22, 58, 120, DateTimeKind.Utc).AddTicks(1720));
+                        .HasDefaultValue(new DateTime(2023, 5, 29, 6, 3, 1, 460, DateTimeKind.Utc).AddTicks(9560));
+
+                    b.Property<bool>("Validated")
+                        .HasColumnType("boolean");
 
                     b.Property<int>("Value")
                         .HasColumnType("integer");

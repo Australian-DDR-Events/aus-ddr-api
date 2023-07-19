@@ -4,8 +4,8 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Core.Entities;
+using Application.Core.Models;
 using Application.Core.Models.Dancer;
-using Ardalis.Result;
 
 namespace Application.Core.Interfaces.Services
 {
@@ -35,9 +35,9 @@ namespace Application.Core.Interfaces.Services
             
         Result<IEnumerable<GetDancerBadgesResponseModel>> GetDancerBadges(Guid id);
 
-        Task<bool> AddBadgeToDancer(Guid dancerId, Guid badgeId, CancellationToken cancellationToken);
-        Task<bool> RemoveBadgeFromDancer(Guid dancerId, Guid badgeId, CancellationToken cancellationToken);
+        Task<Result> AddBadgeToDancer(Guid dancerId, Guid badgeId, CancellationToken cancellationToken);
+        Task<Result> RemoveBadgeFromDancer(Guid dancerId, Guid badgeId, CancellationToken cancellationToken);
 
-        Task<bool> SetAvatarForDancerByAuthId(string authId, Stream fileStream, CancellationToken cancellationToken);
+        Task<Result> SetAvatarForDancerByAuthId(string authId, Stream fileStream, CancellationToken cancellationToken);
     }
 }

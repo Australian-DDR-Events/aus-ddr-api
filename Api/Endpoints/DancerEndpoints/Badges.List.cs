@@ -3,7 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Core.Interfaces.Services;
-using Ardalis.Result;
+using Application.Core.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -29,8 +29,12 @@ public class Badges_List : ControllerBase
     public async Task<ActionResult<IEnumerable<GetDancerBadgesByIdResponse>>> HandleAsync([FromRoute] GetDancerBadgesByIdRequest request, CancellationToken cancellationToken = new CancellationToken())
     {
         var badgesResult = _dancerService.GetDancerBadges(request.Id);
-        if (badgesResult.IsSuccess) return Ok(badgesResult.Value.Select(GetDancerBadgesByIdResponse.Convert));
-        if (badgesResult.Status == ResultStatus.NotFound) return NotFound();
-        return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+
+        return badgesResult.ResultCode switch
+        {
+            ResultCode.Ok => Ok(badgesResult.Value.Value.Select(GetDancerBadgesByIdResponse.Convert)),
+            ResultCode.NotFound => NotFound(),
+            _ => StatusCode(StatusCodes.Status500InternalServerError),
+        };
     }
 }

@@ -25,7 +25,6 @@ namespace Infrastructure
             return services
                 .AddSingleton<ICache, InMemoryCache>()
                 .AddIdentity(configuration)
-                .AddScoped(typeof(IAsyncRepository<>), typeof(GenericEfRepository<>))
                 .AddScoped<ISongRepository, SongRepository>()
                 .AddScoped<IEventRepository, EventRepository>()
                 .AddScoped<IDancerRepository, DancerRepository>()

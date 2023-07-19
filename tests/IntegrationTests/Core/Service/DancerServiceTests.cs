@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Application.Core.Entities;
 using Application.Core.Interfaces;
+using Application.Core.Models;
 using Application.Core.Models.Dancer;
 using Application.Core.Services;
 using Infrastructure.Data;
@@ -49,9 +50,9 @@ public class DancerServiceTests
 
         var result = await _dancerService.MigrateDancer(model, CancellationToken.None);
         
-        Assert.True(result.IsSuccess);
-        Assert.Equal(model.AuthId, result.Value.AuthenticationId);
-        Assert.Equal(dancer.DdrName, result.Value.DdrName);
+        Assert.Equal(ResultCode.Ok, result.ResultCode);
+        Assert.Equal(model.AuthId, result.Value.Value.AuthenticationId);
+        Assert.Equal(dancer.DdrName, result.Value.Value.DdrName);
     }
 
     #endregion
@@ -74,14 +75,14 @@ public class DancerServiceTests
 
         var result = await _dancerService.UpdateDancerAsync(model, CancellationToken.None);
         
-        Assert.True(result.IsSuccess);
+        Assert.Equal(ResultCode.Ok, result.ResultCode);
         Assert.True(
-            result.Value.State == model.State &&
-            result.Value.DdrCode == model.DdrCode &&
-            result.Value.DdrName == model.DdrName &&
-            result.Value.PrimaryMachineLocation == model.PrimaryMachineLocation &&
-            result.Value.AuthenticationId == model.AuthId &&
-            result.Value.Id == dancer.Id
+            result.Value.Value.State == model.State &&
+            result.Value.Value.DdrCode == model.DdrCode &&
+            result.Value.Value.DdrName == model.DdrName &&
+            result.Value.Value.PrimaryMachineLocation == model.PrimaryMachineLocation &&
+            result.Value.Value.AuthenticationId == model.AuthId &&
+            result.Value.Value.Id == dancer.Id
         );
     }
 
@@ -103,13 +104,13 @@ public class DancerServiceTests
 
         var result = await _dancerService.CreateDancerAsync(model, CancellationToken.None);
         
-        Assert.True(result.IsSuccess);
+        Assert.Equal(ResultCode.Ok, result.ResultCode);
         Assert.True(
-            result.Value.State == model.State &&
-            result.Value.DdrCode == model.DdrCode &&
-            result.Value.DdrName == model.DdrName &&
-            result.Value.PrimaryMachineLocation == model.PrimaryMachineLocation &&
-            result.Value.AuthenticationId == model.AuthId
+            result.Value.Value.State == model.State &&
+            result.Value.Value.DdrCode == model.DdrCode &&
+            result.Value.Value.DdrName == model.DdrName &&
+            result.Value.Value.PrimaryMachineLocation == model.PrimaryMachineLocation &&
+            result.Value.Value.AuthenticationId == model.AuthId
         );
     }
 

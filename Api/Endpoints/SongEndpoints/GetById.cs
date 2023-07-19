@@ -1,6 +1,7 @@
 using System.Threading;
 using Application.Core.Interfaces.Services;
-using Ardalis.Result;
+using Application.Core.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -26,7 +27,11 @@ public class GetById : ControllerBase
     public ActionResult<GetSongByIdResponse> HandleAsync([FromRoute] GetSongByIdRequest request, CancellationToken cancellationToken = new CancellationToken())
     {
         var result = _songService.GetSong(request.Id);
-        if (result.Status == ResultStatus.NotFound) return NotFound();
-        return Ok(GetSongByIdResponse.Convert(result.Value));
+        return result.ResultCode switch
+        {
+            ResultCode.Ok => Ok(GetSongByIdResponse.Convert(result.Value.Value)),
+            ResultCode.NotFound => NotFound(),
+            _ => StatusCode(StatusCodes.Status500InternalServerError)
+        };
     }
 }

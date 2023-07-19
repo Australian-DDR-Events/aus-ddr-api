@@ -2,6 +2,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Core.Interfaces.Services;
+using Application.Core.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -28,7 +29,10 @@ public class List : ControllerBase
     public async Task<ActionResult<GetDancersResponse>> HandleAsync([FromQuery] GetDancersRequest request, CancellationToken cancellationToken = new())
     {
         var dancersResult = await _dancerService.GetDancersAsync(request.Page.GetValueOrDefault(0), request.Limit.GetValueOrDefault(20), cancellationToken);
-        if (!dancersResult.IsSuccess) return new StatusCodeResult(StatusCodes.Status500InternalServerError);
-        return Ok(dancersResult.Value.Select(GetDancersResponse.Convert));
+        return dancersResult.ResultCode switch
+        {
+            ResultCode.Ok => Ok(dancersResult.Value.Value.Select(GetDancersResponse.Convert)),
+            _ => StatusCode(StatusCodes.Status500InternalServerError),
+        };
     }
 }

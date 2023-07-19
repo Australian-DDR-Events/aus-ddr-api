@@ -1,13 +1,12 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Core.Entities;
-using Application.Core.Interfaces;
 using Application.Core.Interfaces.Repositories;
 using Application.Core.Interfaces.Services;
-using Ardalis.Result;
+using Application.Core.Models;
+using Microsoft.CodeAnalysis;
 
 namespace Application.Core.Services;
 
@@ -22,12 +21,28 @@ public class EventService : IEventService
 
     public async Task<Result<IEnumerable<Event>>> GetEventsAsync(CancellationToken cancellationToken)
     {
-        return Result<IEnumerable<Event>>.Success(_repository.GetEvents());
+        return new Result<IEnumerable<Event>>
+        {
+            ResultCode = ResultCode.Ok,
+            Value = new Optional<IEnumerable<Event>>(_repository.GetEvents())
+        };
     }
 
     public Task<Result<Event>> GetEventAsync(Guid eventId, CancellationToken cancellationToken)
     {
         var result = _repository.GetEventWithTopScore(eventId);
-        return Task.FromResult(result == null ? Result<Event>.NotFound() : Result<Event>.Success(result));
+
+        return Task.FromResult(result == null
+            ? new Result<Event>
+            {
+                ResultCode = ResultCode.NotFound,
+                Value = new Optional<Event>()
+            }
+            : new Result<Event>
+            {
+                ResultCode = ResultCode.Ok,
+                Value = result
+            }
+        );
     }
 }

@@ -7,9 +7,9 @@ using Application.Core.Entities;
 using Application.Core.Interfaces;
 using Application.Core.Interfaces.Repositories;
 using Application.Core.Interfaces.Services;
+using Application.Core.Models;
 using Application.Core.Models.Dancer;
 using Application.Core.Services;
-using Ardalis.Result;
 using Microsoft.AspNetCore.Http;
 using Moq;
 using SixLabors.ImageSharp;
@@ -47,8 +47,8 @@ namespace UnitTests.Core.Services
 
             var result = _dancerService.GetDancerById(dancer.Id);
             
-            Assert.True(result.IsSuccess);
-            Assert.Equal(dancer.Id, result.Value.Id);
+            Assert.Equal(ResultCode.Ok,result.ResultCode);
+            Assert.Equal(dancer.Id, result.Value.Value.Id);
         }
 
         [Fact(DisplayName = "When GetDancerById, if dancer not found in source, then return NotFound result")]
@@ -62,7 +62,7 @@ namespace UnitTests.Core.Services
 
             var result = _dancerService.GetDancerById(id);
 
-            Assert.Equal(ResultStatus.NotFound, result.Status);
+            Assert.Equal(ResultCode.NotFound, result.ResultCode);
         }
 
         
@@ -87,7 +87,7 @@ namespace UnitTests.Core.Services
         
             var result = await _dancerService.GetDancersAsync(2, 4, new CancellationToken());
         
-            Assert.True(result.IsSuccess);
+            Assert.Equal(ResultCode.Ok, result.ResultCode);
             Assert.Equal(repositoryResponse, result.Value);
         
             _dancerRepository2.Verify(mock => mock.GetDancers(
@@ -121,8 +121,8 @@ namespace UnitTests.Core.Services
 
             var result = await _dancerService.MigrateDancer(requestModel, CancellationToken.None);
             
-            Assert.True(result.IsSuccess);
-            Assert.Equal(repositoryResponse.Id, result.Value.Id);
+            Assert.Equal(ResultCode.Ok, result.ResultCode);
+            Assert.Equal(repositoryResponse.Id, result.Value.Value.Id);
             
             _dancerRepository2.Verify(mock => mock.UpdateDancer(It.IsAny<Dancer>(), It.IsAny<CancellationToken>()), Times.Never);
         }
@@ -150,8 +150,8 @@ namespace UnitTests.Core.Services
 
             var result = await _dancerService.MigrateDancer(requestModel, CancellationToken.None);
             
-            Assert.True(result.IsSuccess);
-            Assert.Equal(repositoryResponse.Id, result.Value.Id);
+            Assert.Equal(ResultCode.Ok, result.ResultCode);
+            Assert.Equal(repositoryResponse.Id, result.Value.Value.Id);
             
             _dancerRepository2.Verify(
                 mock => mock.UpdateDancer(
@@ -176,7 +176,7 @@ namespace UnitTests.Core.Services
 
             var result = await _dancerService.MigrateDancer(requestModel, CancellationToken.None);
             
-            Assert.Equal(ResultStatus.NotFound, result.Status);
+            Assert.Equal(ResultCode.NotFound, result.ResultCode);
             
             _dancerRepository2.Verify(
                 mock => mock.UpdateDancer(It.IsAny<Dancer>(), It.IsAny<CancellationToken>()),
@@ -202,7 +202,7 @@ namespace UnitTests.Core.Services
 
             var result = await _dancerService.MigrateDancer(requestModel, CancellationToken.None);
             
-            Assert.Equal(ResultStatus.NotFound, result.Status);
+            Assert.Equal(ResultCode.NotFound, result.ResultCode);
             
             _dancerRepository2.Verify(
                 mock => mock.UpdateDancer(It.IsAny<Dancer>(), It.IsAny<CancellationToken>()),
@@ -242,8 +242,8 @@ namespace UnitTests.Core.Services
 
             var result = await _dancerService.UpdateDancerAsync(requestModel, CancellationToken.None);
             
-            Assert.True(result.IsSuccess);
-            Assert.Equal(initialDancer.Id, result.Value.Id);
+            Assert.Equal(ResultCode.Ok, result.ResultCode);
+            Assert.Equal(initialDancer.Id, result.Value.Value.Id);
 
             _dancerRepository2.Verify(r =>
                 r.UpdateDancer(It.Is<Dancer>(value =>
@@ -275,7 +275,7 @@ namespace UnitTests.Core.Services
         
             var result = await _dancerService.UpdateDancerAsync(requestModel, CancellationToken.None);
             
-            Assert.Equal(ResultStatus.NotFound, result.Status);
+            Assert.Equal(ResultCode.NotFound, result.ResultCode);
             _dancerRepository2.Verify(r =>
                 r.UpdateDancer(It.IsAny<Dancer>(), It.IsAny<CancellationToken>()), Times.Never
             );
@@ -299,9 +299,9 @@ namespace UnitTests.Core.Services
 
             var result = await _dancerService.CreateDancerAsync(requestModel, CancellationToken.None);
             
-            Assert.True(result.IsSuccess);
+            Assert.Equal(ResultCode.Ok, result.ResultCode);
             Assert.True(
-                result.Value.AuthenticationId == requestModel.AuthId
+                result.Value.Value.AuthenticationId == requestModel.AuthId
             );
             
             _dancerRepository2.Verify(r =>
@@ -330,7 +330,7 @@ namespace UnitTests.Core.Services
             ).Returns(repositoryResponse);
             
             var result = await _dancerService.CreateDancerAsync(requestModel, CancellationToken.None);
-            Assert.Equal(ResultStatus.Error,result.Status);
+            Assert.Equal(ResultCode.Conflict,result.ResultCode);
             _dancerRepository2.Verify(r =>
                 r.UpdateDancer(It.IsAny<Dancer>(), It.IsAny<CancellationToken>()), Times.Never
             );
@@ -352,7 +352,7 @@ namespace UnitTests.Core.Services
 
             var result = _dancerService.GetDancerBadges(id);
             
-            Assert.Equal(ResultStatus.Ok, result.Status);
+            Assert.Equal(ResultCode.Ok, result.ResultCode);
             Assert.Equal(badges, result.Value);
         }
 
@@ -367,8 +367,8 @@ namespace UnitTests.Core.Services
 
             var result = _dancerService.GetDancerBadges(id);
             
-            Assert.Equal(ResultStatus.Ok, result.Status);
-            Assert.Empty(result.Value);
+            Assert.Equal(ResultCode.Ok, result.ResultCode);
+            Assert.Empty(result.Value.Value);
         }
 
         #endregion
@@ -385,7 +385,7 @@ namespace UnitTests.Core.Services
             ).ReturnsAsync(true);
 
             var result = await _dancerService.AddBadgeToDancer(dancerGuid, badgeGuid, CancellationToken.None);
-            Assert.True(result);
+            Assert.Equal(ResultCode.Ok, result.ResultCode);
             _dancerRepository2.Verify(r =>
                 r.AddBadgeToDancer(
                     It.Is<Guid>(value => value.Equals(dancerGuid)),
@@ -409,7 +409,7 @@ namespace UnitTests.Core.Services
             ).ReturnsAsync(true);
 
             var result = await _dancerService.RemoveBadgeFromDancer(dancerGuid, badgeGuid, CancellationToken.None);
-            Assert.True(result);
+            Assert.Equal(ResultCode.Ok, result.ResultCode);
             _dancerRepository2.Verify(r =>
                     r.RemoveBadgeFromDancer(
                         It.Is<Guid>(value => value.Equals(dancerGuid)),
@@ -433,7 +433,7 @@ namespace UnitTests.Core.Services
 
             var result = await _dancerService.SetAvatarForDancerByAuthId(authId, Stream.Null, CancellationToken.None);
             
-            Assert.False(result);
+            Assert.Equal(ResultCode.BadRequest, result.ResultCode);
             _dancerRepository2.Verify(r =>
                 r.GetDancerByAuthId(It.Is<string>(value => value.Equals(authId))),
                 Times.Once);
@@ -462,7 +462,7 @@ namespace UnitTests.Core.Services
             ).Returns(dancer);
 
             var result = await _dancerService.SetAvatarForDancerByAuthId(dancer.AuthenticationId, formFile.OpenReadStream(), CancellationToken.None);
-            Assert.True(result);
+            Assert.Equal(ResultCode.Ok, result.ResultCode);
             
             _dancerRepository2.Verify(r =>
                     r.UpdateDancer(It.Is<Dancer>(
@@ -492,7 +492,7 @@ namespace UnitTests.Core.Services
             ).Returns(dancer);
 
             var result = await _dancerService.SetAvatarForDancerByAuthId(dancer.AuthenticationId, formFile.OpenReadStream(), CancellationToken.None);
-            Assert.True(result);
+            Assert.Equal(ResultCode.Ok, result.ResultCode);
             
             expectedImageSizes.ForEach(size =>
             {

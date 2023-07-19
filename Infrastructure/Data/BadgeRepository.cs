@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Application.Core.Entities;
 using Application.Core.Interfaces.Repositories;
 using Application.Core.Models.Badge;
-using Ardalis.Specification.EntityFrameworkCore;
-using JetBrains.Annotations;
 
 namespace Infrastructure.Data;
 
@@ -17,8 +17,16 @@ public class BadgeRepository : IBadgeRepository
     {
         _context = context;
     }
-    
-    [CanBeNull]
+
+    public async Task<bool> CreateBadge(Badge badge, CancellationToken cancellationToken)
+    {
+        await _context
+            .Badges
+            .AddAsync(badge, cancellationToken);
+        await _context.SaveChangesAsync(cancellationToken);
+        return true;
+    }
+
     public Badge GetBadgeById(Guid id)
     {
         return _context

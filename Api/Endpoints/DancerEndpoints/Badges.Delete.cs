@@ -1,9 +1,10 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Core.Interfaces.Services;
+using Application.Core.Models;
 using AusDdrApi.Attributes;
-using AusDdrApi.Extensions;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -31,6 +32,11 @@ public class Badges_Delete : ControllerBase
     public async Task<ActionResult> HandleAsync([FromRoute] RevokeBadgeFromDancerByIdRequest request, CancellationToken cancellationToken = new())
     {
         var result = await _dancerService.RemoveBadgeFromDancer(request.DancerId, request.BadgeId, cancellationToken);
-        return result ? Ok() : BadRequest();
+        return result.ResultCode switch
+        {
+            ResultCode.Ok => Ok(),
+            ResultCode.BadRequest => BadRequest(),
+            _ => StatusCode(StatusCodes.Status500InternalServerError),
+        };
     }
 }

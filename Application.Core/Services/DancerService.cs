@@ -8,8 +8,9 @@ using Application.Core.Entities;
 using Application.Core.Interfaces;
 using Application.Core.Interfaces.Repositories;
 using Application.Core.Interfaces.Services;
+using Application.Core.Models;
 using Application.Core.Models.Dancer;
-using Ardalis.Result;
+using Microsoft.CodeAnalysis;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
 
@@ -30,29 +31,62 @@ namespace Application.Core.Services
         {
             var skip = page * limit;
             var dancers = _dancerRepository.GetDancers(skip, limit);
-            return Result<IEnumerable<Dancer>>.Success(dancers);
+            return new Result<IEnumerable<Dancer>>
+            {
+                ResultCode = ResultCode.Ok,
+                Value = new Optional<IEnumerable<Dancer>>(dancers)
+            };
         }
 
         public Result<Dancer> GetDancerById(Guid id)
         {
             var dancer = _dancerRepository.GetDancerById(id);
-            return dancer != null ? Result<Dancer>.Success(dancer) : Result<Dancer>.NotFound();
+            return dancer != null
+                ? new Result<Dancer>
+                {
+                    ResultCode = ResultCode.Ok,
+                    Value = dancer,
+                }
+                : new Result<Dancer>
+                {
+                    ResultCode = ResultCode.NotFound, 
+                    Value = new Optional<Dancer>(),
+                };
         }
 
         public async Task<Result<Dancer>> MigrateDancer(MigrateDancerRequestModel requestModel,
             CancellationToken cancellationToken)
         {
             var dancer = _dancerRepository.GetDancerByAuthId(requestModel.AuthId);
-            if (dancer != null) return Result<Dancer>.Success(dancer);
-            if (requestModel.LegacyId == null) return Result<Dancer>.NotFound();
+            if (dancer != null) return new Result<Dancer>
+            {
+                ResultCode = ResultCode.Ok, 
+                Value = dancer
+                
+            };
+            if (requestModel.LegacyId == null) return new Result<Dancer>
+                {
+                    ResultCode = ResultCode.NotFound, 
+                    Value = new Optional<Dancer>(),
+                };
             
             dancer = _dancerRepository.GetDancerByAuthId(requestModel.LegacyId);
-            if (dancer == null) return Result<Dancer>.NotFound();
+            if (dancer == null) return new Result<Dancer>
+            {
+                ResultCode = ResultCode.NotFound,
+                Value = new Optional<Dancer>(),
+                
+            };
 
             dancer.AuthenticationId = requestModel.AuthId;
             await _dancerRepository.UpdateDancer(dancer, cancellationToken);
 
-            return Result<Dancer>.Success(dancer);
+            return new Result<Dancer>
+            {
+                ResultCode = ResultCode.Ok, 
+                Value = dancer
+                
+            };
         }
 
         public async Task<Result<Dancer>> CreateDancerAsync(CreateDancerRequestModel requestModel,
@@ -61,7 +95,11 @@ namespace Application.Core.Services
             var dancer = _dancerRepository.GetDancerByAuthId(requestModel.AuthId);
             if (dancer != null)
             {
-                return Result<Dancer>.Error("Dancer already exists");
+                return new Result<Dancer>
+                {
+                    ResultCode = ResultCode.Conflict,
+                    Value = dancer
+                };
             }
 
             dancer = new Dancer
@@ -75,7 +113,11 @@ namespace Application.Core.Services
             };
 
             await _dancerRepository.CreateDancer(dancer, cancellationToken);
-            return Result<Dancer>.Success(dancer);
+            return new Result<Dancer>
+            {
+                ResultCode = ResultCode.Ok,
+                Value = dancer
+            };
         }
 
         public async Task<Result<Dancer>> UpdateDancerAsync(UpdateDancerRequestModel requestModel, CancellationToken cancellationToken)
@@ -83,7 +125,11 @@ namespace Application.Core.Services
             var dancer = _dancerRepository.GetDancerByAuthId(requestModel.AuthId);
             if (dancer == null)
             {
-                return Result<Dancer>.NotFound();
+                return new Result<Dancer>
+                {
+                    ResultCode = ResultCode.NotFound,
+                    Value = new Optional<Dancer>(),
+                };
             }
 
             dancer.State = requestModel.State;
@@ -92,31 +138,50 @@ namespace Application.Core.Services
             dancer.PrimaryMachineLocation = requestModel.PrimaryMachineLocation;
 
             await _dancerRepository.UpdateDancer(dancer, cancellationToken);
-            return Result<Dancer>.Success(dancer);
+            return new Result<Dancer>
+            {
+                ResultCode = ResultCode.Ok,
+                Value = dancer,
+            };
         }
 
         public Result<IEnumerable<GetDancerBadgesResponseModel>> GetDancerBadges(Guid id)
         {
             var badges = _dancerRepository.GetBadgesForDancer(id);
-            return Result<IEnumerable<GetDancerBadgesResponseModel>>.Success(badges);
+            return new Result<IEnumerable<GetDancerBadgesResponseModel>>
+            {
+                ResultCode = ResultCode.Ok,
+                Value = new Optional<IEnumerable<GetDancerBadgesResponseModel>>(badges)
+            };
         }
 
-        public async Task<bool> AddBadgeToDancer(Guid dancerId, Guid badgeId, CancellationToken cancellationToken)
+        public async Task<Result> AddBadgeToDancer(Guid dancerId, Guid badgeId, CancellationToken cancellationToken)
         {
-            return await _dancerRepository.AddBadgeToDancer(dancerId, badgeId, cancellationToken);
+            await _dancerRepository.AddBadgeToDancer(dancerId, badgeId, cancellationToken);
+            return new Result
+            {
+                ResultCode = ResultCode.Ok,
+            };
         }
 
-        public async Task<bool> RemoveBadgeFromDancer(Guid dancerId, Guid badgeId, CancellationToken cancellationToken)
+        public async Task<Result> RemoveBadgeFromDancer(Guid dancerId, Guid badgeId, CancellationToken cancellationToken)
         {
-            return await _dancerRepository.RemoveBadgeFromDancer(dancerId, badgeId, cancellationToken);
+            await _dancerRepository.RemoveBadgeFromDancer(dancerId, badgeId, cancellationToken);
+            return new Result
+            {
+                ResultCode = ResultCode.Ok,
+            };
         }
 
-        public async Task<bool> SetAvatarForDancerByAuthId(string authId, Stream fileStream, CancellationToken cancellationToken)
+        public async Task<Result> SetAvatarForDancerByAuthId(string authId, Stream fileStream, CancellationToken cancellationToken)
         {
             var dancer = _dancerRepository.GetDancerByAuthId(authId);
             if (dancer == null)
             {
-                return false;
+                return new Result
+                {
+                    ResultCode = ResultCode.BadRequest,
+                };
             }
             var imageSizes = new List<int>() {128, 256};
             var baseImage = await Image.LoadAsync(fileStream, cancellationToken);
@@ -133,7 +198,10 @@ namespace Application.Core.Services
             await _dancerRepository.UpdateDancer(dancer, cancellationToken);
 
             await Task.WhenAll(uploadProcess);
-            return true;
+            return new Result
+            {
+                ResultCode = ResultCode.Ok,
+            };
         }
     }
 }

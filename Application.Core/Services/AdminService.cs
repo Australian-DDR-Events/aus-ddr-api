@@ -6,7 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Application.Core.Interfaces;
 using Application.Core.Interfaces.Services;
-using Ardalis.Result;
+using Application.Core.Models;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
 
@@ -21,7 +21,7 @@ public class AdminService : IAdminService
         _fileStorage = fileStorage;
     }
     
-    public async Task<Result<bool>> UploadImage(string filePath, Stream fileStream, IList<Tuple<int, int>> sizes, CancellationToken cancellationToken)
+    public async Task<Result> UploadImage(string filePath, Stream fileStream, IList<Tuple<int, int>> sizes, CancellationToken cancellationToken)
     {
         var baseImage = await Image.LoadAsync(fileStream, cancellationToken);
             
@@ -35,6 +35,9 @@ public class AdminService : IAdminService
         });
 
         await Task.WhenAll(uploadProcess);
-        return Result<bool>.Success(true);
+        return new Result
+        {
+            ResultCode = ResultCode.Ok
+        };
     }
 }

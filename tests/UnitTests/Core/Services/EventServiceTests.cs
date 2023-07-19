@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Application.Core.Entities;
 using Application.Core.Interfaces.Repositories;
 using Application.Core.Interfaces.Services;
+using Application.Core.Models;
 using Application.Core.Services;
 using Moq;
 using Xunit;
@@ -41,7 +42,7 @@ public class EventServiceTests
         
         var result = await _eventService.GetEventsAsync(new CancellationToken());
         
-        Assert.True(result.IsSuccess);
+        Assert.Equal(ResultCode.Ok, result.ResultCode);
         Assert.Equal(repositoryResponse, result.Value);
         
         _repository.Verify(mock => mock.GetEvents(), Times.Once());

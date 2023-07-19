@@ -15,8 +15,9 @@ public class AuthCodeExchangeResponse
     public int ExpiresIn { get; set; }
         
     [JsonPropertyName("refresh_token")] 
-    [CanBeNull] 
-    public string RefreshToken { get; set; }
+    #nullable enable
+    public string? RefreshToken { get; set; }
+    #nullable disable
         
     [JsonPropertyName("scope")]
     public string Scope { get; set; }

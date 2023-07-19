@@ -1,10 +1,10 @@
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Core.Interfaces;
 using Application.Core.Interfaces.Services;
-using AusDdrApi.Extensions;
+using Application.Core.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -39,6 +39,11 @@ public class Avatar_Set : ControllerBase
             return new BadRequestResult();
         }
         var result = await _dancerService.SetAvatarForDancerByAuthId(userInfo.UserId, request.Image.OpenReadStream(), cancellationToken);
-        return result ? Ok() : NotFound();
+        return result.ResultCode switch
+        {
+            ResultCode.Ok => Ok(),
+            ResultCode.BadRequest => BadRequest(),
+            _ => StatusCode(StatusCodes.Status500InternalServerError),
+        };
     }
 }

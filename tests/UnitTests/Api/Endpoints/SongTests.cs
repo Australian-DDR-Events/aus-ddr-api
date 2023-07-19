@@ -4,9 +4,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using Application.Core.Entities;
 using Application.Core.Interfaces.Services;
+using Application.Core.Models;
 using Application.Core.Models.Song;
-using Ardalis.Result;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis;
 using Moq;
 using Xunit;
 using SongEndpoints = AusDdrApi.Endpoints.SongEndpoints;
@@ -72,7 +73,11 @@ public class SongTests
 
         _songService.Setup(s =>
             s.GetSong(It.IsAny<Guid>())
-        ).Returns(Result<Song>.Success(song));
+        ).Returns(new Result<Song>
+        {
+            ResultCode = ResultCode.Ok,
+            Value = song
+        });
 
         var response = new SongEndpoints.GetById(_songService.Object).HandleAsync(request, CancellationToken.None);
 
@@ -98,7 +103,11 @@ public class SongTests
 
         _songService.Setup(s =>
             s.GetSong(It.IsAny<Guid>())
-        ).Returns(Result<Song>.NotFound());
+        ).Returns(new Result<Song>
+        {
+            ResultCode = ResultCode.NotFound,
+            Value = new Optional<Song>()
+        });
 
         var response = new SongEndpoints.GetById(_songService.Object).HandleAsync(request, CancellationToken.None);
 

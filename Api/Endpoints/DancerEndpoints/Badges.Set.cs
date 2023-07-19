@@ -1,8 +1,10 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Core.Interfaces.Services;
+using Application.Core.Models;
 using AusDdrApi.Attributes;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -30,6 +32,12 @@ public class Badges_Set : ControllerBase
     public async Task<ActionResult> HandleAsync([FromRoute] AddBadgeToDancerByIdRequest request, CancellationToken cancellationToken = new CancellationToken())
     {
         var result = await _dancerService.AddBadgeToDancer(request.DancerId, request.BadgeId, cancellationToken);
-        return result ? Ok() : BadRequest();
+
+        return result.ResultCode switch
+        {
+            ResultCode.Ok => Ok(),
+            ResultCode.NotFound => BadRequest(),
+            _ => StatusCode(StatusCodes.Status500InternalServerError),
+        };
     }
 }

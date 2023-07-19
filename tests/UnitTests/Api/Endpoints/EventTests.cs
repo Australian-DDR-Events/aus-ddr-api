@@ -5,8 +5,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Application.Core.Entities;
 using Application.Core.Interfaces.Services;
-using Ardalis.Result;
+using Application.Core.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis;
 using Moq;
 using Xunit;
 using EventEndpoints = AusDdrApi.Endpoints.EventEndpoints;
@@ -36,7 +37,11 @@ public class EventTests
 
         _eventService.Setup(es =>
             es.GetEventsAsync(It.IsAny<CancellationToken>())
-        ).Returns(Task.FromResult(Result<IEnumerable<Event>>.Success(serviceResponse)));
+        ).Returns(Task.FromResult(new Result<IEnumerable<Event>>
+        {
+            ResultCode = ResultCode.Ok,
+            Value = new Optional<IEnumerable<Event>>(serviceResponse)
+        }));
 
         var result = await new EventEndpoints.List(_eventService.Object).HandleAsync(CancellationToken.None);
         Assert.IsType<OkObjectResult>(result.Result);

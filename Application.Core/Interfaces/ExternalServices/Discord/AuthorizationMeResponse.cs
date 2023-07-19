@@ -1,5 +1,3 @@
-using JetBrains.Annotations;
-
 namespace Application.Core.Interfaces.ExternalServices.Discord;
 
 public class AuthorizationMeResponse

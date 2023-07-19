@@ -1,12 +1,11 @@
 using System;
 using System.Collections.Generic;
-using Application.Core.Entities;
 
 namespace Application.Core.Models.Strategies;
 
 public class SongScoreStrategyModel
 {
-    public Score Score { get; set; }
+    public Entities.Score Score { get; set; }
     public StoredData Data { get; set; }
 
     public class StoredData

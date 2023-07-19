@@ -4,9 +4,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Application.Core.Entities;
 using Application.Core.Interfaces.Repositories;
+using Application.Core.Models;
 using Application.Core.Models.Song;
 using Application.Core.Services;
-using Ardalis.Result;
 using Moq;
 using Xunit;
 
@@ -67,8 +67,8 @@ public class SongServiceTests
 
         var result = _songService.GetSong(song.Id);
         
-        Assert.True(result.IsSuccess);
-        Assert.Equal(song.Id, result.Value.Id);
+        Assert.Equal(ResultCode.Ok, result.ResultCode);
+        Assert.Equal(song.Id, result.Value.Value.Id);
         
         _songRepository.Verify(r =>
                 r.GetSong(It.Is<Guid>(value => value.Equals(song.Id))),
@@ -84,7 +84,7 @@ public class SongServiceTests
 
         var result = _songService.GetSong(Guid.NewGuid());
         
-        Assert.Equal(ResultStatus.NotFound, result.Status);
+        Assert.Equal(ResultCode.NotFound, result.ResultCode);
     }
 
     #endregion

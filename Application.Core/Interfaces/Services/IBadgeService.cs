@@ -2,8 +2,8 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Core.Entities;
+using Application.Core.Models;
 using Application.Core.Models.Badge;
-using Ardalis.Result;
 
 namespace Application.Core.Interfaces.Services
 {

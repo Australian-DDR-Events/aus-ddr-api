@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Application.Core.Entities;
 using Application.Core.Interfaces.Repositories;
+using JetBrains.Annotations;
 
 namespace Infrastructure.Data;
 
@@ -26,5 +27,12 @@ public class ChartRepository : IChartRepository
             .AddAsync(chart, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);
         return true;
+    }
+
+    public Chart GetChartById(Guid chartId)
+    {
+        return _context
+            .Charts
+            .FirstOrDefault(c => c.Id.Equals(chartId));
     }
 }

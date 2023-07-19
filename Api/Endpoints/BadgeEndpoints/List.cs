@@ -1,10 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
-using Application.Core.Entities;
 using Application.Core.Interfaces.Services;
-using AusDdrApi.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -20,7 +17,7 @@ public class List : ControllerBase
         _badgeService = badgeService;
     }
     
-    [HttpGet("/badges")]
+    [HttpGet(GetBadgesRequest.Route)]
     [SwaggerOperation(
         Summary = "Gets a collection of Badges",
         Description = "Gets a collection of badges based on paging request",

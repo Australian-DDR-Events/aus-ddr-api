@@ -56,7 +56,7 @@ namespace Infrastructure
                 }
                 default:
                 {
-                    var credentials = new InstanceProfileAWSCredentials();
+                    var credentials = new BasicAWSCredentials(configuration["AwsConfiguration:AccessKey"], configuration["AwsConfiguration:SecretKey"]);
                     var region = RegionEndpoint.GetBySystemName(configuration["AwsConfiguration:Region"]);
                     var client = new AmazonS3Client(credentials, region);
                     var awsConfiguration = configuration.GetSection("AwsConfiguration").Get<AwsConfiguration>();
